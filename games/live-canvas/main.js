@@ -1,3 +1,4 @@
+import { createPilot } from './pilot.js';
 import { initial, patch, validate, projection } from './state.js';
 
 export default function create(host, { save }) {
@@ -34,7 +35,10 @@ export default function create(host, { save }) {
   const status = document.createElement('div');
   status.className = 'lc-status';
   status.setAttribute('role', 'status');
-  status.textContent = 'An empty canvas. Your live director creates what comes next.';
+  const isEmptyWorld = JSON.stringify(state.world) === JSON.stringify(initial().world);
+  status.textContent = isEmptyWorld
+    ? 'An empty canvas. Your live director creates what comes next.'
+    : '';
   controls.append(status);
   root.append(controls);
   host.root.append(root);
@@ -169,16 +173,20 @@ export default function create(host, { save }) {
     player('text', { target: selected, text }, 'Your intention was heard.');
   };
   renderWorld();
+  const pilot = createPilot({ root, stage, state, host, player, persist });
   return {
-    serialize: () => structuredClone(state),
-    inspect: () => projection(state),
+    step: dt => pilot.step(dt),
+    serialize: () => ({ ...structuredClone(state), pilot: pilot.snapshot() }),
+    inspect: () => ({ ...projection(state), pilot: pilot.inspect() }),
     versions: () => ({ ...state.versions }),
     capabilities: () => [
+      pilot.capability,
       { name: 'world.apply', description: 'Atomically set/delete paths relative to this game-owned world. Validate whole result before mutation. Arrays replaced whole. See games/live-canvas/AUTHORING.md.', scopes: ['world', 'input'], inputSchema: { type: 'object', required: ['operations'], additionalProperties: false, properties: { operations: { type: 'array', minItems: 1, maxItems: 100 }, note: { type: 'string', maxLength: 500 } } } },
       { name: 'asset.bind', description: 'Bind generated image URL to an existing asset placeholder, without remounting or changing story state. Guard assets version. Use /assets/ URL returned by asset import.', scopes: ['assets'], inputSchema: { type: 'object', required: ['id', 'src'], additionalProperties: false, properties: { id: { type: 'string', maxLength: 64 }, src: { type: 'string', maxLength: 500000 } } } }
     ],
     command(name, args) {
       if (disposed) throw new Error('LIVE_CANVAS: Instance disposed. Re-observe active release.');
+      if (name === 'pilot.configure') return pilot.configure(args);
       let next;
       if (name === 'world.apply') next = patch(state.world, args.operations);
       else if (name === 'asset.bind') {
@@ -191,11 +199,12 @@ export default function create(host, { save }) {
       if (name === 'world.apply') state.versions.world++;
       if (assetsChanged) state.versions.assets++;
       renderWorld();
+      pilot.refresh();
       status.textContent = '';
       host.emit('world.changed', args.note || (name === 'asset.bind' ? 'A visual is ready.' : 'The world changed.'), { command: name, versions: { ...state.versions } });
       persist();
       return { applied: true, changed: true, versions: { ...state.versions } };
     },
-    dispose() { disposed = true; root.remove(); }
+    dispose() { disposed = true; pilot.dispose(); root.remove(); }
   };
 }

@@ -7,14 +7,75 @@ the running server rather than assuming a saved example matches its version.
 
 ## Start with the live loop
 
-Fresh installs open Live Canvas; valid remembered sessions stay selected. Discover
-the actual game's capabilities and focused projection, then attach a real director
-with the [live runtime contract](live-runtime.md). Listen, interpret player input,
-apply guarded game-owned commands, await durable acknowledgment, and listen again.
-A model is not silently started by opening the page. Do not substitute another
-one-shot authored demo for this loop. Publish code only when a desired behavior is
-not available through the game's commands. The optional probe is not an engine
-scene or component schema; arbitrary code packs remain free to expose their own.
+Fresh installs open Live Canvas; valid remembered sessions stay selected. Resolve
+the intended session, discover its capabilities once, and attach an actual agent.
+Opening the page does not start a model. The game owns arbitrary code, local
+controls, simulation and save shape; reusable transport and durability wiring do
+not require a component catalog or scene schema.
+
+Keep movement, held keys and other continuous interaction local. The director
+reacts to semantic milestones such as an intention, collision, discovery or changed
+objective, not every frame. Balance speed with creative and mechanical quality:
+reduce redundant context and tool work, not the depth or expressiveness of the
+game. An early consequence or progressive response is useful when it serves play,
+not a requirement that every response be tiny. Complex visuals and mechanics may
+legitimately take longer; explain what is being built and keep existing play usable. Ordinary plot changes and surprising
+player intentions should use compact guarded commands. Do not regenerate the
+whole game for each interaction or publish source just to change its story.
+
+### The director's working loop
+
+Use the exact CLI/MCP schemas in [live-runtime.md](live-runtime.md):
+
+1. Attach with a stable, independent consumer and retain its connection token.
+2. Wait for incremental events. A delivered turn includes its director token,
+   release/run and versions; reuse that context and inspect only missing or stale
+   focused state. Do not bootstrap or fetch history again on every turn.
+3. Issue a discovered game command with the turn's director token, observed
+   release/run, required scope versions and a unique request ID. Set top-level
+   `causeEventId` to the triggering event's `data.eventId` for causal timing.
+4. Await `runtime.command.result` or a compact receipt showing durable success.
+   Queued is not applied. On stale guards, reassess current evidence; on uncertain
+   delivery, check the same request ID before retrying.
+5. Finish the delivered turn using its `nextCursor`, then wait again, including
+   after empty timeouts. Detach when stopping; reattach after a restart/expired lease.
+
+Listening means a wait is actually pending, not merely attached. Keep command
+receipts small. `inspect --scope commands --id REQUEST_ID` locates one receipt;
+use singular `command` inspection for full arguments only if needed. Never carry
+base64 assets or the whole history through routine host turns.
+
+### Spend context on the game, not repeated plumbing
+
+Cache stable discovered capabilities and schemas by game/release. Refresh on
+activation or evidence that the contract changed, not on every input; live scope
+versions and run guards still come from current turn context. Consume deltas from
+the delivered cursor and inspect only the scopes needed for the next decision.
+Prefer the supported long-poll wait and delivered result events over repetitive
+status polling; a pending command may need a focused receipt check, not a fresh
+history dump. Reuse already valid source and assets instead of regenerating them.
+
+Compact transport receipts and focused inspection leave more context for coherent
+world state, rich prose, art direction and deeper mechanics. They are not content
+length limits or an instruction to simplify the player's requested experience.
+
+### Artwork and genuinely new behavior
+
+Run asset creation and capability implementation independently when their
+dependencies permit. Deliver useful intermediate results when available, but allow
+necessary design, generation and integration time rather than substituting shallow
+placeholders for the requested result. `work start` records guarded work; it does not launch
+a worker. Confirm the assigned worker is actually running, especially when reusing
+a completed task: sending a message alone may not restart it. Complete work only
+with its matching token and still-valid target, then await command acknowledgment.
+
+Import a generated file with `asset` and bind its immutable URL using the game's
+existing command (or guarded work completion). This need not publish source or
+remount the world. If the requested behavior really is new, edit and publish code
+while preserving the current save, await activation, then exercise the new controls.
+Never claim “hold left/right” works because that caption or a new choice appeared.
+See [live-session-notes.md](live-session-notes.md) for the bounded evidence behind
+these priorities, not a reusable game script.
 
 ## Select the host profile before authoring
 
@@ -78,13 +139,13 @@ one and discover its actual action schemas:
 ```sh
 node src/agent/cli.js session --op open --session SESSION_ID
 node src/agent/cli.js discover --session SESSION_ID
-node src/agent/cli.js observe --session SESSION_ID --consumer game-host --bootstrap
+node src/agent/cli.js director --session SESSION_ID --op attach --consumer game-host
 ```
 
-`SESSION_ID` is a placeholder. Keep the returned revision and delivered cursor.
-Inspect only relevant state, for example `inspect --scope variables`, or the
-specific entity and scene IDs you observed. Acknowledge only events actually read.
-Use a separate consumer for independent reviewers.
+`SESSION_ID` is a placeholder. Continue with director wait and keep its delivered
+cursor and turn context. For legacy structured-world packs, use `observe` with a
+one-time bootstrap instead and inspect only relevant variables/entities. Acknowledge
+only events actually read. Use a separate consumer for independent reviewers.
 
 For code packs, frame simulation and save state are browser-local. Server metadata
 tracks release activation, coarse checkpoints, command delivery, and events.
@@ -162,23 +223,12 @@ runtime remains. Confirm the active release, inspect a browser screenshot, and
 exercise the changed mechanic. Do not send follow-up commands against an assumed
 new release.
 
-The running game can expose its own command vocabulary and concise summary.
-The summary is the latest bounded `inspect()` snapshot, not a live frame read.
-Session state is likewise the latest durable coarse save. Correlate both with
-events and a fresh browser view before diagnosing current play:
-
-```sh
-node src/agent/cli.js inspect --session SESSION_ID --scope summary
-node src/agent/cli.js inspect --session SESSION_ID --scope commands
-node src/agent/cli.js command --json '{"sessionId":"SESSION_ID","expectedRelease":"OBSERVED_ACTIVE_RELEASE","requestId":"UNIQUE_COMMAND_ID","name":"GAME_DEFINED_COMMAND","args":{}}'
-```
-
-Use the observed `runtime.activeRelease` and a command actually implemented by the
-game. Delivery returns `PENDING`; observe `runtime.command.result` or inspect
-commands before assuming execution. The `commands` scope is not permission to
-invent a command name. Inspect source and the game's summary to understand its
-supported vocabulary. A command can support hosting, but do not bypass the
-player controls when validating whether the interaction is playable.
+The running game's capabilities define its command vocabulary; do not invent a
+command name from a caption. Use the director turn's release, run and scope guards
+as above. Outside that loop, inspect `projection` for these guards before sending
+a registered command. The summary/projection is bounded browser telemetry, not a
+live frame read; correlate it with semantic events and a fresh browser view when
+diagnosing play. A hosting command is not a substitute for player-control validation.
 
 Keep the previous source version before publishing. A world checkpoint is not a
 source-code backup. If using the existing checkpoint interface:
@@ -198,6 +248,21 @@ version is active, inspect a fresh screenshot, and use the new mechanic through
 real player controls. Correlate the visible result with the latest game summary/events. If publication fails,
 retain the last working view and report the exact failed step. Do not claim the
 last-good view is the new build.
+
+## Measure the response the player actually waits for
+
+Correlate a real input with `command.causeEventId`, then inspect `timings` for the
+matching browser `input-to-command-render` span after telemetry arrives. Record
+release/run, start-kind and endpoint: semantic emission and physical input are not
+identical starting points. Missing spans do not mean zero latency. Measure actual
+model/host turnaround separately from local input feedback, event acknowledgment,
+handler time, command acknowledgment and server queue-to-commit. Use each clock's
+own elapsed durations, never subtract browser and server wall clocks. A fast
+transport receipt does not establish an instant creative response, good controls,
+or enjoyment. Track complex visual generation and mechanic design/implementation
+separately from routine direction and engine delivery, including quality validation.
+Compare like work with like work: a longer, richer generation is not automatically
+a regression, and reduced output alone is not evidence of a tooling improvement.
 
 ## Independent replay, not a scripted victory lap
 

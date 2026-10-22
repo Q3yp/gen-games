@@ -118,3 +118,65 @@ release with the observed release guard; wait for runtime.activated and inspect
 actual play. Never eval player text. Nothing in the engine requires things, assets,
 world.apply, this renderer, a genre, or a component catalog. This tiny adapter is
 only a convenient first experiment in quick live state changes.
+
+## Optional local pilot (added from an actual player request)
+
+New ordinary JavaScript in `pilot.js` implements held-key steering, not an engine
+component. Existing saves receive disabled pilot state without changing their world.
+The director deliberately enables it with registered `pilot.configure`:
+
+`{enabled:true,gapCenter:62,gapWidth:22,speed:18}`
+
+Required scopes are **pilot** and **input**, plus usual release/run guards. It adds
+no characters, dialogue, destination or predetermined story outcome. It does not
+replace the imported background or any freely authored thing. Controls are left/right
+arrows or A/D, held while not typing. Opposing keys neutralize movement. A local
+heading indicator and illuminated opening show alignment. Holding a direction moves
+heading; forward approach coasts independently of held keys; an off-course approach safely holds near the gap
+instead of damaging or killing anything. Background roll/parallax and cloud drift
+respond locally, without agent requests per animation frame. Releasing keys holds the heading and commits the steering maneuver while coasting continues. Browser blur/visibility loss clears held keys too.
+
+Configuration fields: enabled (required boolean), gapCenter (5..95), gapWidth
+(10..60), speed (5..40 heading-percent/second), resetCourse (legacy optional boolean), nextLeg (new unique ID), courseLabel (1–80 characters), targetY (12..70).
+The full gap must fit 0..100. Gap defaults center 62, width 22, speed 18. Enabling
+preserves x/progress/passedGap; `resetCourse:true` explicitly resets approach and
+passedGap, not heading, completed-leg history or world. Prefer nextLeg with an explicit ID. Configuration while a steering key is held rejects; wait for
+the maneuver-end event and reassess. To turn controls off, enabled:false. No commands
+accept synthetic player steering; actual play must use the browser controls.
+
+Inspection adds `pilot:{enabled,x,progress,passedGap,gap:{center,width},speed,
+legId,courseLabel,targetY,completedLegs,maneuvering,coasting}`. x/progress describe
+current meaningful navigation, not frame counters.
+The pilot scope advances on maneuver start/end/configuration, never animation frames.
+Serialization captures current navigation progress so reconnect can resume coasting.
+There are no frame or held-key fields in saves. On reaching the opening aligned, passedGap becomes true once and a maneuver
+is committed. Further steering works, but never repeatedly emits crossing events for
+the same configured course. The director decides what being beyond it means.
+
+`player.intent` gains kind `pilot.start` with `{x,progress}` and kind `pilot` with
+`{legId,from:{x,progress},to:{x,progress},aligned,passedGap,reason}`. Reason is `released`,
+`interrupted` or `gap-crossed`. Both use the existing sequence/source/untrusted
+contract, advancing input. Reply to the actual maneuver result, not every key/frame.
+Configuration emits `pilot.configured` containing the committed pilot configuration.
+This is a small custom mechanic authored after play, not a mandatory reusable stage
+library. Publish source once, then configure/direct through commands.
+
+
+### Explicit next leg, preserving the earned crossing
+
+Publishing this change does not reset the completed first crossing or heading.
+Legacy passedGap:true saves migrate that crossing into completedLegs under leg-1.
+The director can start exactly one additional approach using:
+
+`{enabled:true,nextLeg:"window-approach",courseLabel:"Floating window",gapCenter:66,gapWidth:22,targetY:22}`
+
+This resets only the new leg's progress/passedGap, preserves heading and all prior
+completedLegs, and requires the observed pilot/input scopes. nextLeg must not equal
+the current or a previously completed ID. Each aligned arrival appends one history
+entry and emits one gap-crossed milestone. No next leg starts automatically, and no
+story destination/result is authored by this mechanic. The director interprets it.
+With no steering input, a roof on the correct heading continues forward; off-course
+it safely holds at 88% while the local display says which direction to steer.
+Local feedback always reflects the actual heading; do not narrate transient turn
+instructions in persistent character speech. Clear stale steering advice through
+ordinary world.apply when introducing the new course.

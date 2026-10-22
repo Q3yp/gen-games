@@ -56,8 +56,10 @@ node src/agent/cli.js inspect --session SESSION --scope projection --raw
 node src/agent/cli.js command --json '{"sessionId":"SESSION","name":"conversation.reply","args":{"text":"The figure answers."},"expectedRelease":"OBSERVED_RELEASE","expectedRunEpoch":1,"expectedVersions":{"conversation":3},"requestId":"reply-unique-1"}' --raw
 ```
 
-Every declared capability scope requires an expectedVersions entry. Registered
-commands also require expectedRunEpoch. Re-observe and reassess on STALE_SCOPE,
+Every declared capability scope requires a version guard. Registered commands also
+require a run guard. With a valid directorToken, omitted guards can inherit from
+the exact delivered turn snapshot as described below; ordinary commands still
+provide expectedVersions and expectedRunEpoch explicitly. Re-observe and reassess on STALE_SCOPE,
 STALE_RUN or STALE_RELEASE; do not blindly replace guards on stale generated work.
 Reusing a request ID with identical arguments returns its known state, not a second
 application. Queued is not applied: wait for runtime.command.result.
@@ -129,3 +131,47 @@ that tab's `performance.now()`. It measures a command render, not subjective use
 response quality, and includes durable acknowledgment delay. Missing/evicted origins,
 other tabs and reconnects intentionally produce no span. The command hook context
 also carries causeEventId. No game schema or mandatory correlation field is added.
+
+### Keep command context incremental
+
+Command replies, queued/result semantic events, and `inspect commands` contain
+concise receipts, not original arguments or embedded assets. The default command
+inspection includes pending commands plus the five latest completed receipts.
+Use `inspect commands --id REQUEST_ID` for one compact receipt, or explicitly
+`inspect command --id REQUEST_ID --raw` for that command's full durable arguments
+and result. The playing browser privately retrieves a queued command by ID before
+applying it; agent observation does not need to carry its executable inputs again.
+
+`inspect --scope timings --raw` exposes up to 30 recent spans through normal browser
+telemetry (usually the next checkpoint, not a per-frame event stream). Each includes
+`clock: browser.performance.now`, correlation ID, durationMs, release/run, and causal
+origin/endpoint labels where applicable. The enclosing observedAt is server receipt
+time, not an operand for elapsed-time calculation. Timings from another run are
+historical; absence of a matching causal span is not evidence of zero latency.
+
+### Short director commands without weakening guards
+
+A valid directorToken allows omitted expectedRelease, expectedRunEpoch, and required
+expectedVersions entries to inherit from the immutable metadata delivered by that
+turn's `director wait`. Only the command capability's declared scopes are inherited,
+not unrelated asset or character scopes. This saves repeated guard tokens, not
+creative content, and never reads newer state to repair stale work automatically.
+
+```sh
+node src/agent/cli.js command --json '{"sessionId":"SESSION","directorToken":"TURN_TOKEN","requestId":"reply-2","name":"conversation.reply","causeEventId":"INPUT_EVENT_ID","args":{"text":"A fully developed response can go here."}}' --raw
+```
+
+Explicit guards still override the corresponding inherited fields and are validated
+normally. A partial expectedVersions object inherits only missing required scopes.
+If a required scope was absent in the delivered snapshot, the request fails with
+DIRECTOR_SNAPSHOT_MISSING. If that scope has since changed, it fails with STALE_SCOPE;
+run/release changes invalidate the turn. Observe and reassess instead of patching
+stale guards. A second command changing the same scope within one turn must supply
+an explicitly re-observed version or start another turn; inheritance is not refreshed.
+
+Commands without directorToken keep their existing explicit guard requirements.
+Identical request-ID replay uses the original raw request fingerprint before token
+validation, so an already-applied command still reports its durable receipt after
+the turn expires. Changing omitted guards to explicit guards changes that raw request
+and is not an identical retry. The snapshot is bounded metadata, not another world
+save, and is not repeated in each command response.
