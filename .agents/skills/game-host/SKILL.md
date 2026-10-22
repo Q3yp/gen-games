@@ -81,3 +81,10 @@ campaign. Do not inherit an example's scene schema, HUD or combat skeleton merel
 because it exists. The default Live Canvas is an optional composition example,
 not the engine's creative boundary. Reuse lifecycle/transport/save wiring and
 preserve immutable releases; generate the world's concrete verbs and presentation.
+
+Before reporting that an iteration is enjoyable, ask the player-reviewer whether
+it would choose to continue this exact activity without a promised new scene.
+Weigh the ordinary minutes, not just the best reveal or ending. If the answer is
+no, label the iteration unsuccessful and repair its core activity before expanding
+it. Keep iteration reports internal until that judgment is earned; do not transfer
+the burden of rejecting an obviously unrewarding loop to the user.

@@ -1,0 +1,10 @@
+{
+  "id": "sunspindle",
+  "title": "Sunspindle",
+  "description": "A stolen sun on a thread. Break a way through the glass courtyard.",
+  "version": "0.1.0",
+  "runtime": "code",
+  "entry": "./main.js",
+  "saveVersion": 1,
+  "initial": {}
+}
