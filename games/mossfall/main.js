@@ -1,4 +1,11 @@
-import { AREAS, ENEMY_NAMES, newWorld, distance, objective } from './world.js';
+import {
+  AREAS,
+  ENEMY_NAMES,
+  newWorld,
+  distance,
+  objective,
+  objectsIn
+} from './world.js';
 import { act, choose, interact, enemies, nextStep, message } from './rules.js';
 import { paint } from './paint.js';
 
@@ -67,7 +74,7 @@ export default function create(host, { save }) {
     persist();
   }
   function nearbyObject() {
-    return AREAS[w.area].objects
+    return objectsIn(w)
       .filter(
         (o) =>
           !w.areas[w.area].taken.includes(o.id) && distance(o, w.player) <= 1
@@ -136,7 +143,7 @@ export default function create(host, { save }) {
       distance(enemy, w.player) <= (w.player.weapon === 'spear' ? 2 : 1)
     )
       return commit({ type: 'strike', id: enemy.id });
-    const object = AREAS[w.area].objects.find(
+    const object = objectsIn(w).find(
       (o) =>
         o.x === tile.x &&
         o.y === tile.y &&
@@ -178,7 +185,7 @@ export default function create(host, { save }) {
     top.append(quest);
     side.replaceChildren();
     const stats = document.createElement('div');
-    stats.innerHTML = `<span class="mf-overline">LANTERN BEARER</span><strong>${p.hp}<i> / ${p.maxHp}</i></strong><span class="mf-health"><b style="width:${(100 * p.hp) / p.maxHp}%"></b></span><p>HEALTH</p><div class="mf-focus">${'◆'.repeat(p.focus)}${'◇'.repeat(p.maxFocus - p.focus)}</div><p>FOCUS</p><hr><h3>${p.weapon === 'spear' ? 'Briar spear' : p.weapon === 'axe' ? 'Hearth axe' : 'Traveler’s blade'}</h3><p>${p.talent ? `Oath: ${p.talent}` : 'No oath · visit anvil'}</p><p>${p.shards} amber · ${p.tonics} tonics</p><p>${w.seals.length}/2 seals · beat ${w.turn}</p>`;
+    stats.innerHTML = `<span class="mf-overline">LANTERN BEARER</span><strong>${p.hp}<i> / ${p.maxHp}</i></strong><span class="mf-health"><b style="width:${(100 * p.hp) / p.maxHp}%"></b></span><p>HEALTH</p><div class="mf-focus">${'◆'.repeat(p.focus)}${'◇'.repeat(p.maxFocus - p.focus)}</div><p>FOCUS</p><hr><h3>${p.weapon === 'spear' ? 'Briar spear' : p.weapon === 'axe' ? 'Hearth axe' : 'Traveler’s blade'}</h3><p>${p.weapon === 'axe' ? 5 : 3} damage · ${p.weapon === 'spear' ? 2 : 1} tile reach</p><p>${p.talent ? `Oath: ${p.talent}` : 'No oath · visit anvil'}</p><p>Pulse: ${p.talent === 'warden' ? 3 : 2} damage within 2 tiles. Interrupt${p.talent === 'wayfarer' ? ' + push' : ''}.</p><p>${p.shards} amber · ${p.tonics} tonics</p><p>${w.seals.length}/2 seals · beat ${w.turn}</p><p>${p.xp < 3 ? `${p.xp}/3 foes → +4 max health` : 'Lantern awakened · +4 max health'}</p>`;
     side.append(stats);
     const visible = enemies(w).filter((e) => distance(e, p) <= 7);
     if (visible.length) {
@@ -209,8 +216,8 @@ export default function create(host, { save }) {
       button(`Q · Pulse (${p.talent === 'wayfarer' ? 1 : 2} focus)`, () =>
         commit({ type: 'pulse' })
       ),
-      button('Space · Brace +focus', () => commit({ type: 'guard' })),
-      button(`R · Tonic (${p.tonics})`, () => commit({ type: 'heal' }))
+      button('Space · Block 4 / +1 focus', () => commit({ type: 'guard' })),
+      button(`R · Heal 8 (${p.tonics})`, () => commit({ type: 'heal' }))
     );
     const near = nearbyObject();
     if (near)
@@ -262,7 +269,7 @@ export default function create(host, { save }) {
             travel = null;
           else {
             const target = travel,
-              o = AREAS[w.area].objects.find((o) => o.id === target.objectId);
+              o = objectsIn(w).find((o) => o.id === target.objectId);
             if (o && distance(o, w.player) <= 1) useObject(o);
             else {
               const step = nextStep(w, target.x, target.y);
@@ -299,6 +306,7 @@ export default function create(host, { save }) {
         character: w.player,
         seals: w.seals,
         won: w.won,
+        watchman: w.watchman || 'unmet',
         turn: w.turn,
         nearbyActors: enemies(w).map((e) => ({
           id: e.id,
@@ -308,6 +316,9 @@ export default function create(host, { save }) {
           nextAttack: e.intent
         })),
         claimedLoot: w.areas[w.area].taken,
+        people: objectsIn(w)
+          .filter((o) => o.kind === 'npc')
+          .map((o) => ({ id: o.id, name: o.name, position: [o.x, o.y] })),
         latest: w.log.slice(-3),
         commands: {
           help: 'Lists host commands',
@@ -320,6 +331,7 @@ export default function create(host, { save }) {
         return {
           area: w.area,
           objective: objective(w),
+          watchman: w.watchman || 'unmet',
           character: w.player,
           seals: w.seals,
           visited: Object.keys(w.areas).filter(

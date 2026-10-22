@@ -16,6 +16,14 @@ export const AREAS = {
     exits: [{ x: 14, y: 4, to: 'hollow', at: [0, 4], label: 'Briar Hollow →' }],
     objects: [
       { id: 'elder', kind: 'npc', x: 6, y: 3, name: 'Rowan' },
+      {
+        id: 'neri-home',
+        kind: 'npc',
+        x: 7,
+        y: 5,
+        name: 'Neri · home again',
+        requiresReturned: true
+      },
       { id: 'fire', kind: 'camp', x: 5, y: 5, name: 'Rest · restore health' },
       { id: 'forge', kind: 'npc', x: 9, y: 5, name: 'Anvil · shape your light' }
     ],
@@ -33,14 +41,22 @@ export const AREAS = {
       '#..~~.........#',
       '#..~~...##....#',
       '##...........##',
-      '###############'
+      '#######.#######'
     ],
     exits: [
+      { x: 7, y: 8, to: 'grove', at: [7, 1], label: '↓ Bell grove · optional' },
       { x: 0, y: 4, to: 'haven', at: [13, 4], label: '← Hearth' },
       { x: 14, y: 4, to: 'ruins', at: [0, 4], label: 'Drowned Archive →' },
       { x: 7, y: 0, to: 'heart', at: [7, 7], label: '↑ Heartwood · 2 seals' }
     ],
     objects: [
+      {
+        id: 'bell-guide',
+        kind: 'npc',
+        x: 7,
+        y: 7,
+        name: 'Neri’s bell trail · optional'
+      },
       {
         id: 'keeper',
         kind: 'seal',
@@ -90,6 +106,54 @@ export const AREAS = {
       { id: 'moth1', kind: 'moth', x: 7, y: 2, hp: 5 },
       { id: 'sentinel1', kind: 'sentinel', x: 10, y: 4, hp: 9 }
     ]
+  },
+  grove: {
+    name: 'The Bell Grove',
+    subtitle: 'OPTIONAL · spare the watchman or take his amber',
+    tiles: [
+      '#######.#######',
+      '##...........##',
+      '#.............#',
+      '#...##........#',
+      '#.............#',
+      '#.............#',
+      '#...##........#',
+      '##...........##',
+      '###############'
+    ],
+    exits: [
+      {
+        x: 7,
+        y: 0,
+        to: 'hollow',
+        at: [7, 7],
+        label: '↑ Briar Hollow · retreat freely'
+      }
+    ],
+    objects: [
+      {
+        id: 'bell-vow',
+        kind: 'npc',
+        x: 7,
+        y: 2,
+        name: 'Watchman’s vow · read first'
+      },
+      {
+        id: 'root-circle',
+        kind: 'seal',
+        x: 10,
+        y: 4,
+        name: 'Root circle · lure watchman here'
+      },
+      {
+        id: 'mercy-bell',
+        kind: 'camp',
+        x: 9,
+        y: 5,
+        name: 'Mercy bell · ring from beside it'
+      }
+    ],
+    enemies: []
   },
   heart: {
     name: 'The Hollow Crown',
@@ -168,6 +232,14 @@ export function distance(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 export function objective(w) {
+  if (w.area === 'grove')
+    return w.watchman === 'spared'
+      ? 'The watchman is free. Return to Rowan: hearth rests are now free.'
+      : w.watchman === 'slain'
+        ? 'The watchman fell. His amber is yours; the old pact is lost.'
+        : w.watchman === 'active'
+          ? 'Lure the living watchman onto the root circle, then ring the nearby bell. Or defeat him for amber.'
+          : 'Read the watchman’s vow. The optional trial begins only if you choose.';
   if (w.returned)
     return 'The hearth is whole. Explore, change your build, or await a new trail.';
   if (w.won) return 'Bring the living seed home to Rowan.';
@@ -176,4 +248,9 @@ export function objective(w) {
   if (!w.seals.includes('archive-seal'))
     return 'Recover the rain seal in the Drowned Archive.';
   return 'Open Heartwood north of Briar Hollow. Restore its living seed.';
+}
+
+/** Story-gated objects are shared by rendering, input and host inspection. */
+export function objectsIn(w) {
+  return AREAS[w.area].objects.filter((o) => !o.requiresReturned || w.returned);
 }

@@ -26,9 +26,7 @@
   left: 40px;
   top: 22px;
   right: 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: block;
   pointer-events: none;
 }
 .mf-top small,
@@ -47,10 +45,11 @@
   color: #e9dfbb;
 }
 .mf-top p {
-  max-width: 285px;
-  font-size: 15px;
-  line-height: 1.4;
-  text-align: right;
+  max-width: 850px;
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: left;
   color: #c9d5b1;
 }
 .mf-side {

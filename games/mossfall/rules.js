@@ -1,11 +1,8 @@
-import { AREAS, ENEMY_NAMES, walkable, distance, objective } from './world.js';
-export function message(w, text) {
-  w.log.push(text);
-  w.log = w.log.slice(-5);
-}
-export function enemies(w) {
-  return w.areas[w.area].enemies.filter((e) => e.hp > 0);
-}
+import { AREAS, ENEMY_NAMES, walkable, distance } from './world.js';
+import { message, enemies } from './state.js';
+export { message, enemies } from './state.js';
+export { interact, choose } from './interactions.js';
+
 function occupied(w, x, y) {
   return enemies(w).some((e) => e.x === x && e.y === y);
 }
@@ -41,13 +38,29 @@ function damageEnemy(w, e, amount, emit) {
   e.hp -= amount;
   message(w, `${ENEMY_NAMES[e.kind]} −${amount}`);
   if (e.hp <= 0) {
-    w.player.shards += e.kind === 'boss' ? 4 : 2;
+    if (e.id === 'grove-watchman') {
+      w.watchman = 'slain';
+      message(
+        w,
+        'The old pact is lost. You keep the watchman’s amber; the hearth still costs amber.'
+      );
+      emit('mossfall.watchman_choice', 'The watchman was slain', {
+        outcome: 'slain'
+      });
+    }
+    const amber = e.kind === 'boss' ? 4 : 2;
+    const focus = Math.min(1, w.player.maxFocus - w.player.focus);
+    w.player.shards += amber;
     w.player.xp++;
     w.player.focus = Math.min(w.player.maxFocus, w.player.focus + 1);
-    message(w, `${ENEMY_NAMES[e.kind]} falls. +2 amber · +1 focus`);
+    message(
+      w,
+      `${ENEMY_NAMES[e.kind]} falls. +${amber} amber · +${focus} focus`
+    );
     emit('mossfall.enemy_defeated', ENEMY_NAMES[e.kind], {
       enemy: e.id,
-      area: w.area
+      area: w.area,
+      reward: { amber, focus }
     });
     if (w.player.xp === 3) {
       w.player.maxHp += 4;
@@ -61,8 +74,10 @@ function plan(w, e) {
     dx = Math.sign(p.x - e.x),
     dy = Math.sign(p.y - e.y);
   if (e.kind === 'boss') {
-    // Alternate cross-shaped roots and a horizontal sweep; every tell has a one-step escape.
-    if (w.turn % 2)
+    // Count attacks, not global beats: planning every other beat aliases turn parity.
+    // Existing intent is never replaced; this advances only when a new tell is prepared.
+    e.attackCycle = (e.attackCycle ?? 1) + 1;
+    if (e.attackCycle % 2)
       return Array.from({ length: 15 }, (_, x) => ({ x, y: e.y })).concat(
         Array.from({ length: 9 }, (_, y) => ({ x: e.x, y }))
       );
@@ -114,7 +129,11 @@ function enemyTurn(w, guard, emit) {
           : e.kind === 'sentinel'
             ? 3
             : 1;
-    if (distance(e, w.player) <= range)
+    // Line attacks require actual alignment. A diagonal spear flank buys a beat,
+    // not an indefinitely safe damage loop against a stationary knight.
+    const aligned =
+      e.kind !== 'sentinel' || e.x === w.player.x || e.y === w.player.y;
+    if (distance(e, w.player) <= range && aligned)
       e.intent = plan(w, e).filter((t) => walkable(w.area, t.x, t.y));
     else {
       const options = [
@@ -137,6 +156,13 @@ function enemyTurn(w, guard, emit) {
         ) {
           e.x = x;
           e.y = y;
+          if (
+            e.kind === 'sentinel' &&
+            distance(e, w.player) <= range &&
+            (e.x === w.player.x || e.y === w.player.y)
+          ) {
+            e.intent = plan(w, e).filter((t) => walkable(w.area, t.x, t.y));
+          }
           break;
         }
       }
@@ -162,127 +188,6 @@ function enemyTurn(w, guard, emit) {
     );
     emit('mossfall.recovered', 'Returned to hearth', { lostAmber: loss });
   }
-}
-export function interact(w, object, emit) {
-  const p = w.player;
-  if (object.kind === 'camp') {
-    const cost = Math.min(1, p.shards);
-    p.shards -= cost;
-    p.hp = p.maxHp;
-    p.focus = p.maxFocus;
-    w.rests++;
-    message(
-      w,
-      `Restored at the hearth. ${cost ? '1 amber burned.' : 'The hearth shelters you for free.'} Defeated enemies stay defeated.`
-    );
-    return true;
-  }
-  if (object.id === 'elder') {
-    w.met = true;
-    if (w.won && !w.returned) {
-      w.returned = true;
-      emit('mossfall.homecoming', 'The living seed returned to the hearth', {
-        turn: w.turn,
-        deaths: w.deaths
-      });
-    }
-    w.dialog = {
-      title: w.won ? 'A forest begins again' : 'Rowan · keeper of the hearth',
-      text: w.won
-        ? 'You place the living seed in Rowan’s hands. The waters clear and Neri returns home. Your journey remains saved; explore the paths you left behind.'
-        : w.seals.length
-          ? 'Neri’s lantern is burning again. The rain seal lies east in the archive. When both seals sing, take the north path from Briar Hollow.'
-          : 'Neri carried our first seal into Briar Hollow. Free her from the wolves, then recover the rain seal in the archive to the east. Two seals open the north path to the Hollow Crown.',
-      choices: [{ label: 'I’ll carry the light', action: 'close' }]
-    };
-    return true;
-  }
-  if (object.id === 'forge') {
-    w.dialog = {
-      title: 'Shape your lantern',
-      text: p.talent
-        ? `Your oath: ${p.talent}. A new oath costs 3 amber. Your choice changes your lantern pulse.`
-        : 'Choose an oath, free the first time. Q unleashes your lantern pulse. Both paths can finish the journey.',
-      choices: [
-        {
-          label: 'Warden · pulse deals 3, stuns nearby foes',
-          action: 'warden'
-        },
-        {
-          label: 'Wayfarer · pulse costs 1, pushes foes back',
-          action: 'wayfarer'
-        },
-        { label: 'Leave the anvil', action: 'close' }
-      ]
-    };
-    return true;
-  }
-  if (w.areas[w.area].taken.includes(object.id)) return false;
-  if (object.kind === 'seal') {
-    if (enemies(w).length) {
-      message(w, 'The thorns hold fast. Defeat the enemies here first.');
-      return false;
-    }
-    w.areas[w.area].taken.push(object.id);
-    if (object.id === 'heart-seed') {
-      w.won = true;
-      message(w, 'The living seed is yours. Bring it home to Rowan.');
-    } else {
-      w.seals.push(object.id);
-      p.hp = Math.min(p.maxHp, p.hp + 6);
-      p.focus = p.maxFocus;
-      message(
-        w,
-        object.id === 'keeper'
-          ? 'Neri is free. “Take my seal. The second sleeps in the archive, east.” +6 health.'
-          : 'Rain seal recovered. The north gate in Briar Hollow opens. +6 health.'
-      );
-    }
-    emit('mossfall.quest_advanced', objective(w), {
-      seals: w.seals,
-      won: w.won
-    });
-    return true;
-  }
-  if (object.id === 'hollow-cache') {
-    w.dialog = {
-      title: 'A wayfarer’s last gift',
-      text: 'Choose one weapon. Your old blade stays in the chest, so you can switch here later.',
-      choices: [
-        {
-          label: 'Briar spear · strike from two tiles, damage 3',
-          action: 'spear'
-        },
-        { label: 'Hearth axe · adjacent strike, damage 5', action: 'axe' },
-        { label: 'Keep my blade · damage 3', action: 'close' }
-      ]
-    };
-    return true;
-  }
-  p.tonics++;
-  w.areas[w.area].taken.push(object.id);
-  message(w, 'Found a healing tonic. R restores 8 health and consumes a beat.');
-  return true;
-}
-export function choose(w, action) {
-  if (['warden', 'wayfarer'].includes(action)) {
-    if (w.player.talent && w.player.talent !== action && w.player.shards < 3) {
-      message(w, 'Changing your oath needs 3 amber.');
-      w.dialog = null;
-      return;
-    }
-    if (w.player.talent && w.player.talent !== action) w.player.shards -= 3;
-    w.player.talent = action;
-    message(w, `Oath of the ${action} chosen.`);
-  }
-  if (['spear', 'axe'].includes(action)) {
-    w.player.weapon = action;
-    message(
-      w,
-      `${action === 'spear' ? 'Briar spear' : 'Hearth axe'} equipped.`
-    );
-  }
-  w.dialog = null;
 }
 export function act(w, action, emit = () => {}) {
   if (w.dialog) return false;
@@ -351,6 +256,17 @@ export function act(w, action, emit = () => {}) {
     if (exit.to === 'heart' && w.seals.length < 2)
       message(w, 'The Heartwood gate needs Neri’s seal and the rain seal.');
     else {
+      // Add only the deliberately entered new area's state; never replace saved foes.
+      if (!w.areas[exit.to])
+        w.areas[exit.to] = {
+          taken: [],
+          enemies: AREAS[exit.to].enemies.map((e) => ({
+            ...e,
+            maxHp: e.hp,
+            intent: [],
+            stunned: 0
+          }))
+        };
       w.area = exit.to;
       [p.x, p.y] = exit.at;
       for (const e of enemies(w)) e.intent = [];
