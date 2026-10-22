@@ -149,7 +149,9 @@ async function mount(current, session, force = false) {
     previousRoot?.remove();
     $('#code-loading')?.remove();
     try { previous?.dispose?.(); } catch (error) { console.warn(error); }
-    $('#notice').hidden = true;
+    // Clear both the visual notice and its live-region copy after confirmed activation.
+    notify('');
+    $('#announcer').textContent = 'Game is running.';
     reportUI('ui.recovered', next.entry);
   } catch (error) {
     try { candidate?.dispose?.(); } catch { /* Keep the previous running game. */ }

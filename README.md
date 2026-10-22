@@ -10,7 +10,8 @@ No model API, subscription, cloud service, bundler, or production dependency is 
 npm start
 ```
 
-Open **http://127.0.0.1:3000**. In a second terminal:
+Open **http://127.0.0.1:3000** and choose **Menu → Mossfall** to start the
+continuing RPG example. In a second terminal:
 
 ```sh
 npm run agent -- discover
@@ -27,7 +28,12 @@ The host agent can author a new mechanic in source, publish an immutable release
 and observe whether the playing browser activated it. It is not limited to a
 fixed genre, choice schema, effect list, or chat interface.
 
-- **Lumen Weave** is the new code-runtime example. Its game-specific module is
+- **Mossfall** is a code-owned continuing RPG: explore connected areas, choose
+  an oath, trade weapon reach against damage, read enemy intentions, rescue a
+  keeper and bring the living seed home. The same character and world continue
+  beyond that objective. Its game module owns the RPG rules; the runtime stays
+  genre-agnostic. See [actual play](docs/playthrough.md#mossfall-a-continuing-rpg).
+- **Lumen Weave** is an optical puzzle/sandbox code-runtime example. Its game-specific module is
   independent of the runtime's legacy world/scene schema. Treat gameplay quality
   as something to establish through actual play, not a guarantee of this API.
 - **Ember Vault** and **Signal House** remain optional structured-world examples:
@@ -58,7 +64,17 @@ new module must preserve or deliberately migrate its own save.
 ## Author and host a game
 
 Start with [the game-host skill](.agents/skills/game-host/SKILL.md) and
-[host playbook](docs/host-playbook.md). Declare `runtime: "code"`, `entry`,
+[host playbook](docs/host-playbook.md). Load only the relevant genre profile:
+[RPG](.agents/skills/game-host/references/rpg.md),
+[roguelike](.agents/skills/game-host/references/roguelike.md),
+[puzzle/sandbox](.agents/skills/game-host/references/puzzle-sandbox.md),
+[adventure](.agents/skills/game-host/references/adventure.md),
+[conversation/visual novel](.agents/skills/game-host/references/conversation-visual-novel.md),
+or [action](.agents/skills/game-host/references/action.md). Choose one primary
+promise and add a secondary profile only for a relevant subsystem, rather than
+loading every genre into each turn. These guide the host, not the engine schema.
+
+Declare `runtime: "code"`, `entry`,
 `saveVersion`, and an arbitrary JSON `initial` save in `games/<id>/game.json`.
 The entry exports a factory with required `serialize` and `dispose` hooks and
 optional simulation, rendering, inspection, and game-defined command hooks.

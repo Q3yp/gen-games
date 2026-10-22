@@ -67,6 +67,61 @@ improvement supplies a credible reason to try again. It does not establish a
 mature campaign, broad audience enjoyment, addiction, exhaustive puzzle solvability,
 long-term replay value, mobile usability, or a full accessibility/security audit.
 
+## Mossfall RPG browser play
+
+These 2026-10-22 observations come from actual browser input by the primary
+player and implementation lead. The documentation reviewer inspected real
+captured frames, including the loot choice, Neri rescue aftermath, Archive threat
+layout, spear outcome and Warden boss-clear view. It did not operate those runs.
+No tests or test files were added; screenshots and attributed play traces are
+manual evidence, not automated coverage.
+
+- **Primary discovery run:** Wayfarer + spear; wolves cleared, spear selected
+  against axe's damage tradeoff, Neri freed and first seal obtained. The same
+  build and quest continued into the Archive. Pulse interruption and a
+  two-tile spear strike were exercised, with visible maximum-health progression.
+  The player returned the seed to Rowan at beat 153 and entered Bell Grove with
+  the same character at beat 172. This run crossed live repairs to floor threat
+  rendering, knight alignment and boss behavior; it is not a clean final-build
+  walkthrough.
+- **Post-fix author self-play:** a fresh Warden + axe run traversed the base
+  chapter and cleared the boss using actual movement, pulse, brace and strikes.
+  The knight stepped into alignment before telegraphing. At the boss, focus
+  depletion made brace versus retreat a real choice; brace absorbed all but two
+  damage and recovered focus. Boss clear at beat 83, seed pickup at 84:
+  20/22 health, 12 amber, two tonics, two focus, zero deaths. This is the
+  implementation author's informed self-play, not an uncoached external review.
+- **Visual evidence:** the equipment choice states spear damage 3/reach 2 versus
+  axe damage 5/reach 1; later frames retain oath, weapon and quest seals across
+  areas. Threat cells and the next-beat panel are visible in the repaired view.
+  The boss-clear screenshot retains Warden, axe, 2/2 seals and the instruction
+  to bring the seed home. Save persistence beyond scene transitions is a
+  separate check and is not established by these screenshots alone.
+
+- **Optional nonlethal trial, primary player:** at beat 177 a living 9/9-health
+  watchman was lured onto the circle and released by ringing the bell. Reaching
+  the bell deliberately cost five health: 17/22 health, 12 amber, three tonics,
+  no loot or XP. After return, visible Neri explicitly acknowledged the spared
+  watchman. Hearth recovery restored 17 to 22 health at beat 201 without changing
+  amber or tonic counts. The slain branch was not player-played.
+- **Browser reload, primary player:** full reload retained exact beat 201,
+  build, seals, resources, home location and completed quest state. Another
+  conversation at beat 203 preserved Neri's spared-watchman acknowledgment.
+  The browser showed the game running, without a stale-state error. The
+  documentation reviewer inspected the resulting homecoming screenshot. This
+  was a browser reload, not a claimed server-restart check for Mossfall.
+- **Remaining input coverage:** the later contextual E-key repair was reviewed
+  in source only; no separate post-repair player-input replay is claimed here.
+
+Established: connected RPG progression, two tactically different equipped builds,
+readable turn-based intentions, quest return and continuation after the initial
+objective, a nonlethal NPC consequence surviving browser reload, plus modest
+resource pressure in the Warden boss fight. Not
+established by these traces: demanding attrition, many viable builds, exhaustive
+quest outcomes, long-term campaign depth, or broad audience enjoyment. Live
+repair evidence should not be confused with a complete post-fix regression pass.
+Local saves, telemetry and capture media are not committed as source assets.
+
 ## Earlier legacy runtime and tool execution
 
 Manual HTTP sessions, CLI processes, and MCP stdio calls exercised:
@@ -123,4 +178,4 @@ The earlier legacy-build `npm run check` passed for all 36 JavaScript modules an
 
 ## Known coverage limits
 
-No long-duration soak, public-network security audit, adversarial plugin sandbox test, multi-process server exercise, arbitrary third-party MCP-client certification, or full accessibility audit was performed. Combat currently uses Manhattan range without line of sight; there is no cooldown/AOE system. Story branch walkthroughs are not exhaustive coverage of every combination. The missing-module fallback was observed in-browser; an exception thrown partway through a custom update has not separately been induced in-browser.
+No long-duration soak, public-network security audit, adversarial plugin sandbox test, multi-process server exercise, arbitrary third-party MCP-client certification, or full accessibility audit was performed. The legacy structured-world combat uses Manhattan range without line of sight and has no cooldown/AOE system; this does not describe every code pack's independently implemented combat rules. Story branch walkthroughs are not exhaustive coverage of every combination. The missing-module fallback was observed in-browser; an exception thrown partway through a custom update has not separately been induced in-browser.

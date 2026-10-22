@@ -68,6 +68,75 @@ Source mechanics and reusable fixes belong in the repository. Individual saves,
 telemetry, and capture media remain local artifacts unless separately delivered.
 See [verification](verification.md) for exact reported run counts and limitations.
 
+## Mossfall: a continuing RPG
+
+On 2026-10-22 the primary browser player explored Mossfall through real player
+controls, while the implementation lead separately played a contrasting build.
+The documentation reviewer inspected captured frames and the boss-clear image;
+the action sequences below are attributed player reports, not independent input
+execution by that reviewer. Both players are coding agents, not a human play panel.
+
+### Discovery run: Wayfarer and spear
+
+The primary player chose Wayfarer, fought through Briar Hollow, and chose a
+three-damage, two-tile-reach spear over a five-damage adjacent axe. Rescuing Neri
+provided the first seal and directed the same character toward the Drowned
+Archive. The equipped spear, oath, inventory and quest state carried into that
+area; the spear's reach then mattered against a new enemy combination. Killing
+the glass moth granted visible growth of four maximum health.
+
+This was a discovery-and-repair run, not a clean replay of the final build.
+Actual play exposed missing floor threat rendering and a knight that repeatedly
+attacked an empty row when the player stayed diagonal. Those defects were fixed;
+later boss-pattern issues were also corrected before the lead's contrasting run.
+The purpose was to repair demonstrated behavior, not invalidate a good build.
+The primary player eventually returned the living seed to Rowan at beat 153,
+then continued with the same character into Bell Grove at beat 172. Completing
+the initial quest did not replace the game with a new one-shot scene.
+
+### Post-fix author self-play: Warden and axe
+
+The implementation lead's fresh Warden run used an adjacent five-damage axe
+instead of spear spacing. In the Archive, one pulse caught the moth and knight
+together; the repaired knight aligned before telegraphing, and another pulse
+interrupted its attack. At the boss, the player dodged a targeted sweep,
+interrupted a cross attack, and committed to adjacent axe strikes. Running out
+of focus forced a choice between retreat and brace; brace cost two health but
+restored focus. The boss fell at beat 83 and the seed was collected at beat 84,
+with 20/22 health, 12 amber, two unused tonics and two focus remaining, without
+a death. This is author self-play with knowledge of the mechanics, not blind
+independent validation or evidence of demanding attrition.
+
+### Optional nonlethal consequence and reload
+
+In the primary player's continuing session, an independently authored Bell Grove
+trial offered a nonkill approach. The player lured the living, 9/9-health
+watchman onto a circle, deliberately accepted five damage to reach the bell
+without moving him, then rang it at beat 177. The outcome left 17/22 health,
+12 amber and three tonics, with no loot or XP reward. Back home, Neri was visibly
+present and specifically acknowledged the spared watchman. Resting at the hearth
+restored health to 22 at beat 201 without consuming amber or tonics.
+
+A full browser reload retained beat 201, build, seals, resources, home location
+and quest completion. Speaking to Neri again at beat 203 produced the same
+spared-watchman acknowledgment. The browser reported that the game was running,
+without a stale-state error. This establishes a persistent world/NPC consequence
+for the played nonlethal route, not merely a different ending caption. The slain
+branch was not player-played, and a later contextual-interaction-key repair was
+source-reviewed only, not separately replayed.
+
+### What feels different from the optical toy
+
+The new continuity is concrete: an owned character/build, connected locations,
+quest consequences, equipment that changes positioning, and an objective that
+returns the player to an established NPC. The loot panel explains reach versus
+damage; amber floor cells and a next-beat panel make incoming attacks visible.
+The result supports a coherent short RPG chapter with mild tactical resource
+pressure, not claims of deep build diversity or a long campaign. Longer-term
+progression, broader player enjoyment and exhaustive quest branching remain
+unestablished. See [verification](verification.md#mossfall-rpg-browser-play) for
+coverage and evidence boundaries.
+
 ## Earlier legacy experiment: Signal House
 
 On 2026-10-22, a browser player and a separate coding-agent GM shared one real Signal House session. The GM used the documented CLI/tool surface, not implementation source. This was improvised play against the running server, not a prerecorded dialogue or a mocked tool response.

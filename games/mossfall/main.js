@@ -77,7 +77,9 @@ export default function create(host, { save }) {
     return objectsIn(w)
       .filter(
         (o) =>
-          !w.areas[w.area].taken.includes(o.id) && distance(o, w.player) <= 1
+          o.id !== 'root-circle' &&
+          !w.areas[w.area].taken.includes(o.id) &&
+          distance(o, w.player) <= 1
       )
       .sort((a, b) => distance(a, w.player) - distance(b, w.player))[0];
   }
