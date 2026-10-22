@@ -3,11 +3,23 @@ import { renderSelectors, renderCharacter, renderFocus, renderChoices, renderCon
 import { renderGrid, renderStory } from './scenes.js';
 import { renderCustom } from './custom-view.js';
 import { renderPlayerHUD } from './player-shell.js';
+import { isCodeGame, startCodeGame } from './code-game.js';
 let renderFrame;
 function render() {
   if (!state.session) return;
   const current = scene();
   const pack = game();
+  if (isCodeGame()) {
+    renderSelectors(); renderContext();
+    setText('#world-title', pack.title);
+    setText('#world-description', pack.description || '');
+    setText('#scene-title', pack.title);
+    $('#reload-view').hidden = false;
+    $('#menu-reload').hidden = false;
+    document.body.classList.remove('map-world');
+    void startCodeGame();
+    return;
+  }
   $('#reload-view').hidden = !(world().ui || pack?.ui);
   $('#menu-reload').hidden = $('#reload-view').hidden;
   renderSelectors();

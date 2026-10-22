@@ -8,6 +8,7 @@ import { refreshStatus } from './journal.js';
 import { reconnect, loadSession, createSession } from './transport.js';
 import { attack, actOnEntity } from './actions.js';
 import { bindPlayerShell, renderPlayerHUD } from './player-shell.js';
+import { isCodeGame, reloadCodeGame } from './code-game.js';
 function showNewDialog() { $('#new-form .dialog-error')?.remove(); fillSelect($('#new-game'), state.games.map(item => ({ value: item.id, label: item.title || item.id })), $('#game-select').value || state.session?.gameId); $('#new-dialog').showModal(); }
 function bindEvents() {
   $('#new-session').addEventListener('click', showNewDialog);
@@ -55,7 +56,7 @@ function bindEvents() {
     }
   });
   document.addEventListener('keydown', event => {
-    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || $('dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable || event.target.closest('#custom-renderer') || (state.custom?.instance?.ownsInteraction && !state.custom.paused)) return;
+    if (isCodeGame() || event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || $('dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable || event.target.closest('#custom-renderer') || (state.custom?.instance?.ownsInteraction && !state.custom.paused)) return;
     const directions = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] };
     const direction = directions[event.key] || directions[event.key.toLowerCase()];
     if (direction && Array.isArray(scene().map)) { event.preventDefault(); if (!terminal()) void dispatch('world.move', { dx: direction[0], dy: direction[1] }); }
@@ -67,7 +68,7 @@ function bindEvents() {
     try { await navigator.clipboard.writeText(JSON.stringify(state.session, null, 2)); notify('Current session snapshot copied.', true); }
     catch { $('#snapshot-details').open = true; setText('#context-json', JSON.stringify(state.session, null, 2)); notify('Clipboard is unavailable. Expand Inspect state to select and copy the snapshot.'); }
   });
-  $('#reload-view').addEventListener('click', () => { state.customReload++; state.customKey = ''; state.customDisabled = false; void renderCustom(); });
+  $('#reload-view').addEventListener('click', () => { if (isCodeGame()) { reloadCodeGame(); return; } state.customReload++; state.customKey = ''; state.customDisabled = false; void renderCustom(); });
   $('#standard-view').addEventListener('click', () => { state.customDisabled = true; disposeCustom(); render(); });
   new ResizeObserver(() => { if (Array.isArray(scene().map) && state.session) renderGrid(); }).observe($('#play-surface'));
   window.addEventListener('online', () => { if (state.session && !state.reconnect) reconnect(state.generation); });

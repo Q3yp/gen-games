@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { randomUUID, createHash } from 'node:crypto';
 import { requireValue as check } from './errors.js';
-import { validateEnvelope, validateState, validateSchema } from './validate.js';
+import { validateEnvelope, validateState, validateJSONState, validateSchema } from './validate.js';
 import { diff } from './patches.js';
 
 const canonical = value => JSON.stringify(value, (_, item) => item && typeof item === 'object' && !Array.isArray(item) ? Object.fromEntries(Object.keys(item).sort().map(key => [key, item[key]])) : item);
@@ -22,6 +22,8 @@ export class Engine extends EventEmitter {
     const { pack } = this.game(gameId); check(Number.isInteger(seed) && seed >= 0 && seed <= 0xffffffff, 'INVALID_SEED', 'seed must be an unsigned 32-bit integer.');
     const now = new Date().toISOString();
     const session = { id: randomUUID(), gameId, contentVersion: pack.version, revision: 0, sceneEpoch: 0, seed: seed || 1, state: structuredClone(pack.initial), status: 'playing', createdAt: now, updatedAt: now };
+    const game = this.game(gameId);
+    if (pack.runtime === 'code') session.runtime = { release: game.release.release, entry: game.release.entry, saveVersion: game.release.saveVersion, activeRelease: game.release.release, activeEntry: game.release.entry, saveEntry: game.release.entry, activeSaveVersion: game.release.saveVersion, saveRelease: game.release.release, runEpoch: 0, checkpointSeq: 0, summary: null, commands: [] };
     let event;
     this.store.transaction(() => { this.store.save(session); event = this.store.append(session, { type: 'session.created', text: `${pack.title} started.`, data: { gameId } }); });
     return { session, cursor: event.seq };
@@ -50,7 +52,7 @@ export class Engine extends EventEmitter {
       const session = structuredClone(before), pending = [], context = this.context(session, pending, actor);
       const value = operation(context);
       check(!value || typeof value.then !== 'function', 'ASYNC_HANDLER', 'Plugin handlers must be synchronous. Use jobs for asynchronous work.');
-      validateState(session.state);
+      if (session.runtime) validateJSONState(session.state); else validateState(session.state);
       if (session.state.scene !== before.state.scene && !pending.some(event => event.type === 'scene' && event.data?.scene === session.state.scene)) context.emit('scene', `${session.state.scenes[session.state.scene].name || session.state.scene} [${session.state.scene}]`, { scene: session.state.scene, previous: before.state.scene });
       if (bump) session.revision++;
       if (actor === 'player' || session.state.scene !== before.state.scene) session.sceneEpoch++;

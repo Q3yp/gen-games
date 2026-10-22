@@ -3,6 +3,7 @@ import { $, state, savedSession, request, connection, world, number } from './sh
 import { render, scheduleRender } from './render.js';
 import { renderContext } from './panels.js';
 import { disposeCustom } from './custom-view.js';
+import { disposeCodeGame } from './code-game.js';
 import { receiveEvents, renderJournal, refreshStatus } from './journal.js';
 import { applyPatches } from './patches.js';
 function openStream(generation) {
@@ -48,7 +49,7 @@ async function loadSession(id) {
   const generation = ++state.generation;
   state.stream?.close(); clearTimeout(state.reconnect); state.reconnect = null;
   state.pending = false; document.body.classList.remove('is-pending'); connection('Opening world');
-  disposeCustom(); state.customDisabled = false; state.boardKey = ''; state.selected = null; state.skill = null;
+  disposeCodeGame(); disposeCustom(); state.customDisabled = false; state.boardKey = ''; state.selected = null; state.skill = null;
   state.events = []; state.eventIds = new Set(); state.status = null; state.lastAgentEvent = null;
   const { session, cursor } = await request(`/api/sessions/${encodeURIComponent(id)}`);
   if (generation !== state.generation) return;

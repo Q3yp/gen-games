@@ -1,8 +1,45 @@
 # Architecture and guarantees
 
-## One world, three clocks
+## Primary runtime: browser-owned code games
 
-The Node server is the single authority. Players, CLI callers, and MCP clients operate on the same session through named commands. SQLite is the durable source of truth; the browser never writes authoritative state directly.
+Code packs declare `runtime: "code"` and export a trusted local game factory.
+The game owns its canvas/WebGL/DOM, input, frame simulation, and arbitrary
+serializable save. It is not required to model mechanics as entities, scenes,
+choices, stats, or predefined effects. The server is the durable coordination
+boundary, not the authority for every simulated frame.
+
+The browser host calls optional simulation/render hooks and required serialization
+and disposal hooks. It submits coarse saves, bounded game-defined inspection
+summaries, and meaningful events. `session.state` is the latest durable save;
+`runtime.summary` is a saved inspection snapshot. Neither is necessarily current
+to the displayed frame. Use events and actual browser inspection to establish
+what the player experienced.
+
+`publish` snapshots the game's whole source tree into an immutable release,
+guarded by the observed `runtime.release`. Its response is `PENDING`. The browser
+must load the candidate and acknowledge `runtime.activated` before it is known
+to be playing. A failed candidate can leave the old module running. Game-defined
+`command` delivery targets `runtime.activeRelease`, returns pending, and later
+produces `runtime.command.result`; it is not synchronous server execution.
+
+A single live browser lease and `runEpoch` fence stale writers. Monotonic
+checkpoint sequence numbers prevent older saves overwriting later ones. These
+are coordination guards, not multiplayer synchronization or an anti-cheat trust
+boundary. Code is trusted and browser reports remain client-supplied.
+
+Code checkpoints retain release/save identity; restore rewinds the saved release
+and save and advances the run epoch. Source releases are immutable snapshots,
+not arbitrary editable-file backups. Modules own save compatibility and should
+migrate deliberately without silently discarding player progress.
+
+See [host playbook](host-playbook.md) for the factory API, exact publish/command
+loop, activation checks, and evidence-driven play review. The structured-world
+contracts below are maintained for optional legacy packs, not constraints on new
+code games.
+
+## Legacy structured-world runtime: one world, three clocks
+
+For legacy structured-world packs, the Node server is the single authority. Players, CLI callers, and MCP clients operate on the same session through named commands. SQLite is the durable source of truth; the browser never writes authoritative state directly.
 
 1. **Presentation clock:** browser rendering, CSS motion, and custom UI animation loops remain local. They need not wait for an agent or emit simulation noise into its context.
 2. **Simulation clock:** player actions execute synchronously as small transactions. Registered plugin `tick(ctx, deltaMs)` hooks are scheduled every 100 ms; idle hooks create no commits. The supplied combat example is tactical, so opponents act after successful player actions, not on a wall-clock timer.
@@ -12,6 +49,8 @@ The Node server is the single authority. Players, CLI callers, and MCP clients o
 
 ## Modules
 
+- `src/core/code-runtime.js`: immutable code releases, browser leases, coarse saves, activation, and command acknowledgment.
+- `public/code-game.js`: browser-owned module lifecycle and runtime bridge.
 - `src/core/registry.js`: validates pack identity, plugin order/dependencies, and action collisions.
 - `src/core/engine.js`: action context, seeded RNG, transaction/revision boundary, and scheduler hooks.
 - `src/core/store.js`: SQLite storage, WAL, atomic commits, checkpoints, consumers, and persisted request results.
@@ -25,7 +64,7 @@ The Node server is the single authority. Players, CLI callers, and MCP clients o
 - `public/`: standard studio client and custom component host.
 - `games/`: editable source packs, trusted custom modules, and media.
 
-## Transaction contract
+## Legacy transaction contract
 
 An action or authoring mutation supplies a stable `requestId`. Agent actions also supply `expectedRevision`; ordinary player intents may omit it and are validated against current state.
 
@@ -59,7 +98,7 @@ A later read defaults to the reader's `ack`, so a crash before acknowledgement r
 
 Logs currently retain all events. There is no silent truncation, compaction, vector retrieval, or automatic prose summarization. Invalid/future cursors fail with a repair hint. Long-poll reads can wait up to 30 seconds and wake on the next session commit.
 
-## Jobs: slow work without stale outcomes
+## Legacy jobs: slow work without stale outcomes
 
 A job is a persisted generation fence, not a scheduler that launches a model. The agent or external worker owns the actual computation.
 
@@ -68,7 +107,7 @@ A job is a persisted generation fence, not a scheduler that launches a model. Th
 
 Running jobs are marked `interrupted` when the server restarts. Checkpoint restore cancels running jobs and advances revision/epoch. Canceled work is never reactivated by a late completion.
 
-## Browser synchronization and coded components
+## Legacy browser synchronization and coded components
 
 The browser fetches one `{session,cursor}` snapshot, then receives `change` SSE messages containing patches and semantic events. Patch paths are arrays into the full Session object. Arrays are replaced atomically; object fields are diffed recursively. Semantic event history and state patch records share the ordered journal.
 
@@ -80,8 +119,10 @@ A custom ESM module exports `createUI({root,dispatch,asset,escapeHTML})` and ret
 
 ## Persistence and limits
 
-By default `.data/games.sqlite` stores sessions, full successful retry results, all journal events, consumer positions, jobs, and named checkpoints. `GEN_GAMES_DATA` selects a different directory. The data directory is git-ignored and contains private player input; back it up separately if needed. Checkpoints restore world/RNG state, not source files or active computations.
+By default `.data/games.sqlite` stores sessions, full successful retry results, all journal events, consumer positions, jobs, and named checkpoints. `GEN_GAMES_DATA` selects a different directory. The data directory is git-ignored and contains private player input; back it up separately if needed. Legacy checkpoints restore world/RNG state, not source files or active computations. Code checkpoints additionally identify their saved release as described above.
 
-This release is designed for **one server process**. SQLite protects transactions, but broadcast listeners and scheduling are process-local. Do not run two servers against one database. There are no cross-process leases, distributed pub/sub, autoscaling, or multiplayer authorization roles.
+This release is designed for **one server process**. SQLite protects transactions, but broadcast listeners and scheduling are process-local. Do not run two servers against one database. Code browser leases are process-local; there are no cross-process leases, distributed pub/sub, autoscaling, or multiplayer authorization roles.
 
-World state is capped at 2 MB; request bodies at 512 KB; author batches at 100 operations; emitted events at 200 per transaction and 8,000 characters per event text (explicitly marked if truncated). Media belongs in files/URLs. Journal and dedupe tables do not yet compact; disk usage grows with play. Structural validation does not prove that authored story branches are all reachable or every custom rule is semantically correct. Play the game and inspect failures.
+Legacy world state and code saves are capped at 2 MB; request bodies at 512 KB; legacy author batches at 100 operations; legacy emitted events at 200 per transaction and 8,000 characters per event text (explicitly marked if truncated). Media belongs in files/URLs. Journal and dedupe tables do not yet compact; disk usage grows with play. Structural validation does not prove that authored story branches are all reachable or every custom rule is semantically correct. Play the game and inspect failures.
+
+Code publication currently limits a release to 30 MB and excludes dotfiles, node_modules, and symlinks. Code inspection summaries are bounded at 12 KB; browser event batches permit up to 30 semantic events. These bounds limit transfer/context size, not JavaScript execution time. A trusted module can still monopolize the browser thread.

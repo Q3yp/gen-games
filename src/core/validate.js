@@ -65,3 +65,10 @@ export function validateSchema(args, schema) {
     if (rule.maxLength) check(value.length <= rule.maxLength, 'INVALID_ARGUMENT', `${key} is too long.`);
   }
 }
+
+/** Code games own their save schema. The engine only bounds JSON persistence. */
+export function validateJSONState(state) {
+  check(isRecord(state), 'INVALID_STATE', 'A code-game save must be a JSON object.');
+  const text = JSON.stringify(state, (_, value) => { check(typeof value !== 'number' || Number.isFinite(value), 'INVALID_STATE', 'Save numbers must be finite.'); return value; });
+  check(Buffer.byteLength(text) <= 2_000_000, 'STATE_TOO_LARGE', 'Keep saves under 2 MB; media belongs in files.');
+}

@@ -2,6 +2,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Store } from '../core/store.js';
 import { loadGames } from '../core/registry.js';
+import { CodeRuntime } from '../core/code-runtime.js';
 import { Engine } from '../core/engine.js';
 import { ToolService } from '../core/tools.js';
 import { createHttpServer } from './http.js';
@@ -15,10 +16,12 @@ const port = Number(process.env.PORT || 3000);
 if (!['127.0.0.1', 'localhost', '::1'].includes(host) && !process.env.GEN_GAMES_TOKEN) {
   throw new Error('Non-loopback hosting requires GEN_GAMES_TOKEN. This trusted-code runtime is designed for local use.');
 }
-const games = await loadGames(resolve(root, 'games'), { core, combat, narrative });
+const releaseDirectory = resolve(process.env.GEN_GAMES_DATA || resolve(root, '.data'), 'releases');
+const games = await loadGames(resolve(root, 'games'), { core, combat, narrative }, releaseDirectory);
 const store = new Store(resolve(process.env.GEN_GAMES_DATA || resolve(root, '.data'), 'games.sqlite'));
 const engine = new Engine(store, games), tools = new ToolService(engine);
-const server = createHttpServer(engine, tools, root, { token: process.env.GEN_GAMES_TOKEN });
+engine.codeRuntime = new CodeRuntime(engine, resolve(root, 'games'), releaseDirectory);
+const server = createHttpServer(engine, tools, root, { token: process.env.GEN_GAMES_TOKEN, releaseDirectory });
 const interval = setInterval(() => engine.tick(100), 100);
 server.listen(port, host, () => console.log(`gen-games ready: http://${host}:${port}\n${games.size} packs · data ${process.env.GEN_GAMES_DATA || '.data'} · trusted local code`));
 let closing = false;

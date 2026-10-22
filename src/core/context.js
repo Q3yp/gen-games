@@ -2,6 +2,7 @@ import { requireValue as check } from './errors.js';
 import { publicEvent } from './patches.js';
 
 export function summary(session) {
+  if (session.runtime) return `${session.id} | ${session.gameId} r${session.revision} | code canvas\nRelease ${session.runtime.release}; active ${session.runtime.activeRelease}; run ${session.runtime.runEpoch}; save #${session.runtime.checkpointSeq}.\n${compact(session.runtime.summary ?? 'Waiting for browser telemetry.', 1600)}`;
   const s = session.state, player = s.entities[s.player];
   return `${session.id} | ${session.gameId} r${session.revision} | ${s.scenes[s.scene]?.name || s.scene} [${s.scene}]\nPlayer: ${player?.name || s.player} [${s.player}]. Entities ${Object.keys(s.entities).length}; assets ${Object.keys(s.assets).length}; skills ${Object.keys(s.skills).length}.`;
 }

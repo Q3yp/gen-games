@@ -19,29 +19,60 @@ npm run agent -- session --op list
 
 Select the browser's session ID, then follow [the agent quick loop](AGENTS.md) or [CLI/MCP setup](docs/agent-tools.md). A coding agent is not bundled or silently started: connect your own agent through the CLI, MCP stdio bridge, or HTTP tools.
 
-## Two playable worlds, one engine
+## An open canvas for game-making agents
 
-- **Ember Vault**: three tactical dungeon floors, deterministic combat, opponent pathfinding, equipment, consumables, authored skills, loot, locked progression, a boss, and victory/death.
-- **Signal House**: a conversation-driven lighthouse mystery with eight scenes, relationship/flag conditions, inventory, branching endings, free-text player input, and a custom coded UI. Unknown speech becomes an explicit request for a connected director. Enable `narrative.mode` director routing to send all free text to the agent; `narrative.reply` can publish prose and world edits atomically.
+The primary runtime is a **code game**: a trusted JavaScript module owns its
+canvas/WebGL/DOM presentation, direct input, simulation, and serializable save.
+The host agent can author a new mechanic in source, publish an immutable release,
+and observe whether the playing browser activated it. It is not limited to a
+fixed genre, choice schema, effect list, or chat interface.
 
-Both packs are editable examples, not special cases hidden in the engine. The shared plugins implement movement, inventory, combat, narrative, conditions, and effects. Add a third pack or replace the UI without forking the runtime.
+- **Lumen Weave** is the new code-runtime example. Its game-specific module is
+  independent of the runtime's legacy world/scene schema. Treat gameplay quality
+  as something to establish through actual play, not a guarantee of this API.
+- **Ember Vault** and **Signal House** remain optional structured-world examples:
+  tactical dungeon combat and a conversation-driven lighthouse mystery. Their
+  server plugins, named actions, structured authoring, and custom UI remain
+  available for compatibility; they do not define what new games must be.
 
-## What is implemented
+## Runtime boundaries
 
-- Browser input applies immediately through validated actions; CSS/animation rendering and plugin simulation do not wait for a model turn.
-- SQLite saves world state, seeded RNG, ordered events, request-id results, independent consumer cursors, jobs, and named checkpoints.
-- Eight concise agent tools: `discover`, `session`, `observe`, `inspect`, `act`, `author`, `jobs`, `checkpoint`.
-- Bounded incremental observation, explicit acknowledge/resume, targeted inspection, rich repairable errors, stale-revision rejection, and durable retry deduplication.
-- Atomic live authoring of characters, opponents, items, stats, scenes, choices, skills, and asset records.
-- Fenced background proposals. Context jobs reject stale narrative; content jobs guard exact asset/skill targets and tolerate unrelated player movement.
-- Browser bootstrap + persistent SSE patches rather than full snapshots on every event.
-- Trusted local JavaScript plugins and ESM UI components with a clear lifecycle and fallback behavior.
+Code games run continuously in the browser without waiting for model turns.
+The browser owns frame state; the server persists coarse saves and checkpoints,
+release metadata, bounded inspection summaries, command results, and semantic
+events. A saved summary is not an authoritative live frame read. Legacy packs
+instead retain server-authoritative transactions and incremental state patches.
 
-## Author a game
+Agent tools include `discover`, `session`, `observe`, `inspect`, `publish`,
+`command`, and `checkpoint`. Legacy packs additionally use `act`, `author`, and
+`jobs`. Discovery supplies the current schemas. Publication and command delivery
+are asynchronous: a `PENDING` response does not prove activation or execution.
+Inspect acknowledgments and the actual browser before reporting success.
 
-Start with [the authoring guide](docs/authoring.md). Game data lives in `games/<id>/game.json`; reusable mechanics live in `src/plugins`; custom UI modules and media live beside their pack. An asset is a file/URL plus a registry entry, so agent-generated art can be imported without coupling the engine to an image vendor.
+Observation is incremental and bounded, with independent consumer cursors.
+Code releases snapshot the game tree so relative imports remain versioned.
+Trusted local game code can use arbitrary mechanics; it is not sandboxed and can
+still block its browser. Source publication is not automatic migration, and a
+new module must preserve or deliberately migrate its own save.
 
-Use live `author` edits for the current session. Edit the pack's source JSON/code when the change should apply to future sessions. These are intentionally different operations. Server plugin/source-pack changes load on restart; existing saved sessions keep their own world state.
+## Author and host a game
+
+Start with [the game-host skill](.agents/skills/game-host/SKILL.md) and
+[host playbook](docs/host-playbook.md). Declare `runtime: "code"`, `entry`,
+`saveVersion`, and an arbitrary JSON `initial` save in `games/<id>/game.json`.
+The entry exports a factory with required `serialize` and `dispose` hooks and
+optional simulation, rendering, inspection, and game-defined command hooks.
+
+Build a direct interaction, a meaningful tradeoff, and readable consequences.
+Prove a new mechanic by editing and publishing code, then exercise it through
+player controls. Inspect a screenshot after activation and replay with a different
+strategy. Visual polish, syntax checks, and successful publication are useful
+evidence, but none alone demonstrates enjoyable play.
+
+The [authoring guide](docs/authoring.md) also documents the legacy plugin/UI and
+structured-data route. Legacy server plugin changes load on restart; code-runtime
+publication is a distinct operation and does not require treating gameplay as
+server-side structured edits.
 
 ## Commands
 
@@ -68,4 +99,4 @@ The repository intentionally has no test suite or test files. Actual manual runt
 
 ## Scope
 
-This is an extensible local-first v1, not a production multiplayer server or a universal game editor. JavaScript game packs are trusted local code, not sandboxed user uploads. There is no built-in LLM, remote matchmaking, automatic content migration, procedural dungeon generator, or automatic image generation. The current examples are tactical/adventure games; adding an action game's authoritative simulation is a plugin task, not a claim that all genres are already implemented.
+This is an extensible local-first v1, not a production multiplayer server or a universal game editor. JavaScript game packs are trusted local code, not sandboxed user uploads. There is no built-in LLM, remote matchmaking, automatic content migration, procedural dungeon generator, or automatic image generation. The open code runtime permits game-specific simulations; it does not supply every genre's physics, networking, editor, or mechanics out of the box.

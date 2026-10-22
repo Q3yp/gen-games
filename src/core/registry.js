@@ -2,9 +2,10 @@ import { readdir, readFile } from 'node:fs/promises';
 import { resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { requireValue as check } from './errors.js';
-import { validateState } from './validate.js';
+import { snapshotRelease } from './code-runtime.js';
+import { validateState, validateJSONState } from './validate.js';
 
-export async function loadGames(directory, builtins) {
+export async function loadGames(directory, builtins, releaseDirectory = resolve(directory, '../.data/releases')) {
   const games = new Map();
   for (const folder of await readdir(directory, { withFileTypes: true })) {
     if (!folder.isDirectory()) continue;
@@ -13,6 +14,12 @@ export async function loadGames(directory, builtins) {
     catch (error) { if (error.code === 'ENOENT') continue; throw error; }
     check(pack.id === folder.name && /^[a-z0-9-]+$/.test(pack.id), 'INVALID_PACK', `Game id must match folder ${folder.name}.`);
     check(typeof pack.title === 'string' && typeof pack.version === 'string', 'INVALID_PACK', `${pack.id} needs title and version.`);
+    if (pack.runtime === 'code') {
+      validateJSONState(pack.initial);
+      const release = await snapshotRelease(directory, releaseDirectory, pack.id);
+      games.set(pack.id, { pack, plugins: [], actions: new Map(), release });
+      continue;
+    }
     validateState(pack.initial);
     const plugins = [], actions = new Map(), ids = new Set();
     for (const name of pack.plugins || []) {

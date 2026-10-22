@@ -1,0 +1,10 @@
+{
+  "id": "lumen-weave",
+  "title": "Lumen Weave",
+  "description": "A living light machine. Bend a river of photons into a blooming constellation, then let a coding host invent the next law of nature.",
+  "version": "0.1.0",
+  "runtime": "code",
+  "entry": "./main.js",
+  "saveVersion": 1,
+  "initial": { "seed": 8421, "round": 1, "best": 0 }
+}

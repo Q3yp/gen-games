@@ -83,3 +83,9 @@ body.custom-immersive:not(.studio-open) .scene-stage.immersive .pack-view { disp
 .menu-utilities { display: flex; gap: 8px; flex-wrap: wrap; }
 body:not(.studio-open):not(.map-world):not(.custom-owned) .renderer { display: block; padding: 110px 24px 240px; overflow: auto; }
 body:not(.studio-open):not(.map-world) .dialogue-scene { margin: auto; }
+.code-game #menu-player, .code-game #menu-focus, .code-game .player-rail,
+.code-game .focus-panel, .code-game .player-hud { display: none; }
+.code-game .menu-columns { grid-template-columns: 1fr; }
+.code-game .custom-renderer { position: relative; }
+.code-game .pack-view { position: relative; }
+#code-loading { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; }

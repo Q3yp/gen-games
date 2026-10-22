@@ -66,12 +66,13 @@ export function createHttpServer(engine, tools, root, options = {}) {
       if (path === '/api/games' && request.method === 'GET') { send(response, 200, { games: [...engine.games.values()].map(({ pack }) => publicPack(pack)) }); return; }
       if (path === '/api/sessions') {
         if (request.method === 'POST') { const input = await body(request); send(response, 201, engine.create(input.gameId, input.seed)); }
-        else send(response, 200, { sessions: engine.store.sessions().map(({ state, ...session }) => ({ ...session, scene: state.scene, player: state.entities[state.player]?.name })) });
+        else send(response, 200, { sessions: engine.store.sessions().map(({ state, ...session }) => ({ ...session, scene: state.scene, player: state.entities?.[state.player]?.name })) });
         return;
       }
-      const match = path.match(/^\/api\/sessions\/([\w-]+)(?:\/(actions|events|status|diagnostics))?$/);
+      const match = path.match(/^\/api\/sessions\/([\w-]+)(?:\/(actions|events|status|diagnostics|runtime))?$/);
       if (match) {
         const [, id, action] = match;
+        if (action === 'runtime' && request.method === 'POST') { send(response, 200, engine.codeRuntime.browser(id, await body(request))); return; }
         if (action === 'diagnostics' && request.method === 'POST') { send(response, 200, reportDiagnostic(engine, id, await body(request))); return; }
         if (action === 'events' && request.method === 'GET') { stream(request, response, engine, id, url); return; }
         if (action === 'actions' && request.method === 'POST') { const input = await body(request); send(response, 200, engine.act({ ...input, sessionId: id }, 'player')); return; }
@@ -82,11 +83,12 @@ export function createHttpServer(engine, tools, root, options = {}) {
         return;
       }
       check(request.method === 'GET' && !path.startsWith('/api/'), 'NOT_FOUND', 'Route not found.');
-      if (path.startsWith('/games/')) await serveFile(response, resolve(root, 'games'), decodeURIComponent(path.slice(6)));
+      if (path.startsWith('/releases/')) await serveFile(response, options.releaseDirectory || resolve(root, '.data/releases'), decodeURIComponent(path.slice(9)));
+      else if (path.startsWith('/games/')) await serveFile(response, resolve(root, 'games'), decodeURIComponent(path.slice(6)));
       else await serveFile(response, resolve(root, 'public'), path === '/' ? '/index.html' : decodeURIComponent(path));
     } catch (error) {
       if (response.headersSent) { response.end(); return; }
-      const info = errorInfo(error), status = info.code === 'NOT_FOUND' || info.code.endsWith('_NOT_FOUND') ? 404 : info.code === 'STALE_REVISION' ? 409 : 400;
+      const info = errorInfo(error), status = info.code === 'NOT_FOUND' || info.code.endsWith('_NOT_FOUND') ? 404 : ['STALE_REVISION','STALE_RELEASE','STALE_RUN','STALE_CHECKPOINT','RUNTIME_BUSY','RUNTIME_LEASE_LOST','COMMAND_NOT_PENDING'].includes(info.code) ? 409 : 400;
       send(response, status, { ok: false, error: info });
     }
   });

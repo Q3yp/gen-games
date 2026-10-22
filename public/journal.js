@@ -1,6 +1,8 @@
 import { $, $$, escapeHTML, state, request, world, setText } from './shared.js';
 import { renderStatus } from './panels.js';
+import { receiveCodeEvents } from './code-game.js';
 function receiveEvents(events = []) {
+  receiveCodeEvents(events);
   for (const event of events) {
     if (event.seq !== undefined && state.eventIds.has(event.seq)) continue;
     if (event.seq !== undefined) state.eventIds.add(event.seq);
