@@ -5,11 +5,36 @@ export function paintShadows(c, s, time) {
   const t = Number(time || 0);
   for (const shadow of s.shadows || []) {
     if (shadow.phase === 'dispersed') {
+      c.save();
+      c.globalCompositeOperation = 'screen';
+      eel(c, shadow, t);
+      c.restore();
       remains(c, shadow, t);
       continue;
     }
     if (shadow.phase === 'charge' && shadow.aim) charge(c, shadow, t);
     eel(c, shadow, t);
+    if (shadow.crackFlash > 0) {
+      const p = 1 - shadow.crackFlash / 2;
+      c.save();
+      c.globalAlpha = 1 - p;
+      for (let i = 0; i < 18; i++) {
+        const a = (i * TAU) / 18;
+        line(
+          c,
+          [
+            [shadow.x + Math.cos(a) * 30, shadow.y + Math.sin(a) * 30],
+            [
+              shadow.x + Math.cos(a) * (45 + p * 140),
+              shadow.y + Math.sin(a) * (45 + p * 140)
+            ]
+          ],
+          '#ffe9a0',
+          3
+        );
+      }
+      c.restore();
+    }
   }
 }
 
@@ -85,7 +110,10 @@ function eel(c, o, t) {
   glow(c, -100, 0, 165, 'rgba(2,8,20,.3)');
   const body = c.createLinearGradient(0, -35, 0, 35);
   body.addColorStop(0, '#36515a');
-  body.addColorStop(0.3, '#152734');
+  body.addColorStop(
+    0.3,
+    seals === 0 ? '#a4d3bd' : seals === 1 ? '#365e60' : '#152734'
+  );
   body.addColorStop(0.8, '#07131f');
   body.addColorStop(1, '#213b45');
   c.fillStyle = body;
@@ -178,6 +206,19 @@ function shell(c, x, y, t, phase) {
   if (phase === 'stunned') glow(c, x, y, 27, 'rgba(255,222,148,.24)');
   c.save();
   c.translate(x, y);
+  if (phase === 'charge') {
+    glow(c, 0, 0, 65, 'rgba(255,221,135,.65)');
+    ellipse(c, 0, 0, 12, 25, '#fff1b2');
+    for (const side of [-1, 1]) {
+      c.save();
+      c.translate(side * 25, 0);
+      c.rotate(side * 0.5);
+      ellipse(c, 0, 0, 10, 24, '#e1dfc5', '#ffffff', 2);
+      c.restore();
+    }
+    c.restore();
+    return;
+  }
   c.fillStyle = phase === 'charge' ? '#f3e6bc' : '#d0cdb2';
   c.strokeStyle = '#f5eccc';
   c.lineWidth = 1.2;

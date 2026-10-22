@@ -33,3 +33,34 @@ are authored by the coding agent, not yet allocated by an integrated editor.
 
 Judge each next iteration through the player's voluntary choices and candid
 feedback. Do not turn the observations above into a prescribed test route.
+
+## Independent play observations, continued
+
+The player voluntarily led a procession back to the empty arch, returned when it
+bloomed, and tried to sail through it. A glowing but initially non-traversable
+entrance caused frustration. A real, saved undertide region was then authored;
+the player described the ribbed interior as a good change of scale and wanted to
+investigate its long, shell-covered creature. Entering was not part of the opening
+source pack. The saved surface remains available on return.
+
+Combat was less successful. The player could chip shells but could not reliably
+read why a bell worked, and initially could not see damage cost. They voluntarily
+paused rather than grind the final shell. Five small hull lights were added;
+shells now visibly open around luminous cores before lunging, fractures burst
+outward, and freed creatures retain an embodied presence. The next player verdict
+is still required. These changes are not evidence that combat is now enjoyable.
+
+A real engine defect surfaced during live publication: replayed historical release
+events overwrote newer desired runtime state, attempted stale activation and left
+a large failure notice over an already updated game. The host runtime now refreshes
+authoritative state, abandons obsolete candidates and clears only its owned stale
+notice. Genuine failures remain visible and dismissible. A browser reload preserved
+the player's position, three hull lights and remaining shell; a later new browser
+tab also resumed that save. This establishes continuity, not enjoyment.
+
+Per-lunge diagnostic events were unnecessarily filling the host cursor while no
+new player decision occurred. Tidelight now emits the first target-directed charge
+and target changes, plus actual hits, releases and player actions; continuous
+animation remains in saved local simulation. No fixed combat component was added
+to the generic engine. Source registration and stale-publication repair are generic;
+Tidelight mechanics and art remain generated campaign-owned modules.

@@ -42,6 +42,7 @@ export function createShadows(
   }
   function crack(c, cause) {
     c.seals = Math.max(0, c.seals - 1);
+    c.crackFlash = 2;
     record('shadow.cracked', 'A shell seal split beneath the water.', {
       id: c.id,
       cause,
@@ -92,7 +93,19 @@ export function createShadows(
   function tick(c, dt) {
     prepare(c);
     c.grace = Math.max(0, c.grace - dt);
-    if (c.phase === 'dispersed') return;
+    c.crackFlash = Math.max(0, (c.crackFlash || 0) - dt);
+    if (c.phase === 'dispersed') {
+      const light =
+        s.lanterns.find((l) => l.id === s.player.carrying) || s.player;
+      const d = distance(c, light);
+      if (d > 115)
+        move(
+          c,
+          Math.atan2(light.y - c.y, light.x - c.x),
+          Math.min(d - 115, 75 * dt)
+        );
+      return;
+    }
     if (c.phase === 'stunned') {
       c.timer -= dt;
       // A long, readable recoil; no damage is possible until a fresh charge.
@@ -113,14 +126,11 @@ export function createShadows(
     }
     if (c.phase === 'charge') {
       c.timer -= dt;
-      c.chargeProgress = clamp(1 - c.timer / 1.5, 0, 1);
+      c.chargeProgress = clamp(1 - c.timer / (c.windup || 1.5), 0, 1);
       if (c.timer <= 0) {
         c.phase = 'dash';
         c.timer = Math.min(1.45, Math.max(0.35, distance(c, c.aim) / 210));
         c.hit = false;
-        record('shadow.dashed', 'The shadow lunged along its pale wake.', {
-          id: c.id
-        });
       }
       return;
     }
@@ -170,20 +180,23 @@ export function createShadows(
     c.angle = Math.atan2(light.y - c.y, light.x - c.x);
     if (distance(c, light) < 265 && c.timer <= 0) {
       c.phase = 'charge';
-      c.timer = 1.5;
+      c.windup = 3;
+      c.timer = c.windup;
       c.chargeProgress = 0;
       // Lock the visible attack line now, not to the player's future position.
       c.aim = { x: light.x, y: light.y };
-      record(
-        'shadow.charging',
-        'Three shell seams brighten; a pale wake points toward a light.',
-        {
-          id: c.id,
-          light: light.id,
-          x: c.aim.x,
-          y: c.aim.y
-        }
-      );
+      if (c.announcedTarget !== light.id)
+        record(
+          'shadow.charging',
+          'Three shell seams brighten; a pale wake points toward a light.',
+          {
+            id: c.id,
+            light: light.id,
+            x: c.aim.x,
+            y: c.aim.y
+          }
+        );
+      c.announcedTarget = light.id;
       return;
     }
     move(c, c.angle, 38 * dt);

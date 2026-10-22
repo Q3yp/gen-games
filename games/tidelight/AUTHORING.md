@@ -19,3 +19,11 @@ publication guarded by the current release and observed world version.
 
 Pure player review: the player sees only the world, controls and a brief premise.
 Never coach the hidden solution or measure enjoyment by successful completion.
+
+Persisted regions live inside the game save. Source publications must preserve
+phase/timer, pause, hull, carried lights and region state. Emit semantic changes,
+not every animation/attack phase. The optional shell encounter currently supports
+bell interaction and physical collisions with the awakened ruin. Its cues must
+remain in the world rather than recommended-key labels. The independent player's
+latest verdict called the combat repetitive; do not treat shell completion as a
+fun gate or force the player through it to see the next creation.

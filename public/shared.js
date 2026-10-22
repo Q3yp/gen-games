@@ -8,6 +8,7 @@ const forbidden = new Set(['__proto__', 'constructor', 'prototype']);
 const freeze = value => { if (isObject(value) && !Object.isFrozen(value)) { Object.freeze(value); Object.values(value).forEach(freeze); } return value; };
 const state = { games: [], sessions: [], session: null, cursor: 0, events: [], eventIds: new Set(), stream: null, reconnect: null, generation: 0, pending: false, selected: null, skill: null, connectedAt: null, status: null, statusAvailable: true, statusBusy: false, boardKey: '', custom: null, customKey: '', customFailureKey: '', customGeneration: 0, customDisabled: false, lastAgentEvent: null, choices: [], customReload: 0, sendAction: null };
 let noticeTimer;
+let noticeVersion = 0;
 const savedSession = { get: () => { try { return localStorage.getItem('gen-games.session'); } catch { return null; } }, set: id => { try { localStorage.setItem('gen-games.session', id); } catch { /* Persistence also lives on the server. */ } } };
 
 async function request(path, options = {}) {
@@ -25,12 +26,30 @@ async function request(path, options = {}) {
 }
 function notify(message, success = false, persistent = false) {
   const element = $('#notice');
+  const version = ++noticeVersion;
+  const dismiss = () => {
+    if (version !== noticeVersion) return;
+    clearTimeout(noticeTimer);
+    element.hidden = true;
+    element.textContent = '';
+    $('#announcer').textContent = '';
+  };
   clearTimeout(noticeTimer);
   element.textContent = message;
   element.hidden = !message;
   element.classList.toggle('success', success);
   $('#announcer').textContent = message;
-  if (message && !persistent) noticeTimer = setTimeout(() => { element.hidden = true; }, 7500);
+  if (message && persistent) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'notice-dismiss';
+    button.textContent = 'Dismiss';
+    button.setAttribute('aria-label', 'Dismiss notification');
+    button.addEventListener('click', dismiss);
+    element.append(button);
+  }
+  if (message && !persistent) noticeTimer = setTimeout(dismiss, 7500);
+  return dismiss;
 }
 function connection(label, online = false) {
   const element = $('#connection');

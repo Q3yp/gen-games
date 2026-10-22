@@ -25,6 +25,7 @@ const isCodeGame = () =>
     (pack) => pack.id === state.session.gameId && pack.runtime === 'code'
   );
 const releaseInfo = (session) => ({ ...session.runtime });
+const releaseKey = (runtime) => `${runtime.release}:${runtime.runEpoch}`;
 function releaseURL(raw) {
   const url = new URL(raw, location.origin);
   if (
@@ -50,6 +51,7 @@ function presentation(on) {
 function disposeCodeGame() {
   generation++;
   if (run) {
+    run.activationNotice?.();
     if (run.events.length)
       notify(
         `${run.events.length} game events are still unacknowledged and cannot be carried into another run.`,
@@ -114,7 +116,17 @@ function frame(current, time) {
 }
 async function mount(current, session, force = false) {
   const next = releaseInfo(session);
-  const key = `${next.release}:${next.runEpoch}`;
+  const key = releaseKey(next);
+  const isDesired = () =>
+    run === current &&
+    state.session?.id === current.id &&
+    state.session.runtime &&
+    releaseKey(state.session.runtime) === key;
+  if (!isDesired()) return;
+  if (current.key === key && current.failedKey !== key) {
+    current.activationNotice?.();
+    current.activationNotice = null;
+  }
   if (
     current.loading ||
     current.commandBusy ||
@@ -131,7 +143,7 @@ async function mount(current, session, force = false) {
     if (force) url.searchParams.set('reload', Date.now());
     const module = await import(url.href);
     if (
-      run !== current ||
+      !isDesired() ||
       current.commandBusy ||
       current.pendingResult ||
       current.eventWriting ||
@@ -143,7 +155,7 @@ async function mount(current, session, force = false) {
     // Freeze the previous simulation only after import; keep its visual until validated.
     current.swapping = true;
     await current.pendingWrite?.catch(() => {});
-    if (run !== current) return;
+    if (!isDesired()) return;
     const sameEpoch = next.runEpoch === current.epoch;
     const save =
       sameEpoch && current.instance
@@ -192,6 +204,7 @@ async function mount(current, session, force = false) {
         ? current.release.release
         : session.runtime.saveRelease
     });
+    if (!isDesired()) return;
     if (
       !candidate ||
       typeof candidate.dispose !== 'function' ||
@@ -202,11 +215,7 @@ async function mount(current, session, force = false) {
     candidate.render?.();
     clone(candidate.serialize());
     await new Promise((resolve) => requestAnimationFrame(resolve));
-    if (run !== current) {
-      candidate.dispose?.();
-      root.remove();
-      return;
-    }
+    if (!isDesired()) return;
     // Server acknowledgement fences a release before the local swap becomes active.
     await post(current.id, {
       op: 'applied',
@@ -217,11 +226,8 @@ async function mount(current, session, force = false) {
       ...projection(current, candidate)
     });
     await new Promise((resolve) => requestAnimationFrame(resolve));
-    if (run !== current) {
-      candidate.dispose?.();
-      root.remove();
-      return;
-    }
+    // Once acknowledged, honor the activation before mounting any newer target.
+    if (run !== current) return;
     const previous = current.instance;
     const previousRoot = current.root;
     current.instance = candidate;
@@ -277,16 +283,18 @@ async function mount(current, session, force = false) {
     }
     // Clear both the visual notice and its live-region copy after confirmed activation.
     notify('');
+    current.activationNotice?.();
+    current.activationNotice = null;
     $('#announcer').textContent = 'Game is running.';
     reportUI('ui.recovered', next.entry);
   } catch (error) {
-    try {
-      candidate?.dispose?.();
-    } catch {
-      /* Keep the previous running game. */
-    }
-    root?.remove();
     if (run !== current) return;
+    // Superseded work is not a game failure, including server-side publication
+    // races that arrive before the corresponding stream snapshot.
+    if (!isDesired() || error.code === 'STALE_RELEASE') {
+      await syncRuntime(current);
+      return;
+    }
     current.failedKey = key;
     if ($('#code-loading'))
       $('#code-loading').textContent =
@@ -297,12 +305,20 @@ async function mount(current, session, force = false) {
       error,
       'Fix and publish a new release. The previous running game was retained.'
     );
-    notify(
+    current.activationNotice = notify(
       `${current.instance ? 'Update could not be applied; the previous game is still running.' : 'Game could not start.'} ${error.message}`,
       false,
       true
     );
   } finally {
+    if (root !== current.root) {
+      try {
+        candidate?.dispose?.();
+      } catch {
+        /* Keep the previous running game. */
+      }
+      root?.remove();
+    }
     current.swapping = false;
     current.loading = false;
     scheduleEvents(current);
@@ -394,6 +410,9 @@ async function syncRuntime(current) {
       `/api/sessions/${encodeURIComponent(current.id)}`
     );
     if (run !== current) return;
+    // A response started before a publication must not roll back the stream.
+    if (state.session?.id !== session.id) return;
+    if (session.revision < state.session.revision) return;
     state.session = session;
     if (
       current.reconnectRequired ||
@@ -415,8 +434,11 @@ function receiveCodeEvents(events) {
   if (!run) return;
   for (const event of events) {
     if (event.type === 'runtime.release' && state.session?.id === run.id) {
-      Object.assign(state.session.runtime, event.data);
-      void mount(run, state.session);
+      // Events can be replayed or arrive without a snapshot. Fetch the current
+      // target instead of letting historical events overwrite a newer snapshot.
+      if (event.data?.release === state.session.runtime.release)
+        void mount(run, state.session);
+      else void syncRuntime(run);
     }
     if (
       event.type !== 'runtime.command' ||

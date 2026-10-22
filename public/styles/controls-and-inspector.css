@@ -464,6 +464,16 @@ code {
   color:#edc7a3;
   line-height:1.6
 }
+.notice-dismiss {
+  margin-left:12px;
+  padding:3px 8px;
+  font:inherit;
+  color:inherit;
+  background:transparent;
+  border:1px solid currentColor;
+  border-radius:5px;
+  cursor:pointer
+}
 .notice.success {
   background:#253b2b;
   border-color:#49653c;
