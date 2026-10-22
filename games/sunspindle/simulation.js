@@ -2,7 +2,7 @@ import { clamp, confine, direction, distance, separate } from './physics.js';
 import { effects } from './effects.js';
 import { combat } from './combat.js';
 import { enemies } from './enemies.js';
-import { enterThreadmill } from './rooms.js';
+import { enterThreadmill, enterStagedRoom } from './rooms.js';
 
 export function simulation(s, emit = () => {}) {
   const keys = new Set(), fx = effects(s);
@@ -91,14 +91,19 @@ export function simulation(s, emit = () => {}) {
   function objectives() {
     if (!s.cleared && s.enemies.length && s.enemies.every(e => e.hp <= 0)) {
       s.cleared = true;
+      if (s.roomKey === 'glassworks') {
+        s.exitReady = true;
+        notice('Quiet at last. The garden is open.', 5);
+        fx.ring(s.exit.x, s.exit.y, '#fff2a7', 160, 1);
+      }
       record('room.cleared', 'The guards are gone. The courtyard belongs to the keeper.', { rescue: s.rescue });
     }
-    if (!s.exitReady || s.exitAsked || distance(s.player, s.exit) > 76) return;
+    if (s.player.hp <= 0 || s.respawn > 0 || !s.exitReady || s.exitAsked || distance(s.player, s.exit) > 76) return;
     s.exitAsked = true; s.awaitingHost = true; s.shots = [];
-    s.player.hp = s.player.maxHp;
+    s.versions.route = (s.versions.route || 0) + 1;
     fx.ring(s.exit.x, s.exit.y, '#fff2a7', 160, 1);
-    notice('The sunbird keeps you safe while it finds the way onward.', 7);
-    record('game.decision_due', 'The keeper and rescued sunbird reached the open arch. What lies beyond is not yet authored.',
+    notice(s.roomKey === 'glassworks' ? 'The sunbird rests at the garden gate.' : 'The sunbird keeps you safe while it finds the way onward.', 7);
+    record('game.decision_due', 'The keeper and rescued sunbird reached the open arch.',
       { reason: 'open-exit', rescued: true, guardsRemaining: s.enemies.filter(e => e.hp > 0).length });
   }
   function tick(dt) {
@@ -119,12 +124,12 @@ export function simulation(s, emit = () => {}) {
     weight(dt); guards.step(dt, dt * s.timeFlow); confine(p, 18); objectives();
   }
   function step(dt) {
-    if (s.room === 1 && s.awaitingHost && enterThreadmill(s)) keys.clear();
-    if (s.paused || !Number.isFinite(dt) || dt <= 0) return;
+    if (enterStagedRoom(s) || (s.room === 1 && s.awaitingHost && enterThreadmill(s))) keys.clear();
     if (s.arrivalPending) {
-      record('room.entered', 'The keeper and sunbird entered the Threadmill.', s.arrivalPending);
+      record('room.entered', `The keeper and sunbird entered ${s.roomName || 'the next room'}.`, s.arrivalPending);
       delete s.arrivalPending;
     }
+    if (s.paused || !Number.isFinite(dt) || dt <= 0) return;
     dt = Math.min(dt, 0.1);
     fx.step(dt);
     if (s.hitstop > 0) { s.hitstop = Math.max(0, s.hitstop - dt); return; }

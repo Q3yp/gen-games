@@ -7,6 +7,7 @@ import { manageWork } from './work.js';
 import { directorFor } from './director.js';
 import { manageJob } from './jobs.js';
 import { observe, summary, compact } from './context.js';
+import { validateToolArguments } from './tool-arguments.js';
 
 export class ToolService {
   constructor(engine) {
@@ -19,6 +20,7 @@ export class ToolService {
         'INVALID_REQUEST',
         'Provide a tool name and an arguments object.'
       );
+      validateToolArguments(tool, args);
       const result = await this.execute(tool, args);
       return { ok: true, ...result };
     } catch (error) {

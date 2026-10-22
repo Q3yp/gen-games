@@ -23,6 +23,12 @@ Verify pause/blur/reload during a held cue: inactive input cannot progress the g
 
 Exercise controls under actual browser timing, including rapid inputs and a defensive maneuver. Can the player identify why they were hit before seeing a log? Compare two tools or movement strategies; distinguish tactical choice from execution difficulty. Verify that effects and UI do not conceal threats. A scripted command that wins an encounter does not validate action controls.
 
+Check the easiest bypass as well as the intended technique. A fiddly optional
+target plus a trivial exit may offer neither a worthwhile fight nor an interesting
+choice. Earn continuation through the ordinary local activity, not a promised next
+reveal. Prepare supported situations while the player acts; if new authoring is
+not ready, offer a complete short stopping point rather than a long empty wait.
+
 ## When the player reports guesswork
 
 Fix the visible cause and consequence before adding another encounter. A bright

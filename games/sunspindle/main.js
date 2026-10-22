@@ -2,6 +2,7 @@ import { initial, projection } from './state.js';
 import { simulation } from './simulation.js';
 import { paint } from './paint.js';
 import { sound } from './sound.js';
+import { capabilities, stagePassage } from './commands.js';
 
 export default function create(host, { save }) {
   const s = initial(save);
@@ -112,7 +113,8 @@ export default function create(host, { save }) {
     serialize: () => structuredClone(s),
     inspect: () => projection(s),
     versions: () => ({ ...s.versions }),
-    capabilities: () => [],
+    capabilities,
+    command: (name, args) => stagePassage(s, name, args, emit),
     dispose() {
       disposed = true;
       off.forEach(fn => fn());

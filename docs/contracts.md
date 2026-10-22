@@ -85,7 +85,7 @@ Factories mount once per session/module/version; regular world revisions call `u
 
 ## Agent tools
 
-Eight tools: `discover`, `session`, `observe`, `inspect`, `act`, `author`, `jobs`, `checkpoint`. Canonical schemas live in `src/agent/schemas.js`; command-specific schemas come from registered actions through `discover --session ID`. See [agent tools](agent-tools.md) for exact flags, retries, cursors, jobs, MCP configuration, and examples.
+Canonical tool schemas live in `src/core/tool-schemas.js`, re-exported by `src/agent/schemas.js` for CLI/MCP discovery. The server checks supplied top-level field names, types, and enums before dispatch; handlers retain operation-specific validation and game-defined payload schemas. Command-specific schemas come from registered actions through `discover --session ID`. See [agent tools](agent-tools.md) for exact flags, retries, cursors, jobs, MCP configuration, and examples.
 
 ## Browser diagnostics
 

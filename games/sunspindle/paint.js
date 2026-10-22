@@ -1,5 +1,7 @@
 import { palace, exitArch, foreground } from './paint-palace.js';
 import { threadmill } from './paint-threadmill.js';
+import { blastCourt } from './paint-blast-court.js';
+import { blastJar, sunbolt } from './paint-artillery.js';
 import { courier, enemy, telegraph, crystal, weight } from './paint-figures.js';
 import { arrow, effects, ambience, pointer } from './paint-effects.js';
 
@@ -23,9 +25,11 @@ export function paint(c, s, view) {
     const k = Math.min(7, s.shake * 30);
     c.translate(Math.sin(t * 137) * k, Math.cos(t * 117) * k * 0.6);
   }
-  palace(c, s, t);
+  const presentation = s.presentation || (s.room === 2 ? 'threadmill' : 'courtyard');
+  if (presentation === 'glassworks') blastCourt(c, s, t);
+  else palace(c, s, t);
   exitArch(c, s, t);
-  if (s.room === 2) threadmill(c, s, t);
+  if (presentation === 'threadmill') threadmill(c, s, t);
   for (const e of s.enemies || []) telegraph(c, e);
   // Ground-position sorting keeps characters and the hanging prism overlapping naturally.
   const entities = [
@@ -38,8 +42,12 @@ export function paint(c, s, view) {
     if (e.type === 'player') courier(c, e.value, t);
     else if (e.type === 'enemy') enemy(c, e.value, t);
     else if (e.value.kind === 'crystal') crystal(c, e.value, s, t);
+    else if (e.value.kind === 'blastjar') blastJar(c, e.value, t);
   }
-  for (const a of s.shots || []) arrow(c, a);
+  for (const a of s.shots || []) {
+    if (a.kind === 'shell') sunbolt(c, a);
+    else arrow(c, a);
+  }
   weight(c, s, t);
   effects(c, s);
   ambience(c, s, t);

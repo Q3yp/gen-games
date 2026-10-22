@@ -3,19 +3,20 @@ import { polygon, line, ellipse, shadow } from './paint-primitives.js';
 import { ram } from './paint-ram.js';
 import { archer } from './paint-archer.js';
 import { guardian } from './paint-guardian.js';
+import { artillery } from './paint-artillery.js';
 
 export function telegraph(c, e) {
   if (e.hp <= 0 || !['windup', 'lunge'].includes(e.phase)) return;
   const angle = Number.isFinite(e.aimX) ? Math.atan2(e.aimY, e.aimX) : (e.angle || 0),
     len = Math.min(e.aimDistance || 260, e.kind !== 'archer' ? 470 : 620),
-    ram = e.kind !== 'archer';
+    ram = e.kind === 'ram' || e.kind === 'guardian';
   c.save();
   c.translate(e.x, e.y);
   c.rotate(angle);
   const g = c.createLinearGradient(20, 0, len, 0);
   g.addColorStop(0, ram ? '#b9553c23' : '#b9553c12');
   g.addColorStop(1, '#b9553c00');
-  const spread = ram ? (e.kind === 'guardian' ? 48 : 32) : Math.tan(0.17) * len;
+  const spread = ram ? (e.kind === 'guardian' ? 48 : 32) : Math.tan(e.kind === 'artillery' ? 0.34 : 0.17) * len;
   polygon(c, [
     [16, -(ram ? 17 : 4)],
     [len, -spread],
@@ -68,12 +69,13 @@ export function enemy(c, e, t) {
     c.translate(-e.x, -e.y);
   }
   shadow(c, e.x, e.y, e.kind === 'ram' ? 25 : 18, e.kind === 'ram' ? 36 : 46, 0.22);
-  if (e.kind === 'guardian') guardian(c, e, t);
+  if (e.kind === 'artillery') artillery(c, e, t);
+  else if (e.kind === 'guardian') guardian(c, e, t);
   else if (e.kind === 'ram') ram(c, e, t);
   else archer(c, e, t);
   if (e.hp > 0 && e.hp < e.maxHp) {
     for (let i = 0; i < e.maxHp; i++) ellipse(
-      c, e.x + (i - (e.maxHp - 1) / 2) * 7, e.y + 29, 1.8, 1.8,
+      c, e.x + (i - (e.maxHp - 1) / 2) * 7, e.y + (e.kind === 'artillery' ? 72 : 38), 2.2, 2.2,
       i < e.hp ? '#a95b4b' : '#c8b69b'
     );
   }

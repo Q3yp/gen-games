@@ -38,6 +38,15 @@ without restarting the server. Creating another campaign
 alone isolates save state, not source. This intentionally avoids a new branching,
 cloud-sync or multi-user source management framework.
 
+Creating a campaign uses the running registry's cached release and manifest, not
+an automatic reread of edited files. `register` on an existing game ID does not
+refresh it. For a fresh campaign from revised source, first publish into a
+disposable preview session, verify that release there, then create the player
+campaign and verify its release. Publication updates that game ID's creation
+default even though other existing sessions remain pinned. Never use a preserved
+player ending as the preview target. Registration snapshots a genuinely new ID;
+server startup also snapshots source, so a restart may change new-campaign defaults.
+
 ## Fresh agent: discover, open, attach
 
 ```sh
@@ -90,6 +99,13 @@ references are each ≤40 JSON entries and ≤8 KB; total workspace ≤30 KB. Re
 files, immutable release URLs and artifacts rather than embedding transcripts or
 media. `basedOn` records game freshness at handoff writing so a later host can see
 whether play has advanced; handoff prose is not authoritative live state.
+
+Keep a resume brief to the useful minimum: player intent and latest play verdict;
+exact campaign/source identity; desired/active/save release and freshness; current
+objective, resources and preserved choices; pending authored work and its guard;
+next permitted action or explicit stopping condition. Distinguish a completed
+trial from a request for another room, and host feasibility checks from independent
+play judgment. Link detailed source/artifacts instead of copying logs or save JSON.
 
 Game code may expose a compact `inspect().progress` string or object. The library
 displays this as game-owned progress, separate from the agent's optional handoff

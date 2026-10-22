@@ -223,6 +223,17 @@ runtime remains. Confirm the active release, inspect a browser screenshot, and
 exercise the changed mechanic. Do not send follow-up commands against an assumed
 new release.
 
+When a game exposes inactive staging, use its guarded command to prepare supported
+arrangements while the player still has useful local play. Await the durable
+command result, then separately verify the game's safe-boundary entry event; staged
+does not mean entered. Save pending content and carry the live player's condition
+at entry, not a snapshot captured during staging. Audit upstream exit/recovery
+rules too: a correct transition cannot preserve damage already erased by a gate.
+Preserve or explicitly migrate staged factory versions across source publication.
+These are game-defined commands, not a required engine scene catalog. Genuinely new
+rules still need source. A short complete stopping point beats an empty exit while
+the host spends minutes authoring; do not promise continuation before it is ready.
+
 The running game's capabilities define its command vocabulary; do not invent a
 command name from a caption. Use the director turn's release, run and scope guards
 as above. Outside that loop, inspect `projection` for these guards before sending

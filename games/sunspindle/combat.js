@@ -5,8 +5,9 @@ export function combat(s, record, once, fx, notice) {
     if (e.hp <= 0) return;
     e.hp = Math.max(0, e.hp - damage); e.flash = 0.18;
     e.phase = 'recover'; e.timer = e.phaseDuration = 1.25;
-    const shove = e.kind === 'guardian' ? 155 : e.kind === 'ram' ? 330 : 430;
+    const shove = e.kind === 'artillery' ? 0 : e.kind === 'guardian' ? 155 : e.kind === 'ram' ? 330 : 430;
     e.vx = push.x * shove; e.vy = push.y * shove;
+    if (e.kind === 'artillery') e.blastShake = source === 'blastjar' ? 0.45 : 0.2;
     s.shake = Math.max(s.shake, 4); s.hitstop = Math.max(s.hitstop, 0.035);
     fx.burst(e.x, e.y, '#fff2ac', 12); fx.ring(e.x, e.y, '#ffdf86', 44, 0.22);
     once('combat.first_hit', 'The sunweight knocked a guard out of its attack.', { target: e.id, source });
@@ -17,8 +18,29 @@ export function combat(s, record, once, fx, notice) {
       record('enemy.defeated', 'A guard fell; its place in the courtyard is clear.', { id: e.id, kind: e.kind, source });
     }
   }
+  function burstJar(p) {
+    p.hp = 0; p.flash = 0.4;
+    const radius = 175, targets = [];
+    fx.burst(p.x, p.y, '#ffb04f', 36, 340);
+    fx.ring(p.x, p.y, '#ffe5a0', radius, 0.45);
+    fx.ring(p.x, p.y, '#ed8649', radius, 0.65);
+    for (const e of s.enemies) {
+      if (e.hp <= 0 || distance(p, e) > radius + e.radius) continue;
+      enemyHit(e, 2, direction(p, e), 'blastjar');
+      e.timer = e.phaseDuration = 1.6;
+      e.flash = 0.35;
+      targets.push(e.id);
+    }
+    // A jar never hurts the keeper or detonates another jar.
+    s.shake = Math.max(s.shake, 9); s.hitstop = Math.max(s.hitstop, 0.065);
+    record('blastjar.burst', 'A clay sunjar burst outward across the courtyard.', { id: p.id, radius, targets });
+  }
   function propHit(p, damage, source) {
     if (p.hp <= 0) return;
+    if (p.kind === 'blastjar') {
+      if (source === 'sunweight') burstJar(p);
+      return;
+    }
     p.hp = Math.max(0, p.hp - damage); p.flash = 0.24;
     fx.burst(p.x, p.y, '#b7ffec', p.hp ? 10 : 28, p.hp ? 140 : 250);
     fx.ring(p.x, p.y, '#caffef', p.hp ? 55 : 150, p.hp ? 0.3 : 0.75);

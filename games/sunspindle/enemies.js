@@ -13,10 +13,14 @@ export function enemies(s, fight, fx) {
     e.aimDistance = Math.min(470, distance(e, s.player) + 80);
   }
   function volley(e) {
-    for (const offset of [-0.17, 0, 0.17]) {
+    const artillery = e.kind === 'artillery';
+    const spread = artillery ? 0.34 : 0.17, speed = artillery ? 220 : 285;
+    const muzzle = artillery ? e.radius + 14 : 31;
+    for (const offset of [-spread, 0, spread]) {
       const angle = e.angle + offset, x = Math.cos(angle), y = Math.sin(angle);
-      s.shots.push({ id: `reed-${++s.shotSerial}`, x: e.x + x * 31, y: e.y + y * 31,
-        vx: x * 285, vy: y * 285, r: 7, angle, life: 4.5, kind: 'arrow' });
+      s.shots.push({ id: `${artillery ? 'shell' : 'reed'}-${++s.shotSerial}`, x: e.x + x * muzzle, y: e.y + y * muzzle,
+        vx: x * speed, vy: y * speed, r: artillery ? 12 : 7, angle,
+        life: artillery ? 6 : 4.5, kind: artillery ? 'shell' : 'arrow' });
     }
     fx.burst(e.x + e.aimX * 30, e.y + e.aimY * 30, '#edaa6c', 5, 65);
   }
@@ -27,7 +31,7 @@ export function enemies(s, fight, fx) {
       if (e.kind === 'ram' || e.kind === 'guardian') {
         phase(e, 'lunge', e.aimDistance / (e.lungeSpeed || 470)); e.hitPlayer = false;
         fx.ring(e.x, e.y, '#ed9570', 42, 0.25);
-      } else { volley(e); phase(e, 'recover', 2.1); }
+      } else { volley(e); phase(e, 'recover', e.kind === 'artillery' ? 2.4 : 2.1); }
       return;
     }
     if (e.phase === 'lunge') {
@@ -44,6 +48,13 @@ export function enemies(s, fight, fx) {
       return;
     }
     const d = distance(e, s.player), n = direction(e, s.player, e.angle);
+    if (e.kind === 'artillery') {
+      // This planted creature commits to one readable direction, never tracking
+      // during its windup. Any ordinary hit cancels that commitment.
+      e.angle = Math.atan2(n.y, n.x);
+      if (e.timer <= 0) { aim(e); phase(e, 'windup', 2); }
+      return;
+    }
     if (e.kind === 'guardian') {
       const target = Math.atan2(n.y, n.x);
       const delta = Math.atan2(Math.sin(target - e.angle), Math.cos(target - e.angle));
@@ -62,10 +73,19 @@ export function enemies(s, fight, fx) {
   function step(dt, hostileDt) {
     for (const e of s.enemies) {
       e.flash = Math.max(0, e.flash - dt); e.blockFlash = Math.max(0, (e.blockFlash || 0) - dt);
+      if (e.kind === 'artillery') e.blastShake = Math.max(0, (e.blastShake || 0) - dt);
       e.crashCooldown = Math.max(0, e.crashCooldown - dt);
       if (e.hp <= 0) { e.down = Math.max(0, e.down - dt); continue; }
       const previous = { x: e.x, y: e.y };
       think(e, hostileDt);
+      // Recoil is painted rather than simulated: the artillery's position is
+      // fixed even when another guard crashes into it or the player approaches.
+      if (e.kind === 'artillery') {
+        e.vx = 0; e.vy = 0;
+        separate(s.player, e, e.radius + 18);
+        confine(s.player, 18);
+        continue;
+      }
       e.x += e.vx * dt; e.y += e.vy * dt;
       fight.collisions(e, previous);
       e.vx *= Math.exp(-dt * 4.8); e.vy *= Math.exp(-dt * 4.8);
@@ -79,7 +99,7 @@ export function enemies(s, fight, fx) {
       const previous = { x: shot.x, y: shot.y };
       shot.x += shot.vx * hostileDt; shot.y += shot.vy * hostileDt; shot.life -= hostileDt;
       if (segmentHits(previous, shot, s.player, shot.r + 16)) {
-        fight.playerHit(previous, 'reed volley'); shot.life = 0;
+        fight.playerHit(previous, shot.kind === 'shell' ? 'artillery volley' : 'reed volley'); shot.life = 0;
       }
       if (s.props.some(p => p.hp > 0 && segmentHits(previous, shot, p, p.r + shot.r))) shot.life = 0;
       if (confine(shot, shot.r)) shot.life = 0;

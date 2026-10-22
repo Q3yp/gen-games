@@ -153,6 +153,14 @@ objects, regardless of flag placement. `--file -` reads stdin once. No shell
 expressions or JSON contents are evaluated. Generic JSON is passed through to the
 server, so new supported fields do not need new CLI flags.
 
+The server rejects unknown top-level fields and invalid top-level types/enums
+before executing a tool, with a compact error and supported-field hint. For
+example, inspect `{ "target": "commands" }` or `{ "path": "commands" }` is
+rejected with a hint to use `{ "scope": "commands" }`; `path` expects an array.
+Use `node src/agent/cli.js inspect --help` for its current schema. These shallow
+checks do not restrict nested game-defined command/action payloads; each handler
+still owns its defaults, required fields, bounds, and game-specific validation.
+
 ## Background jobs and checkpoints
 
 Start a job against the revision used to generate its proposed edits:
