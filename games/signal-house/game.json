@@ -1,0 +1,1115 @@
+{
+  "id": "signal-house",
+  "title": "Signal House",
+  "description": "An intimate conversation-driven mystery at the edge of the sea. Repair a forgotten lighthouse, earn a keeper’s trust, and choose how to answer a voice from the past.",
+  "version": "1.0.0",
+  "plugins": [
+    "core",
+    "narrative"
+  ],
+  "ui": "/games/signal-house/ui.js",
+  "tags": [
+    "adventure",
+    "conversation",
+    "branching-story"
+  ],
+  "cover": "/games/signal-house/assets/house.svg",
+  "initial": {
+    "scene": "landing",
+    "player": "visitor",
+    "entities": {
+      "visitor": {
+        "id": "visitor",
+        "name": "You",
+        "kind": "player",
+        "components": {
+          "appearance": {
+            "glyph": "@",
+            "color": "#e8cfaa"
+          },
+          "stats": {
+            "health": 1,
+            "maxHealth": 1,
+            "attack": 0,
+            "defense": 0,
+            "mana": 0,
+            "maxMana": 0
+          },
+          "inventory": {
+            "items": [
+              "maraved-letter"
+            ]
+          },
+          "position": {
+            "x": 4,
+            "y": 8,
+            "scene": "landing"
+          }
+        }
+      },
+      "maraved-letter": {
+        "id": "maraved-letter",
+        "name": "Mara’s letter",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "✉",
+            "color": "#e4cda7"
+          },
+          "item": {
+            "consumable": false,
+            "description": "A letter asking you to find June and keep a promise.",
+            "effects": [
+              {
+                "type": "narrate",
+                "text": "“If you hear my voice on the midnight band, don’t answer alone. Find June. Tell her I kept the promise.”"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "readLetter"
+                ],
+                "value": true
+              }
+            ]
+          }
+        }
+      },
+      "june": {
+        "id": "june",
+        "name": "June",
+        "kind": "character",
+        "components": {
+          "appearance": {
+            "glyph": "J",
+            "color": "#d7ab69"
+          },
+          "interact": {
+            "text": "“The workshop has the coil. The archive has the truth. I’ll be here when you’re ready.”",
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "knowPlan"
+                ],
+                "value": true
+              }
+            ]
+          },
+          "position": {
+            "x": 4,
+            "y": 7,
+            "scene": "foyer"
+          }
+        }
+      },
+      "workbench": {
+        "id": "workbench",
+        "name": "Copper coil",
+        "kind": "prop",
+        "components": {
+          "appearance": {
+            "glyph": "◎",
+            "color": "#d29a69"
+          },
+          "interact": {
+            "text": "The copper seam can be carefully soldered. Examine the workshop choices."
+          },
+          "position": {
+            "x": 4,
+            "y": 7,
+            "scene": "workshop"
+          }
+        }
+      },
+      "ledger": {
+        "id": "ledger",
+        "name": "Keeper’s ledger",
+        "kind": "prop",
+        "components": {
+          "appearance": {
+            "glyph": "▤",
+            "color": "#c6c1a7"
+          },
+          "interact": {
+            "text": "One frequency repeats in the original ledger: 88.4.",
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "frequencyFound"
+                ],
+                "value": true
+              }
+            ]
+          },
+          "position": {
+            "x": 4,
+            "y": 7,
+            "scene": "archive"
+          }
+        }
+      },
+      "beacon": {
+        "id": "beacon",
+        "name": "The lantern",
+        "kind": "prop",
+        "components": {
+          "appearance": {
+            "glyph": "◉",
+            "color": "#ffe0a1"
+          },
+          "interact": {
+            "text": "The mechanism waits for a repaired coil and the true frequency."
+          },
+          "position": {
+            "x": 4,
+            "y": 7,
+            "scene": "lantern-room"
+          }
+        }
+      }
+    },
+    "scenes": {
+      "landing": {
+        "id": "landing",
+        "name": "The last boat",
+        "description": "The ferry leaves you on a rain-dark jetty with a letter from your missing sister. At the top of the cliff, Signal House has begun transmitting again. It has been empty for nineteen years.",
+        "background": "house",
+        "chapter": "01 / ARRIVAL",
+        "objective": "Follow the signal. Find out who is waiting.",
+        "entry": {
+          "x": 4,
+          "y": 8
+        },
+        "choices": [
+          {
+            "id": "read-letter",
+            "label": "Read your sister’s letter",
+            "text": "“If you hear my voice on the midnight band, don’t answer alone. Find June. Tell her I kept the promise.”",
+            "once": true,
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "readLetter"
+                ],
+                "value": true
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "Your sister left a warning: do not answer alone."
+              }
+            ]
+          },
+          {
+            "id": "climb-path",
+            "label": "Climb to Signal House",
+            "text": "You fold the letter into your coat and follow the light.",
+            "next": "foyer"
+          }
+        ],
+        "dialogue": {
+          "speaker": "The sea",
+          "fallback": "Only the tide answers. The path to the house is still visible.",
+          "intents": [
+            {
+              "id": "call-sister",
+              "keywords": [
+                "mara",
+                "sister",
+                "hello"
+              ],
+              "text": "A thin voice slips between the waves: “Find June.” Then the static takes it."
+            }
+          ]
+        }
+      },
+      "foyer": {
+        "id": "foyer",
+        "name": "A light in the hall",
+        "description": "June sits beside a dismantled radio, rainwater silvering the shoulders of her coat. She looks up when the door opens. “You’re late,” she says. “Or I am. It’s difficult to tell in this house.”",
+        "background": "house",
+        "portrait": "june",
+        "chapter": "02 / THE KEEPER",
+        "objective": "Win June’s trust and learn what the signal needs.",
+        "entry": {
+          "x": 4,
+          "y": 8
+        },
+        "choices": [
+          {
+            "id": "offer-letter",
+            "label": "Show June the letter",
+            "text": "“Mara sent me. She said you kept a promise.”",
+            "once": true,
+            "when": {
+              "path": [
+                "variables",
+                "readLetter"
+              ],
+              "equals": true
+            },
+            "effects": [
+              {
+                "type": "increment",
+                "path": [
+                  "variables",
+                  "trust"
+                ],
+                "amount": 2
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "letterShared"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "June reads the last line twice. “Then we still have time.”",
+                "speaker": "June"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "June knows Mara. She trusts you more after reading the letter."
+              }
+            ]
+          },
+          {
+            "id": "honest-fear",
+            "label": "Admit that you’re frightened",
+            "text": "“I don’t understand any of this. But I couldn’t leave her out there.”",
+            "once": true,
+            "effects": [
+              {
+                "type": "increment",
+                "path": [
+                  "variables",
+                  "trust"
+                ],
+                "amount": 1
+              },
+              {
+                "type": "narrate",
+                "text": "“Good,” June says quietly. “People who aren’t frightened do careless things.”",
+                "speaker": "June"
+              }
+            ]
+          },
+          {
+            "id": "demand-answers",
+            "label": "Demand an explanation",
+            "text": "“Tell me where my sister is.”",
+            "once": true,
+            "effects": [
+              {
+                "type": "increment",
+                "path": [
+                  "variables",
+                  "trust"
+                ],
+                "amount": -1
+              },
+              {
+                "type": "narrate",
+                "text": "June’s expression closes. “We can blame each other after the tide turns.”",
+                "speaker": "June"
+              }
+            ]
+          },
+          {
+            "id": "ask-plan",
+            "label": "Ask what needs fixing",
+            "text": "“What do we need to bring her home?”",
+            "once": true,
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "knowPlan"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "“A copper coil from the workshop. The true frequency from the archive. Then we light the lantern together.”",
+                "speaker": "June"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "Repair the coil. Recover the true frequency. Return to the lantern room."
+              }
+            ]
+          },
+          {
+            "id": "go-workshop",
+            "label": "Search the workshop",
+            "next": "workshop"
+          },
+          {
+            "id": "go-archive",
+            "label": "Open the archive",
+            "next": "archive"
+          },
+          {
+            "id": "go-lantern",
+            "label": "Climb to the lantern room",
+            "next": "lantern-room"
+          }
+        ],
+        "dialogue": {
+          "speaker": "June",
+          "fallback": "“Tell me about Mara, the signal, or the promise. Or let’s get to work.”",
+          "intents": [
+            {
+              "id": "mara",
+              "keywords": [
+                "mara",
+                "sister"
+              ],
+              "text": "“She stayed when everyone else left. She thought a signal was only a voice looking for someone willing to listen.”"
+            },
+            {
+              "id": "promise",
+              "keywords": [
+                "promise"
+              ],
+              "when": {
+                "not": {
+                  "path": [
+                    "variables",
+                    "promiseDiscussed"
+                  ],
+                  "equals": true
+                }
+              },
+              "text": "“I promised I wouldn’t let her answer alone again. I intend to keep it.”",
+              "effects": [
+                {
+                  "type": "set",
+                  "path": [
+                    "variables",
+                    "promiseDiscussed"
+                  ],
+                  "value": true
+                },
+                {
+                  "type": "increment",
+                  "path": [
+                    "variables",
+                    "trust"
+                  ],
+                  "amount": 1
+                }
+              ]
+            },
+            {
+              "id": "signal",
+              "keywords": [
+                "signal",
+                "frequency",
+                "repair"
+              ],
+              "text": "“The workshop has the coil. The archive has the frequency. We need both before we can reach the lantern.”"
+            },
+            {
+              "id": "june",
+              "keywords": [
+                "you",
+                "june",
+                "alone"
+              ],
+              "text": "“Nineteen years of keeping a light. You get used to the dark. You shouldn’t, but you do.”"
+            }
+          ]
+        }
+      },
+      "workshop": {
+        "id": "workshop",
+        "name": "The shape of a storm",
+        "description": "Every workbench is covered in small, patient repairs. A copper coil has split along its seam. Beside it sits a soldering iron and a recording labeled FOR WHEN YOU FORGET.",
+        "background": "house",
+        "chapter": "03 / THE COIL",
+        "objective": "Repair the copper coil. Learn why the signal failed.",
+        "entry": {
+          "x": 4,
+          "y": 8
+        },
+        "choices": [
+          {
+            "id": "play-tape",
+            "label": "Play the old recording",
+            "text": "The tape turns. Mara’s voice fills the workshop.",
+            "once": true,
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "heardTape"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "“The signal doesn’t travel through distance. It travels through memory. The house can find us, but it needs someone at each end.”",
+                "speaker": "Mara"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "The signal follows shared memories, not distance."
+              }
+            ]
+          },
+          {
+            "id": "repair-coil",
+            "label": "Carefully solder the broken coil",
+            "text": "You clean the seam, steady your hands, and make the smallest repair you can.",
+            "once": true,
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "coilRepaired"
+                ],
+                "value": true
+              },
+              {
+                "type": "increment",
+                "path": [
+                  "variables",
+                  "repairs"
+                ],
+                "amount": 1
+              },
+              {
+                "type": "narrate",
+                "text": "The coil sings one clean note. For a moment, the room smells of a summer you remember."
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "The copper coil is repaired."
+              }
+            ]
+          },
+          {
+            "id": "take-shortcut",
+            "label": "Bridge the coil with scrap wire",
+            "text": "You bridge the gap with a length of spare wire.",
+            "once": true,
+            "when": {
+              "not": {
+                "path": [
+                  "variables",
+                  "coilRepaired"
+                ],
+                "equals": true
+              }
+            },
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "coilRepaired"
+                ],
+                "value": true
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "unstableCoil"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "The coil crackles to life. It works, but its note is uneven."
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "The coil works, but the improvised repair is unstable."
+              }
+            ]
+          },
+          {
+            "id": "fix-shortcut",
+            "label": "Replace the makeshift bridge",
+            "text": "You undo the shortcut and solder the seam properly.",
+            "once": true,
+            "when": {
+              "path": [
+                "variables",
+                "unstableCoil"
+              ],
+              "equals": true
+            },
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "unstableCoil"
+                ],
+                "value": false
+              },
+              {
+                "type": "increment",
+                "path": [
+                  "variables",
+                  "repairs"
+                ],
+                "amount": 1
+              },
+              {
+                "type": "narrate",
+                "text": "The unstable hum resolves into a steady tone."
+              }
+            ]
+          },
+          {
+            "id": "workshop-return",
+            "label": "Return to June",
+            "next": "foyer"
+          },
+          {
+            "id": "workshop-archive",
+            "label": "Cross to the archive",
+            "next": "archive"
+          }
+        ],
+        "dialogue": {
+          "speaker": "The recording",
+          "fallback": "The tape clicks softly. The coil and recording wait on the bench.",
+          "intents": [
+            {
+              "id": "memory",
+              "keywords": [
+                "memory",
+                "remember",
+                "home"
+              ],
+              "text": "“If the signal loses its way, give it something ordinary. The sound of a kettle. The name of a street. A place you both called home.”"
+            }
+          ]
+        }
+      },
+      "archive": {
+        "id": "archive",
+        "name": "What the sea keeps",
+        "description": "The archive smells of salt and paper. A ledger lists every signal the house ever received. One date repeats through nineteen years. Under the floorboards, something taps three times.",
+        "background": "house",
+        "chapter": "04 / THE FREQUENCY",
+        "objective": "Find the real frequency and a memory to anchor it.",
+        "entry": {
+          "x": 4,
+          "y": 8
+        },
+        "choices": [
+          {
+            "id": "read-ledger",
+            "label": "Study the keeper’s ledger",
+            "text": "You compare the repeated entries until the pattern emerges.",
+            "once": true,
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "frequencyFound"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "The real frequency is 88.4. The official log says 88.1. Someone changed it on the night Mara vanished."
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "The true frequency is 88.4, not the number in the official log."
+              }
+            ]
+          },
+          {
+            "id": "lift-floorboard",
+            "label": "Lift the loose floorboard",
+            "text": "Beneath the wood lies a photograph: you and Mara at the summer pier.",
+            "once": true,
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "memoryFound"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "On the back, in your own childhood handwriting: “The sea always gives us back.”"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "The photograph holds a shared memory: the summer pier."
+              }
+            ]
+          },
+          {
+            "id": "read-confession",
+            "label": "Read June’s unsent letter",
+            "text": "“I changed the frequency because I thought the other voice was a trick. I was trying to save her.”",
+            "once": true,
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "knowSecret"
+                ],
+                "value": true
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "lastNote"
+                ],
+                "value": "June changed the frequency to protect Mara. She has kept the light ever since."
+              }
+            ]
+          },
+          {
+            "id": "archive-return",
+            "label": "Return to June",
+            "next": "foyer"
+          },
+          {
+            "id": "archive-lantern",
+            "label": "Take the stairs to the lantern",
+            "next": "lantern-room"
+          }
+        ],
+        "dialogue": {
+          "speaker": "The archive",
+          "fallback": "The ledger, the loose floorboard, and an unsent letter offer three different kinds of answer.",
+          "intents": [
+            {
+              "id": "knocking",
+              "keywords": [
+                "knock",
+                "tap",
+                "floor"
+              ],
+              "text": "Three taps. A pause. Three more. The sound comes from beneath the loose floorboard."
+            },
+            {
+              "id": "frequency",
+              "keywords": [
+                "88",
+                "frequency",
+                "ledger"
+              ],
+              "text": "Compare the original ledger with the official log. One digit has been altered."
+            }
+          ]
+        }
+      },
+      "lantern-room": {
+        "id": "lantern-room",
+        "name": "The midnight band",
+        "description": "The lantern turns over a black sea. Through the speaker, Mara takes one slow breath. “I can hear you,” she says. June waits by the switch, afraid to meet your eyes.",
+        "background": "lantern",
+        "portrait": "june",
+        "chapter": "05 / THE ANSWER",
+        "objective": "Choose how to answer. What you learned changes what can be saved.",
+        "entry": {
+          "x": 4,
+          "y": 8
+        },
+        "choices": [
+          {
+            "id": "forgive-june",
+            "label": "Tell June you understand",
+            "text": "“You tried to save her. You stayed. Now help me bring her home.”",
+            "once": true,
+            "when": {
+              "path": [
+                "variables",
+                "knowSecret"
+              ],
+              "equals": true
+            },
+            "effects": [
+              {
+                "type": "increment",
+                "path": [
+                  "variables",
+                  "trust"
+                ],
+                "amount": 2
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "forgaveJune"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "June lets out a breath she seems to have held for nineteen years. “Together, then.”",
+                "speaker": "June"
+              }
+            ]
+          },
+          {
+            "id": "blame-june",
+            "label": "Confront June about the frequency",
+            "text": "“You changed it. All of this started with you.”",
+            "once": true,
+            "when": {
+              "path": [
+                "variables",
+                "knowSecret"
+              ],
+              "equals": true
+            },
+            "effects": [
+              {
+                "type": "increment",
+                "path": [
+                  "variables",
+                  "trust"
+                ],
+                "amount": -2
+              },
+              {
+                "type": "narrate",
+                "text": "“Yes,” she says. “It did. I’m still here.”",
+                "speaker": "June"
+              }
+            ]
+          },
+          {
+            "id": "tune-lantern",
+            "label": "Install the coil and tune to 88.4",
+            "text": "The coil settles into place. You turn the dial to the number the ledger kept safe.",
+            "once": true,
+            "when": {
+              "all": [
+                {
+                  "path": [
+                    "variables",
+                    "coilRepaired"
+                  ],
+                  "equals": true
+                },
+                {
+                  "path": [
+                    "variables",
+                    "frequencyFound"
+                  ],
+                  "equals": true
+                }
+              ]
+            },
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "signalReady"
+                ],
+                "value": true
+              },
+              {
+                "type": "narrate",
+                "text": "Static resolves into the sound of waves against the summer pier. Mara is closer now."
+              },
+              {
+                "type": "cue",
+                "visual": "signal",
+                "color": "#f7d89c"
+              }
+            ]
+          },
+          {
+            "id": "answer-together",
+            "label": "Remember the pier, together",
+            "text": "You tell Mara about the summer pier. June holds the switch. “The sea always gives us back,” you say.",
+            "next": "homecoming",
+            "when": {
+              "all": [
+                {
+                  "path": [
+                    "variables",
+                    "signalReady"
+                  ],
+                  "equals": true
+                },
+                {
+                  "path": [
+                    "variables",
+                    "memoryFound"
+                  ],
+                  "equals": true
+                },
+                {
+                  "path": [
+                    "variables",
+                    "trust"
+                  ],
+                  "gte": 2
+                },
+                {
+                  "path": [
+                    "variables",
+                    "unstableCoil"
+                  ],
+                  "equals": false
+                }
+              ]
+            },
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "outcome"
+                ],
+                "value": "homecoming"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "ending"
+                ],
+                "value": "The sea gives you back"
+              }
+            ]
+          },
+          {
+            "id": "answer-alone",
+            "label": "Answer Mara alone",
+            "text": "You take the microphone. “Follow my voice.”",
+            "next": "crossing",
+            "when": {
+              "path": [
+                "variables",
+                "signalReady"
+              ],
+              "equals": true
+            },
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "outcome"
+                ],
+                "value": "crossing"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "ending"
+                ],
+                "value": "A light on the other shore"
+              }
+            ]
+          },
+          {
+            "id": "keep-light",
+            "label": "Leave the channel open until dawn",
+            "text": "You refuse to rush the answer. You and June keep the light turning, one more night.",
+            "next": "vigil",
+            "when": {
+              "path": [
+                "variables",
+                "signalReady"
+              ],
+              "equals": true
+            },
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "outcome"
+                ],
+                "value": "vigil"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "ending"
+                ],
+                "value": "Keep a light for me"
+              }
+            ]
+          },
+          {
+            "id": "lantern-return",
+            "label": "Go back. There is more to understand.",
+            "next": "foyer"
+          }
+        ],
+        "dialogue": {
+          "speaker": "Mara",
+          "fallback": "“I’m here. But I need more than a voice. Give me something I can find my way back to.”",
+          "intents": [
+            {
+              "id": "pier",
+              "keywords": [
+                "pier",
+                "summer",
+                "home"
+              ],
+              "when": {
+                "path": [
+                  "variables",
+                  "memoryFound"
+                ],
+                "equals": true
+              },
+              "text": "“I remember. The boards were warm. You wouldn’t let go of my hand. Don’t let go now.”"
+            },
+            {
+              "id": "alone",
+              "keywords": [
+                "alone",
+                "afraid"
+              ],
+              "text": "“Neither of us has to do this alone. Not this time.”"
+            },
+            {
+              "id": "frequency",
+              "keywords": [
+                "frequency",
+                "coil",
+                "help"
+              ],
+              "text": "“Make the signal steady. Then give it a memory we both know.”"
+            }
+          ]
+        }
+      },
+      "homecoming": {
+        "id": "homecoming",
+        "name": "The sea gives you back",
+        "description": "At dawn, someone knocks on the door. Mara stands on the step in the coat she wore nineteen years ago. June laughs once, disbelievingly, and then the three of you are crying. Behind you, Signal House finally falls quiet.",
+        "background": "lantern",
+        "chapter": "ENDING / HOMECOMING",
+        "objective": "Three people. One promise kept.",
+        "choices": []
+      },
+      "crossing": {
+        "id": "crossing",
+        "name": "A light on the other shore",
+        "description": "Mara’s voice becomes a hand in yours. The room folds like a map. When you open your eyes, the summer pier stretches ahead, endless in the dusk. Far away, June keeps a light turning. You are not home. But you are not alone.",
+        "background": "house",
+        "chapter": "ENDING / THE CROSSING",
+        "objective": "Some answers are a beginning, not a way back.",
+        "choices": []
+      },
+      "vigil": {
+        "id": "vigil",
+        "name": "Keep a light for me",
+        "description": "The midnight band fades, but you do not close it. At sunrise, June brings two cups of tea to the lantern room. Somewhere in the static, Mara is singing. You have a frequency, a promise, and tomorrow. Sometimes hope is a thing you maintain.",
+        "background": "lantern",
+        "chapter": "ENDING / THE VIGIL",
+        "objective": "The light remains. So do you.",
+        "choices": []
+      }
+    },
+    "assets": {
+      "cover": {
+        "id": "cover",
+        "kind": "image",
+        "src": "/games/signal-house/assets/house.svg",
+        "alt": "A remote lighthouse standing against a violet sea",
+        "license": "CC0-1.0; original artwork created for this project"
+      },
+      "house": {
+        "id": "house",
+        "kind": "image",
+        "src": "/games/signal-house/assets/house.svg",
+        "alt": "Signal House at dusk",
+        "license": "CC0-1.0; original artwork created for this project"
+      },
+      "june": {
+        "id": "june",
+        "kind": "image",
+        "src": "/games/signal-house/assets/june.svg",
+        "alt": "June, a young radio engineer in a yellow raincoat",
+        "license": "CC0-1.0; original artwork created for this project"
+      },
+      "lantern": {
+        "id": "lantern",
+        "kind": "image",
+        "src": "/games/signal-house/assets/lantern.svg",
+        "alt": "The restored lantern shining out over the water",
+        "license": "CC0-1.0; original artwork created for this project"
+      }
+    },
+    "skills": {},
+    "variables": {
+      "trust": 0,
+      "repairs": 0,
+      "readLetter": false,
+      "coilRepaired": false,
+      "unstableCoil": false,
+      "frequencyFound": false,
+      "memoryFound": false,
+      "knowSecret": false,
+      "signalReady": false,
+      "lastNote": "A letter. A missing sister. A light that should not be burning."
+    }
+  }
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b1e">
+  <meta name="description" content="An agent-native game studio. Persistent worlds, human play, and a live coding director in one runtime.">
+  <title>gen / games — Play a living world</title>
+  <link rel="icon" type="image/svg+xml" href="/mark.svg">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#play-surface">Skip to game</a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="gen games home"><img src="/mark.svg" alt="" width="38" height="38"><span>gen<span class="brand-slash">/</span>games<small>THE LIVING WORLD STUDIO</small></span></a>
+    <div class="session-controls">
+      <label class="select-field"><span>WORLD</span><select id="game-select" aria-label="Select game world"><option>Loading worlds…</option></select></label>
+      <label class="select-field session-field"><span>SESSION</span><select id="session-select" aria-label="Select saved session"><option>No session</option></select></label>
+      <button class="button new-session" id="new-session"><span aria-hidden="true">＋</span> New run</button>
+    </div>
+    <div class="connection" id="connection" role="status"><span class="status-dot"></span><span>Connecting</span></div>
+  </header>
+
+  <main class="workspace">
+    <aside class="player-rail" aria-label="Player tools">
+      <div class="world-summary"><p class="eyebrow">YOUR EXPEDITION <span id="world-number">01</span></p><h1 id="world-title">A world awaits.</h1><p id="world-description">Connecting to your local game runtime.</p><span class="tag" id="world-version">LOCAL-FIRST · PERSISTENT</span></div>
+      <section class="panel player-panel" aria-labelledby="player-heading"><div class="section-heading"><h2 id="player-heading">Character</h2><span class="tiny-label" id="player-role">PLAYER</span></div><div id="player-card" class="loading-block">Loading character…</div></section>
+      <section class="panel" aria-labelledby="inventory-heading"><div class="section-heading"><h2 id="inventory-heading">Inventory</h2><span class="counter" id="inventory-count">0</span></div><div id="inventory" class="item-list"><p class="empty-note">Your pack is empty.</p></div></section>
+      <section class="panel" aria-labelledby="skills-heading"><div class="section-heading"><h2 id="skills-heading">Abilities</h2><span class="tiny-label">SELECT + TARGET</span></div><div id="skills" class="skill-list"><p class="empty-note">Your abilities will appear here.</p></div></section>
+      <div class="rail-footer"><span class="mini-orbit" aria-hidden="true"></span><p>One runtime.<br><strong>Infinite possibilities.</strong></p></div>
+    </aside>
+
+    <section class="play-column" aria-label="Game and actions">
+      <div class="scene-heading"><div><p class="eyebrow"><span class="live-spark" aria-hidden="true"></span> LIVE WORLD <span class="divider">/</span> <span id="scene-kind">EXPLORING</span></p><h2 id="scene-title">Preparing the scene</h2></div><button id="help-button" class="icon-button" title="Keyboard controls" aria-label="Show keyboard controls">?</button></div>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <section id="play-surface" class="scene-stage" tabindex="0" aria-label="Interactive game world">
+        <div class="stage-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div id="standard-renderer" class="renderer"><div class="stage-empty"><span class="loading-orbit" aria-hidden="true"></span><h3>Opening your world</h3><p>Your progress stays here. The story keeps moving.</p></div></div>
+        <div id="custom-renderer" class="custom-renderer" hidden></div>
+        <div id="effect-layer" class="effect-layer" aria-hidden="true"></div>
+        <div class="stage-topline"><span class="stage-chip" id="scene-badge">SCENE 01</span><span class="stage-chip" id="render-mode">STANDARD VIEW</span></div>
+        <div class="stage-bottomline"><span id="stage-hint">Arrow keys / WASD to explore</span><span class="local-motion"><i></i> LOCAL RENDER</span></div>
+      </section>
+      <div id="custom-warning" class="custom-warning" hidden><span></span><button class="text-button" id="standard-view">Use standard view</button></div>
+      <div class="scene-description" id="scene-description"></div>
+      <section class="command-panel" aria-labelledby="command-heading"><div class="command-title"><div><p class="eyebrow">MAKE YOUR MOVE</p><h3 id="command-heading">What happens next?</h3></div><div class="revision-label">REV <span id="revision">000</span></div></div><div id="choices" class="choice-list"></div><div class="action-row"><div id="movement" class="movement" aria-label="Movement controls"><button data-move="0,-1" class="move-up" aria-label="Move north" title="Move north (W or ↑)">↑</button><button data-move="-1,0" class="move-left" aria-label="Move west" title="Move west (A or ←)">←</button><button data-move="0,1" class="move-down" aria-label="Move south" title="Move south (S or ↓)">↓</button><button data-move="1,0" class="move-right" aria-label="Move east" title="Move east (D or →)">→</button></div><form id="say-form" class="say-form"><label for="say-input" class="sr-only">Say something to the world</label><input id="say-input" name="text" maxlength="1000" autocomplete="off" placeholder="Say something to the world…"><button class="send-button" type="submit" aria-label="Send dialogue" title="Send dialogue">↗</button></form></div><p class="control-note" id="control-note">Move with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrow keys. Click a hostile to attack.</p></section>
+      <section class="event-panel" aria-labelledby="event-heading"><div class="section-heading"><h2 id="event-heading"><span class="event-symbol" aria-hidden="true">↳</span> World journal</h2><span id="event-count" class="tiny-label">LIVE EVENTS</span></div><ol id="event-list" class="event-list" aria-live="polite" aria-relevant="additions"><li class="empty-note">Your first move starts the journal.</li></ol></section>
+    </section>
+
+    <aside class="inspector-rail" aria-label="World inspector">
+      <section class="director-card"><div class="director-top"><div class="director-icon" aria-hidden="true">✳</div><span class="tag mint">LIVE CONTEXT</span></div><p class="eyebrow">THE DIRECTOR'S DESK</p><h2>A world you can<br>build on.</h2><p>Play in the browser. Let an agent observe, act, and extend the very same world.</p><div class="agent-status"><span class="status-dot"></span><div><strong id="agent-status">Waiting for world</strong><small id="agent-detail">State and events stream here.</small></div></div><div class="runtime-metrics"><div><strong id="metric-revision">0</strong><span>REVISION</span></div><div><strong id="metric-entities">0</strong><span>ENTITIES</span></div><div><strong id="metric-uptime">00:00</strong><span>CONNECTED</span></div></div></section>
+      <section class="panel focus-panel" aria-labelledby="focus-heading"><div class="section-heading"><h2 id="focus-heading">In focus</h2><span class="tiny-label">INSPECT</span></div><div id="focus-content"><p class="empty-note">Select an entity in the scene to inspect it.</p></div></section>
+      <section class="panel context-panel" aria-labelledby="context-heading"><div class="section-heading"><h2 id="context-heading">World context</h2><button id="copy-context" class="text-button" title="Copy the current authoritative session snapshot">Copy</button></div><dl id="context-summary" class="context-summary"></dl><div id="world-variables" class="variables"></div><details id="snapshot-details"><summary>Inspect state <span aria-hidden="true">{ }</span></summary><pre id="context-json" tabindex="0" aria-label="Session state as JSON"></pre></details><details class="agent-details"><summary>Connect a coding agent <span aria-hidden="true">↗</span></summary><p>Use the repository's agent CLI or MCP server to read events, inspect context, and make revision-checked changes. The browser stays live while your agent works.</p><code>npm run agent -- --help</code><p class="empty-note">No agent process is started by this page.</p></details></section>
+      <div class="inspector-footer"><span>ENGINE / 01</span><span>HUMAN + AGENT</span></div>
+    </aside>
+  </main>
+
+  <dialog id="new-dialog"><form id="new-form"><div class="dialog-heading"><span class="eyebrow">A NEW BEGINNING</span><button type="button" class="icon-button" data-close-dialog aria-label="Close new session dialog">×</button></div><h2>Where to next?</h2><p>Start a fresh run. Your other sessions remain saved.</p><label class="form-label" for="new-game">World</label><select id="new-game" required></select><label class="form-label" for="new-seed">Seed <span>optional</span></label><input id="new-seed" type="number" step="1" placeholder="Let the world surprise you"><p class="form-hint">The same seed gives you the same starting randomness.</p><button id="create-session" type="submit" class="button primary">Enter world <span aria-hidden="true">↗</span></button></form></dialog>
+  <dialog id="help-dialog"><div class="dialog-heading"><span class="eyebrow">QUICK GUIDE</span><button class="icon-button" data-close-dialog aria-label="Close controls dialog">×</button></div><h2>The world is yours.</h2><ul class="help-list"><li><kbd>W A S D</kbd><span>Move around the grid</span></li><li><kbd>↑ ← ↓ →</kbd><span>Also move around the grid</span></li><li><kbd>Click</kbd><span>Attack a hostile, interact with a friendly entity, or step onto an adjacent tile</span></li><li><kbd>1–9</kbd><span>Choose a numbered story option</span></li><li><kbd>Enter</kbd><span>Send text when the dialogue field is focused</span></li></ul><p>Inventory and ability buttons work with keyboard and pointer. Text fields keep their normal typing controls. Every accepted move is saved by the server.</p></dialog>
+  <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+</body>
+</html>

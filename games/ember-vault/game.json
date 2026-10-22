@@ -1,0 +1,1019 @@
+{
+  "id": "ember-vault",
+  "title": "Ember Vault",
+  "description": "A lantern-lit tactical roguelike. Descend through three hand-built floors, master your skills, and bring the last living ember home.",
+  "version": "1.0.0",
+  "plugins": [
+    "core",
+    "combat",
+    "narrative"
+  ],
+  "tags": [
+    "roguelike",
+    "tactical",
+    "dungeon"
+  ],
+  "cover": "/games/ember-vault/assets/vault.svg",
+  "initial": {
+    "scene": "cinder-gate",
+    "player": "lantern-bearer",
+    "entities": {
+      "lantern-bearer": {
+        "id": "lantern-bearer",
+        "name": "The Lantern-bearer",
+        "kind": "player",
+        "components": {
+          "appearance": {
+            "glyph": "@",
+            "color": "#f4d88d"
+          },
+          "stats": {
+            "health": 46,
+            "maxHealth": 46,
+            "attack": 5,
+            "defense": 1,
+            "mana": 14,
+            "maxMana": 14,
+            "experience": 0
+          },
+          "inventory": {
+            "items": [
+              "travel-blade",
+              "red-tonic",
+              "blue-tonic"
+            ]
+          },
+          "equipment": {
+            "weapon": "travel-blade"
+          },
+          "skills": [
+            "spark",
+            "sunder",
+            "ember-lance"
+          ],
+          "position": {
+            "x": 2,
+            "y": 10,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "travel-blade": {
+        "id": "travel-blade",
+        "name": "Traveler’s blade",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "†",
+            "color": "#e5c68d"
+          },
+          "item": {
+            "attack": 2,
+            "slot": "weapon",
+            "description": "A reliable, notched blade. +2 attack."
+          }
+        }
+      },
+      "red-tonic": {
+        "id": "red-tonic",
+        "name": "Crimson tonic",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "!",
+            "color": "#ed6e6c"
+          },
+          "item": {
+            "heal": 22,
+            "consumable": true,
+            "description": "Restore 22 health. Using it takes a turn."
+          }
+        }
+      },
+      "blue-tonic": {
+        "id": "blue-tonic",
+        "name": "Azure tonic",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "!",
+            "color": "#83b7f1"
+          },
+          "item": {
+            "mana": 12,
+            "consumable": true,
+            "description": "Restore 12 focus."
+          }
+        }
+      },
+      "gate-stairs": {
+        "id": "gate-stairs",
+        "name": "Stairs to the Glassworks",
+        "kind": "landmark",
+        "components": {
+          "appearance": {
+            "glyph": ">",
+            "color": "#f0c976"
+          },
+          "interact": {
+            "text": "The steps spiral toward the old workshops.",
+            "scene": "glassworks",
+            "position": {
+              "x": 2,
+              "y": 10
+            }
+          },
+          "position": {
+            "x": 14,
+            "y": 2,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "warm-fountain": {
+        "id": "warm-fountain",
+        "name": "The Last Warm Spring",
+        "kind": "prop",
+        "components": {
+          "appearance": {
+            "glyph": "♧",
+            "color": "#80c8b7"
+          },
+          "interact": {
+            "text": "The spring remembers sunlight. Warmth returns to your hands.",
+            "once": true,
+            "usedText": "The spring is quiet now.",
+            "effects": [
+              {
+                "type": "heal",
+                "target": "player",
+                "amount": 46
+              },
+              {
+                "type": "heal",
+                "target": "player",
+                "amount": 14,
+                "resource": "mana"
+              }
+            ]
+          },
+          "position": {
+            "x": 3,
+            "y": 4,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "iron-coat": {
+        "id": "iron-coat",
+        "name": "Forged coat",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "♜",
+            "color": "#b7bac6"
+          },
+          "item": {
+            "defense": 2,
+            "slot": "armor",
+            "description": "Smoked iron plates. +2 defense."
+          },
+          "position": {
+            "x": 12,
+            "y": 9,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "cache-tonic": {
+        "id": "cache-tonic",
+        "name": "Sealed crimson tonic",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "!",
+            "color": "#ed6e6c"
+          },
+          "item": {
+            "heal": 22,
+            "consumable": true
+          },
+          "position": {
+            "x": 3,
+            "y": 2,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "ash-rat": {
+        "id": "ash-rat",
+        "name": "Ash rat",
+        "kind": "enemy",
+        "components": {
+          "appearance": {
+            "glyph": "r",
+            "color": "#cf7959"
+          },
+          "stats": {
+            "health": 12,
+            "maxHealth": 12,
+            "attack": 3,
+            "defense": 0
+          },
+          "ai": {
+            "hostile": true,
+            "aggro": 5
+          },
+          "reward": {
+            "experience": 12,
+            "gold": 3
+          },
+          "position": {
+            "x": 4,
+            "y": 8,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "clinker": {
+        "id": "clinker",
+        "name": "Clinker",
+        "kind": "enemy",
+        "components": {
+          "appearance": {
+            "glyph": "g",
+            "color": "#ac9774"
+          },
+          "stats": {
+            "health": 17,
+            "maxHealth": 17,
+            "attack": 4,
+            "defense": 0
+          },
+          "ai": {
+            "hostile": true,
+            "aggro": 5
+          },
+          "reward": {
+            "experience": 17,
+            "gold": 3
+          },
+          "loot": [
+            {
+              "chance": 1,
+              "entity": {
+                "id": "dropped-tonic",
+                "name": "Small crimson tonic",
+                "kind": "item",
+                "components": {
+                  "appearance": {
+                    "glyph": "!",
+                    "color": "#ed6e6c"
+                  },
+                  "item": {
+                    "heal": 14,
+                    "consumable": true
+                  }
+                }
+              }
+            }
+          ],
+          "position": {
+            "x": 10,
+            "y": 9,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "coal-moth": {
+        "id": "coal-moth",
+        "name": "Coal moth",
+        "kind": "enemy",
+        "components": {
+          "appearance": {
+            "glyph": "m",
+            "color": "#daa45f"
+          },
+          "stats": {
+            "health": 10,
+            "maxHealth": 10,
+            "attack": 3,
+            "defense": 0
+          },
+          "ai": {
+            "hostile": true,
+            "aggro": 4
+          },
+          "reward": {
+            "experience": 10,
+            "gold": 3
+          },
+          "position": {
+            "x": 12,
+            "y": 4,
+            "scene": "cinder-gate"
+          }
+        }
+      },
+      "glass-stairs": {
+        "id": "glass-stairs",
+        "name": "Northern seal",
+        "kind": "landmark",
+        "components": {
+          "appearance": {
+            "glyph": ">",
+            "color": "#82bbc4"
+          },
+          "interact": {
+            "when": {
+              "path": [
+                "variables",
+                "sealBroken"
+              ],
+              "equals": true
+            },
+            "lockedText": "The Glasskeeper’s rune locks the stair.",
+            "scene": "heart-vault",
+            "position": {
+              "x": 2,
+              "y": 10
+            }
+          },
+          "position": {
+            "x": 14,
+            "y": 1,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "return-gate": {
+        "id": "return-gate",
+        "name": "Stairs to the Cinder Gate",
+        "kind": "landmark",
+        "components": {
+          "appearance": {
+            "glyph": "<",
+            "color": "#b0a28a"
+          },
+          "interact": {
+            "scene": "cinder-gate",
+            "position": {
+              "x": 14,
+              "y": 3
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 11,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "glass-saber": {
+        "id": "glass-saber",
+        "name": "Glassfire saber",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "†",
+            "color": "#82d8e5"
+          },
+          "item": {
+            "attack": 5,
+            "slot": "weapon",
+            "description": "A blade that catches impossible light. +5 attack."
+          },
+          "position": {
+            "x": 8,
+            "y": 4,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "focus-cistern": {
+        "id": "focus-cistern",
+        "name": "Focus cistern",
+        "kind": "prop",
+        "components": {
+          "appearance": {
+            "glyph": "◈",
+            "color": "#8ca9f0"
+          },
+          "interact": {
+            "once": true,
+            "text": "Blue light pools between your palms.",
+            "effects": [
+              {
+                "type": "heal",
+                "target": "player",
+                "amount": 46
+              },
+              {
+                "type": "heal",
+                "target": "player",
+                "amount": 14,
+                "resource": "mana"
+              }
+            ]
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "vault-tonic": {
+        "id": "vault-tonic",
+        "name": "Artisan’s crimson tonic",
+        "kind": "item",
+        "components": {
+          "appearance": {
+            "glyph": "!",
+            "color": "#ed6e6c"
+          },
+          "item": {
+            "heal": 25,
+            "consumable": true
+          },
+          "position": {
+            "x": 13,
+            "y": 9,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "glass-crawler": {
+        "id": "glass-crawler",
+        "name": "Glass crawler",
+        "kind": "enemy",
+        "components": {
+          "appearance": {
+            "glyph": "c",
+            "color": "#8ebbc4"
+          },
+          "stats": {
+            "health": 16,
+            "maxHealth": 16,
+            "attack": 4,
+            "defense": 1
+          },
+          "ai": {
+            "hostile": true,
+            "aggro": 5
+          },
+          "reward": {
+            "experience": 16,
+            "gold": 3
+          },
+          "position": {
+            "x": 7,
+            "y": 9,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "glass-crawler-east": {
+        "id": "glass-crawler-east",
+        "name": "Glass crawler",
+        "kind": "enemy",
+        "components": {
+          "appearance": {
+            "glyph": "c",
+            "color": "#8ebbc4"
+          },
+          "stats": {
+            "health": 16,
+            "maxHealth": 16,
+            "attack": 4,
+            "defense": 1
+          },
+          "ai": {
+            "hostile": true,
+            "aggro": 5
+          },
+          "reward": {
+            "experience": 16,
+            "gold": 3
+          },
+          "position": {
+            "x": 13,
+            "y": 7,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "glasskeeper": {
+        "id": "glasskeeper",
+        "name": "The Glasskeeper",
+        "kind": "enemy",
+        "components": {
+          "appearance": {
+            "glyph": "K",
+            "color": "#a8d9dc"
+          },
+          "stats": {
+            "health": 28,
+            "maxHealth": 28,
+            "attack": 5,
+            "defense": 2
+          },
+          "ai": {
+            "hostile": true,
+            "aggro": 5
+          },
+          "reward": {
+            "experience": 28,
+            "gold": 3
+          },
+          "onDefeat": [
+            {
+              "type": "set",
+              "path": [
+                "variables",
+                "sealBroken"
+              ],
+              "value": true
+            },
+            {
+              "type": "narrate",
+              "text": "The northern seal shatters. The way to the heart is open."
+            },
+            {
+              "type": "cue",
+              "visual": "burst",
+              "color": "#85d5dc"
+            }
+          ],
+          "loot": [
+            {
+              "chance": 1,
+              "entity": {
+                "id": "focus-drop",
+                "name": "Distilled focus",
+                "kind": "item",
+                "components": {
+                  "appearance": {
+                    "glyph": "!",
+                    "color": "#83b7f1"
+                  },
+                  "item": {
+                    "mana": 10,
+                    "consumable": true
+                  }
+                }
+              }
+            }
+          ],
+          "position": {
+            "x": 13,
+            "y": 3,
+            "scene": "glassworks"
+          }
+        }
+      },
+      "return-glass": {
+        "id": "return-glass",
+        "name": "Stairs to the Glassworks",
+        "kind": "landmark",
+        "components": {
+          "appearance": {
+            "glyph": "<",
+            "color": "#b0a28a"
+          },
+          "interact": {
+            "scene": "glassworks",
+            "position": {
+              "x": 14,
+              "y": 2
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 11,
+            "scene": "heart-vault"
+          }
+        }
+      },
+      "old-brazier": {
+        "id": "old-brazier",
+        "name": "Pilgrim’s brazier",
+        "kind": "prop",
+        "components": {
+          "appearance": {
+            "glyph": "♨",
+            "color": "#f0b66f"
+          },
+          "interact": {
+            "once": true,
+            "text": "You speak the names of those waiting above. The little flame steadies.",
+            "effects": [
+              {
+                "type": "heal",
+                "target": "player",
+                "amount": 46
+              },
+              {
+                "type": "heal",
+                "target": "player",
+                "amount": 14,
+                "resource": "mana"
+              }
+            ]
+          },
+          "position": {
+            "x": 3,
+            "y": 9,
+            "scene": "heart-vault"
+          }
+        }
+      },
+      "furnace-sentinel": {
+        "id": "furnace-sentinel",
+        "name": "Furnace Sentinel",
+        "kind": "enemy",
+        "components": {
+          "appearance": {
+            "glyph": "Ω",
+            "color": "#f49858"
+          },
+          "stats": {
+            "health": 54,
+            "maxHealth": 54,
+            "attack": 7,
+            "defense": 3
+          },
+          "ai": {
+            "hostile": true,
+            "aggro": 8
+          },
+          "reward": {
+            "experience": 54,
+            "gold": 3
+          },
+          "onDefeat": [
+            {
+              "type": "set",
+              "path": [
+                "variables",
+                "sentinelFallen"
+              ],
+              "value": true
+            },
+            {
+              "type": "narrate",
+              "text": "The sentinel kneels. Its last breath is the sound of a door opening."
+            },
+            {
+              "type": "cue",
+              "visual": "burst",
+              "color": "#f9c96e"
+            }
+          ],
+          "position": {
+            "x": 8,
+            "y": 2,
+            "scene": "heart-vault"
+          }
+        }
+      },
+      "living-ember": {
+        "id": "living-ember",
+        "name": "The Living Ember",
+        "kind": "relic",
+        "components": {
+          "appearance": {
+            "glyph": "◆",
+            "color": "#ffe7a0"
+          },
+          "interact": {
+            "when": {
+              "path": [
+                "variables",
+                "sentinelFallen"
+              ],
+              "equals": true
+            },
+            "lockedText": "The sentinel’s shadow still covers the ember.",
+            "once": true,
+            "text": "You lift the ember. Above you, every lantern in the sleeping city kindles at once. The mountain is no longer cold.",
+            "effects": [
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "outcome"
+                ],
+                "value": "victory"
+              },
+              {
+                "type": "set",
+                "path": [
+                  "variables",
+                  "emberRecovered"
+                ],
+                "value": true
+              },
+              {
+                "type": "cue",
+                "visual": "burst",
+                "color": "#fff1b7"
+              },
+              {
+                "type": "narrate",
+                "text": "THE LAST LIGHT RETURNS · You carried the dawn home."
+              }
+            ]
+          },
+          "position": {
+            "x": 8,
+            "y": 1,
+            "scene": "heart-vault"
+          }
+        }
+      }
+    },
+    "scenes": {
+      "cinder-gate": {
+        "id": "cinder-gate",
+        "name": "I · The Cinder Gate",
+        "description": "A dead furnace breathes beneath the mountain. Recover its living ember before the last light above goes out. Move with WASD or the arrow keys. Click a nearby foe to strike; use Spark at a distance.",
+        "entry": {
+          "x": 2,
+          "y": 10
+        },
+        "map": [
+          "#################",
+          "#...............#",
+          "#......#........#",
+          "#......#..^^....#",
+          "#...............#",
+          "#......#........#",
+          "#......#..#####.#",
+          "#......#........#",
+          "#...............#",
+          "#......#........#",
+          "#...............#",
+          "#...............#",
+          "#################"
+        ],
+        "background": "tiles",
+        "ambient": "A low, copper-colored hum.",
+        "objective": "Reach the eastern stair. Find supplies before descending.",
+        "exits": [
+          {
+            "x": 14,
+            "y": 2,
+            "scene": "glassworks",
+            "position": {
+              "x": 2,
+              "y": 10
+            }
+          }
+        ],
+        "tiles": {
+          "~": {
+            "name": "Cold water"
+          },
+          "^": {
+            "name": "Hot cinder",
+            "color": "#e68a35",
+            "effects": [
+              {
+                "type": "damage",
+                "target": "player",
+                "amount": 2
+              },
+              {
+                "type": "narrate",
+                "text": "Hot cinders bite through your boots."
+              }
+            ]
+          }
+        },
+        "choices": [
+          {
+            "id": "read-gate",
+            "label": "Read the scratched warning",
+            "text": "“It eats what you give it. Give it neither fear nor fire.”",
+            "once": true
+          }
+        ]
+      },
+      "glassworks": {
+        "id": "glassworks",
+        "name": "II · The Glassworks",
+        "description": "The old workshops are frozen mid-task. Behind cracked glass, a bell still rings on its own. A rune on the northern door answers to the glasskeeper.",
+        "entry": {
+          "x": 2,
+          "y": 10
+        },
+        "map": [
+          "#################",
+          "#...............#",
+          "#....#..........#",
+          "#....#~~~~.#....#",
+          "#....#.....#....#",
+          "#..........#....#",
+          "#....#.....#....#",
+          "#....#..........#",
+          "#..........#....#",
+          "#....#.....#....#",
+          "#..........#....#",
+          "#...............#",
+          "#################"
+        ],
+        "background": "tiles",
+        "objective": "Defeat the Glasskeeper to break the northern seal.",
+        "exits": [
+          {
+            "x": 2,
+            "y": 11,
+            "scene": "cinder-gate",
+            "position": {
+              "x": 14,
+              "y": 3
+            }
+          },
+          {
+            "x": 14,
+            "y": 1,
+            "scene": "heart-vault",
+            "position": {
+              "x": 2,
+              "y": 10
+            },
+            "when": {
+              "path": [
+                "variables",
+                "sealBroken"
+              ],
+              "equals": true
+            },
+            "lockedText": "The glass seal holds. Its keeper must fall first."
+          }
+        ],
+        "choices": [
+          {
+            "id": "workshop-note",
+            "label": "Read the foreman’s note",
+            "text": "The guardian cannot be outrun in close quarters. The old Spark technique reaches across the room.",
+            "once": true
+          }
+        ]
+      },
+      "heart-vault": {
+        "id": "heart-vault",
+        "name": "III · The Heart Vault",
+        "description": "A single ember hangs in the chamber, bright as a remembered sunrise. The sentinel unfolds from its throne. This is what it has been waiting for.",
+        "entry": {
+          "x": 2,
+          "y": 10
+        },
+        "map": [
+          "#################",
+          "#...............#",
+          "#...............#",
+          "#.......^.......#",
+          "#....#..^..#....#",
+          "#....#..^..#....#",
+          "#.......^.......#",
+          "#...............#",
+          "#....#.....#....#",
+          "#...............#",
+          "#...............#",
+          "#...............#",
+          "#################"
+        ],
+        "background": "tiles",
+        "objective": "Defeat the Furnace Sentinel. Claim the living ember.",
+        "tiles": {
+          "^": {
+            "name": "Ember fissure",
+            "effects": [
+              {
+                "type": "damage",
+                "target": "player",
+                "amount": 2
+              },
+              {
+                "type": "narrate",
+                "text": "The ember fissure flares beneath you."
+              }
+            ]
+          }
+        },
+        "exits": [
+          {
+            "x": 2,
+            "y": 11,
+            "scene": "glassworks",
+            "position": {
+              "x": 14,
+              "y": 2
+            }
+          }
+        ],
+        "choices": [
+          {
+            "id": "listen-heart",
+            "label": "Listen to the vault",
+            "text": "Under the sentinel’s iron breathing, you hear a heartbeat. Not its own.",
+            "once": true
+          }
+        ]
+      }
+    },
+    "assets": {
+      "cover": {
+        "id": "cover",
+        "kind": "image",
+        "src": "/games/ember-vault/assets/vault.svg",
+        "alt": "A sunken furnace beneath a mountain, glowing amber",
+        "license": "CC0-1.0; original artwork created for this project"
+      },
+      "tiles": {
+        "id": "tiles",
+        "kind": "image",
+        "src": "/games/ember-vault/assets/dungeon.svg",
+        "alt": "Hand-drawn stone tiles and ember fissures",
+        "license": "CC0-1.0; original artwork created for this project"
+      },
+      "hero": {
+        "id": "hero",
+        "kind": "image",
+        "src": "/games/ember-vault/assets/warden.svg",
+        "alt": "A hooded lantern-bearer",
+        "license": "CC0-1.0; original artwork created for this project"
+      },
+      "boss": {
+        "id": "boss",
+        "kind": "image",
+        "src": "/games/ember-vault/assets/sentinel.svg",
+        "alt": "The iron furnace sentinel",
+        "license": "CC0-1.0; original artwork created for this project"
+      }
+    },
+    "skills": {
+      "spark": {
+        "id": "spark",
+        "name": "Spark",
+        "cost": 3,
+        "power": 5,
+        "range": 5,
+        "visual": "spark",
+        "description": "A bolt of amber light. Range 5. Costs 3 focus."
+      },
+      "sunder": {
+        "id": "sunder",
+        "name": "Sunder",
+        "cost": 4,
+        "power": 8,
+        "range": 1,
+        "piercing": true,
+        "visual": "slash",
+        "description": "A heavy strike that ignores armor. Costs 4 focus."
+      },
+      "ember-lance": {
+        "id": "ember-lance",
+        "name": "Ember Lance",
+        "cost": 6,
+        "power": 11,
+        "range": 4,
+        "visual": "fire",
+        "description": "A focused beam from the lantern. Range 4. Costs 6 focus."
+      }
+    },
+    "variables": {
+      "gold": 0,
+      "turn": 0,
+      "sealBroken": false,
+      "sentinelFallen": false,
+      "objective": "Recover the living ember."
+    },
+    "dialogue": {
+      "speaker": "The Vault",
+      "fallback": "The vault answers in sparks and settling stone. Your lantern is company enough.",
+      "intents": [
+        {
+          "id": "help",
+          "keywords": [
+            "help",
+            "how",
+            "control"
+          ],
+          "text": "Move with the arrow keys or WASD. Stand beside an enemy to attack. Spark reaches five tiles. Pick up items nearby, equip better gear, and use springs once per run."
+        },
+        {
+          "id": "ember",
+          "keywords": [
+            "ember",
+            "light",
+            "home"
+          ],
+          "text": "The living ember waits below the glassworks. Bring it back, and the city will see another dawn."
+        }
+      ]
+    }
+  }
+}
