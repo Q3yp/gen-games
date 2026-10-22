@@ -84,3 +84,7 @@ Factories mount once per session/module/version; regular world revisions call `u
 ## Agent tools
 
 Eight tools: `discover`, `session`, `observe`, `inspect`, `act`, `author`, `jobs`, `checkpoint`. Canonical schemas live in `src/agent/schemas.js`; command-specific schemas come from registered actions through `discover --session ID`. See [agent tools](agent-tools.md) for exact flags, retries, cursors, jobs, MCP configuration, and examples.
+
+## Browser diagnostics
+
+`POST /api/sessions/:id/diagnostics` accepts `{type:"ui.failed"|"ui.recovered",path,message?,hint?,clientRevision?}`. Path is capped at 300 characters; message at 500 and hint at 300. These advisory client reports append semantic events and never mutate world revision. Consecutive identical diagnostics are suppressed. Custom components need not call this endpoint: the host reports import/update failures and recovery automatically, without full stacks or world dumps.

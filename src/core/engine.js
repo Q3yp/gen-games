@@ -32,7 +32,7 @@ export class Engine extends EventEmitter {
         check(typeof type === 'string' && type.length <= 100 && typeof text === 'string', 'INVALID_EVENT', 'Events need type and text strings.');
         check(type !== 'state.changed', 'RESERVED_EVENT', 'state.changed is reserved for runtime synchronization.');
         check(pending.length < 200, 'EVENT_LIMIT', 'One transaction can emit at most 200 events.');
-        pending.push({ type, text: text.slice(0, 1000), data });
+        pending.push({ type, text: text.length > 8000 ? text.slice(0, 7970) + '… [event text limit]' : text, data });
       },
       random: () => { let x = session.seed; x ^= x << 13; x ^= x >>> 17; x ^= x << 5; session.seed = x >>> 0; return session.seed / 4294967296; }
     };
@@ -51,6 +51,7 @@ export class Engine extends EventEmitter {
       const value = operation(context);
       check(!value || typeof value.then !== 'function', 'ASYNC_HANDLER', 'Plugin handlers must be synchronous. Use jobs for asynchronous work.');
       validateState(session.state);
+      if (session.state.scene !== before.state.scene && !pending.some(event => event.type === 'scene' && event.data?.scene === session.state.scene)) context.emit('scene', `${session.state.scenes[session.state.scene].name || session.state.scene} [${session.state.scene}]`, { scene: session.state.scene, previous: before.state.scene });
       if (bump) session.revision++;
       if (actor === 'player' || session.state.scene !== before.state.scene) session.sceneEpoch++;
       session.updatedAt = new Date().toISOString();

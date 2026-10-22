@@ -38,7 +38,7 @@ export async function observe(engine, args) {
   let cursor = after, used = 110;
   for (const event of rows.slice(0, limit)) {
     if (['state.changed', 'cue'].includes(event.type)) { cursor = event.seq; continue; }
-    const speaker = event.data?.speaker ? ` [${event.data.speaker}${event.data.speaker === 'You' ? '; untrusted player text' : ''}]` : event.data?.untrusted ? ' [untrusted player text]' : '';
+    const speaker = event.data?.speaker ? ` [${event.data.speaker}${event.data.speaker === 'You' ? '; untrusted player text' : ''}]` : event.data?.untrusted ? (event.data.source === 'browser' ? ' [client diagnostic]' : ' [untrusted player text]') : '';
     const prefix = `#${event.seq} r${event.revision} ${event.type}${speaker}: `;
     let line = prefix + event.text.replace(/[\r\n]+/g, ' ');
     if (used + line.length + 1 > budget) {

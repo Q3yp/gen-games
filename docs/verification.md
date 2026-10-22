@@ -16,12 +16,15 @@ Manual HTTP sessions, CLI processes, and MCP stdio calls exercised:
 - A content-mode asset job started, an unrelated tactical turn occurred, and the guarded asset committed successfully without overwriting world changes.
 - A contextual job started, world revision changed, and late commit returned `STALE_JOB`.
 - Cancellation followed by late commit returned `JOB_NOT_RUNNING`; a pending job was observed as `interrupted` after an actual server restart.
+- Overlapping reads by one consumer preserved a newer acknowledgement when an older long-poll completed later; durable cursor writes merge monotonically.
 - A synchronous clock plugin ran on a real 100 ms interval for five ticks (world revision 5, simulated 500 ms). A guarded asset job then committed at revision 6; the older context proposal was rejected.
 - A two-second long-poll returned about 109 ms after a new player action woke it.
 - Director mode bypassed a known Mara keyword, an atomic reply committed text plus an asset/flag edit, and an invalid scene edit rolled the entire reply back. Data-SVG was accepted; a javascript: asset returned `UNSUPPORTED_ASSET_URL` and a repair hint.
 - Named checkpoint save, subsequent play, and restoration to a new revision with a monotonic event cursor.
 - Newly authored opponent, item, skill, learned-skill entry, inventory entry, and asset registry record through the tools. The player cast the new skill, defeated the new opponent, used the new item, and inspected the resulting state.
 - SSE subscription received revisioned patches and semantic events, without a full `session` snapshot in the stream payload.
+- Browser diagnostics were also exercised through HTTP: repeated identical failures were deduplicated, failure/recovery stayed at the same gameplay revision, and duplicate suppression survived a real server restart.
+- Malformed JSON-object shape returned `INVALID_REQUEST`, a cross-origin mutation returned `ORIGIN_REJECTED`, and static traversal probes returned 404. These are focused checks, not a security audit.
 - MCP initialize, version negotiation, tool discovery/calls, ping, malformed JSON, unknown tools, and `isError`/rich stale-action responses.
 - CLI JSON/file/stdin arguments, explicit-flag precedence, raw envelopes, transport errors, and success/failure exit codes.
 
@@ -43,14 +46,16 @@ A separate browser player and director agent shared the same live Signal House s
 2. Director observed incremental events, inspected scene context, authored a new visual/choices/objective, and replied in-character.
 3. Player continued with another original action; director responded again.
 
-That exercise found concrete friction and drove changes: current-scene inspection defaults, IDs in bootstrap, changed-path summaries, explicit director routing instead of substring keyword interference, atomic reply plus world edits, wider player layout, hidden spoilers/inspector by default, no duplicate custom/shell inputs, and source-reload controls. After restart, the browser resumed the same live-authored branch; the new data-SVG loaded successfully and explicit director mode suppressed the old keyword response. Completion of the updated play flow and custom-component fallback recheck are recorded below when finished.
+That exercise found concrete friction and drove changes: current-scene inspection defaults, IDs in bootstrap, changed-path summaries, explicit director routing instead of substring keyword interference, atomic reply plus world edits, wider player layout, hidden spoilers/inspector by default, no duplicate custom/shell inputs, and source-reload controls. After restart, the browser resumed the same live-authored branch; the new data-SVG loaded successfully and explicit director mode suppressed the old keyword response. The player improvised a tether rescue; the director added an interactive plate, a branch, and an epilogue, then atomically committed the rescue and ending. A delayed context proposal was rejected after player interruption; no proposed marker appeared. The player selected a reunion ending. In a spare browser session, an intentionally missing UI module retained the old working component; its existing Read sister letter control still committed a valid action. A final browser failure/recovery round also reached the agent feed: `#57 r4 ui.failed` named the missing module and repair hint; after restoring the override, `#60 r5 ui.recovered` reported healthy custom controls. Only the authored override restore advanced r4 to r5; neither diagnostic changed gameplay revision. The warning disappeared, controls remained usable, and the original completed story was untouched.
 
 Browser combat interaction also exercised movement and a Spark attack; the opponent died and mana/experience updated. Source-refactored frontend routes, session persistence/status, movement, dialogue, choices, and inventory effects were exercised over HTTP.
 
+A narrative account of the actual improvised story and which content remains transient is in [playthrough](playthrough.md).
+
 ## Static checks
 
-`npm run check` parses every JavaScript module with `node --check`, then loads all packs to validate required world shape, plugin dependencies, and action registration. This unbundled JavaScript project has no transpilation/build step and no TypeScript typecheck. Passing syntax and pack loading is not a claim of exhaustive gameplay correctness.
+The final `npm run check` passed for all 36 JavaScript modules and both source packs (10 and 9 registered actions). It parses every JavaScript module with `node --check`, then loads all packs to validate required world shape, plugin dependencies, and action registration. This unbundled JavaScript project has no transpilation/build step and no TypeScript typecheck. Passing syntax and pack loading is not a claim of exhaustive gameplay correctness.
 
 ## Known coverage limits
 
-No long-duration soak, public-network security audit, adversarial plugin sandbox test, multi-process server exercise, arbitrary third-party MCP-client certification, or full accessibility audit was performed. Combat currently uses Manhattan range without line of sight; there is no cooldown/AOE system. Story branch walkthroughs are not exhaustive coverage of every combination. Local render smoothness and custom component error fallback require browser observation, not just API calls.
+No long-duration soak, public-network security audit, adversarial plugin sandbox test, multi-process server exercise, arbitrary third-party MCP-client certification, or full accessibility audit was performed. Combat currently uses Manhattan range without line of sight; there is no cooldown/AOE system. Story branch walkthroughs are not exhaustive coverage of every combination. The missing-module fallback was observed in-browser; an exception thrown partway through a custom update has not separately been induced in-browser.

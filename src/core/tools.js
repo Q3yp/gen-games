@@ -1,4 +1,5 @@
-import { applyOperations, atPath, isRecord } from './validate.js';
+import { authorEdits } from './authoring.js';
+import { atPath, isRecord } from './validate.js';
 import { requireValue as check, errorInfo } from './errors.js';
 import { manageJob } from './jobs.js';
 import { observe, summary, compact } from './context.js';
@@ -38,7 +39,7 @@ export class ToolService {
       return { text: `INSPECT r${session.revision} ${scope}${args.id ? ` ${args.id}` : ''}\n${compact(value ?? null, 6000)}`, data: { revision: session.revision, cursor: store.head(session.id) } };
     }
     if (tool === 'act') return this.mutation(engine.act(args));
-    if (tool === 'author') return this.mutation(engine.transact(args, ctx => { applyOperations(ctx.state, args.operations); ctx.emit('author.updated', `${args.operations.length} edits: ${args.operations.slice(0, 5).map(op => op.path.join('.')).join(', ')}${args.operations.length > 5 ? '…' : ''}.`, { paths: args.operations.map(op => op.path) }); return { operations: args.operations.length }; }));
+    if (tool === 'author') return this.mutation(engine.transact(args, ctx => { authorEdits(ctx, args.operations); return { operations: args.operations.length }; }));
     if (tool === 'jobs') {
       const result = manageJob(engine, args);
       if (result.session) return this.mutation(result);

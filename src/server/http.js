@@ -1,3 +1,4 @@
+import { reportDiagnostic } from './diagnostics.js';
 import { createServer } from 'node:http';
 import { readFile, realpath, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
@@ -68,9 +69,10 @@ export function createHttpServer(engine, tools, root, options = {}) {
         else send(response, 200, { sessions: engine.store.sessions().map(({ state, ...session }) => ({ ...session, scene: state.scene, player: state.entities[state.player]?.name })) });
         return;
       }
-      const match = path.match(/^\/api\/sessions\/([\w-]+)(?:\/(actions|events|status))?$/);
+      const match = path.match(/^\/api\/sessions\/([\w-]+)(?:\/(actions|events|status|diagnostics))?$/);
       if (match) {
         const [, id, action] = match;
+        if (action === 'diagnostics' && request.method === 'POST') { send(response, 200, reportDiagnostic(engine, id, await body(request))); return; }
         if (action === 'events' && request.method === 'GET') { stream(request, response, engine, id, url); return; }
         if (action === 'actions' && request.method === 'POST') { const input = await body(request); send(response, 200, engine.act({ ...input, sessionId: id }, 'player')); return; }
         const session = engine.session(id);

@@ -63,6 +63,7 @@ The repository intentionally has no test suite or test files. Actual manual runt
 - [Agent tools and error recovery](docs/agent-tools.md)
 - [Exact shared contracts](docs/contracts.md)
 - [Security boundary and limitations](docs/security.md)
+- [Actual player + director playthrough](docs/playthrough.md)
 - [Design research and sources](docs/research.md)
 
 ## Scope

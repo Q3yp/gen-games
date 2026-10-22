@@ -1,6 +1,7 @@
+import { authorEdits } from './authoring.js';
 import { randomUUID, createHash } from 'node:crypto';
 import { requireValue as check } from './errors.js';
-import { applyOperations, safePath } from './validate.js';
+import { safePath } from './validate.js';
 const digest = (state, path) => createHash('sha256').update(JSON.stringify(path.reduce((value, key) => value?.[key], state)) ?? '<missing>').digest('hex');
 
 export function manageJob(engine, args) {
@@ -37,7 +38,7 @@ export function manageJob(engine, args) {
       for (const guard of current.guards) check(digest(ctx.state, guard.path) === guard.digest, 'CONTENT_CONFLICT', `Guarded content changed: ${guard.path.join('.')}. No changes.`, 'Inspect current content and start a new job.');
       check(Array.isArray(args.operations) && args.operations.every(op => current.guards.some(guard => JSON.stringify(guard.path) === JSON.stringify(op.path))), 'UNGUARDED_CONTENT', 'Every content operation must target exactly one guarded asset or skill path.');
     } else check(ctx.session.sceneEpoch === current.sceneEpoch && ctx.session.revision === current.revision, 'STALE_JOB', 'The player or world changed since this job started. No changes.', 'Read new events and start a fresh job; do not replay old narrative.');
-    applyOperations(ctx.state, args.operations);
+    authorEdits(ctx, args.operations);
     current.status = 'committed'; current.completedAt = new Date().toISOString(); store.saveJob(current);
     ctx.emit('job.committed', `${current.label} applied.`, { jobId: current.id });
     return { id: current.id, status: current.status };

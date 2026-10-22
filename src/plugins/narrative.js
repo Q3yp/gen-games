@@ -1,4 +1,4 @@
-import { applyOperations } from '../core/validate.js';
+import { authorEdits } from '../core/authoring.js';
 import { scene, condition, visibleChoices, ensurePlaying, applyEffects, transition, markChoice, recordDialogue } from './effects.js';
 function choose(ctx, choice) {
   ctx.require(condition(ctx, choice.requires), 'CHOICE_LOCKED', choice.lockedText || 'You do not yet have what this choice requires.');
@@ -40,7 +40,7 @@ export default {
       run(ctx, { speaker = 'Narrator', text, operations }) {
         ctx.require(ctx.actor === 'agent', 'DIRECTOR_ONLY', 'Only the director may author a dialogue response.');
         ctx.require(typeof text === 'string' && text.trim().length > 0 && text.length <= 4000 && typeof speaker === 'string' && speaker.length <= 100, 'INVALID_SPEECH', 'Use a speaker name and a response of 1 to 4,000 characters.');
-        if (operations !== undefined) applyOperations(ctx.state, operations);
+        if (operations !== undefined) authorEdits(ctx, operations);
         ctx.state.dialogue ||= {};
         ctx.state.dialogue.pending = null;
         ctx.state.dialogue.reply = { text: text.trim(), speaker, scene: ctx.state.scene };

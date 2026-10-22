@@ -32,6 +32,7 @@ export class Store {
   events(id, after, limit = 100) {
     return this.db.prepare('SELECT * FROM events WHERE session_id=? AND seq>? ORDER BY seq LIMIT ?').all(id, after, limit).map(row => ({ seq: row.seq, sessionId: row.session_id, revision: row.revision, type: row.type, text: row.text, data: JSON.parse(row.data), at: row.at }));
   }
+  lastDiagnostic(id) { const row = this.db.prepare("SELECT type,data FROM events WHERE session_id=? AND type IN ('ui.failed','ui.recovered') ORDER BY seq DESC LIMIT 1").get(id); return row && { type: row.type, data: JSON.parse(row.data) }; }
   request(id, requestId) {
     const row = this.db.prepare('SELECT * FROM requests WHERE session_id=? AND request_id=?').get(id, requestId);
     return row && { fingerprint: row.fingerprint, result: JSON.parse(row.result) };
@@ -39,7 +40,7 @@ export class Store {
   remember(id, requestId, fingerprint, result) { this.db.prepare('INSERT INTO requests VALUES(?,?,?,?)').run(id, requestId, fingerprint, JSON.stringify(result)); }
   consumer(id, name) { return this.db.prepare('SELECT name,ack,delivered FROM consumers WHERE session_id=? AND name=?').get(id, name) || { name, ack: 0, delivered: 0 }; }
   consumers(id) { return this.db.prepare('SELECT name,ack,delivered FROM consumers WHERE session_id=?').all(id); }
-  saveConsumer(id, consumer) { this.db.prepare('INSERT OR REPLACE INTO consumers VALUES(?,?,?,?)').run(id, consumer.name, consumer.ack, consumer.delivered); }
+  saveConsumer(id, consumer) { this.db.prepare('INSERT INTO consumers VALUES(?,?,?,?) ON CONFLICT(session_id,name) DO UPDATE SET ack=MAX(ack,excluded.ack),delivered=MAX(delivered,excluded.delivered)').run(id, consumer.name, consumer.ack, consumer.delivered); }
   jobs(id) { return this.db.prepare('SELECT body FROM jobs WHERE session_id=? ORDER BY rowid DESC').all(id).map(row => JSON.parse(row.body)); }
   job(id) { const row = this.db.prepare('SELECT body FROM jobs WHERE id=?').get(id); return row && JSON.parse(row.body); }
   saveJob(job) { this.db.prepare('INSERT OR REPLACE INTO jobs VALUES(?,?,?)').run(job.id, job.sessionId, JSON.stringify(job)); }

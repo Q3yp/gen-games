@@ -55,7 +55,7 @@ Named consumers persist two independent positions:
 - `delivered`: the furthest cursor actually delivered to that reader.
 - `ack`: the furthest delivered cursor the reader explicitly confirms processing.
 
-A later read defaults to the reader's `ack`, so a crash before acknowledgement re-delivers context rather than losing it. Acknowledgement cannot move backward or exceed that reader's delivered position. An explicit bootstrap establishes a compact current baseline and cursor, without acknowledging it. Each reader has its own cursor; one agent cannot drain another's feed.
+A later read defaults to the reader's `ack`, so a crash before acknowledgement re-delivers context rather than losing it. Acknowledgement cannot move backward or exceed that reader's delivered position. An explicit bootstrap establishes a compact current baseline and cursor, without acknowledging it. Each reader has its own cursor; one agent cannot drain another's feed. Cursor persistence merges monotonically, so an older concurrent long-poll cannot overwrite a newer acknowledgement.
 
 Logs currently retain all events. There is no silent truncation, compaction, vector retrieval, or automatic prose summarization. Invalid/future cursors fail with a repair hint. Long-poll reads can wait up to 30 seconds and wake on the next session commit.
 
@@ -74,6 +74,8 @@ The browser fetches one `{session,cursor}` snapshot, then receives `change` SSE 
 
 Reconnect starts from a fresh snapshot when needed. More than 1,000 pending SSE records triggers an explicit `resync`, not a silently incomplete view. Agent tools do not consume browser patches or receive snapshots with every action.
 
+The browser reports custom-view load/update failures and successful recovery through a same-origin diagnostic endpoint. Bounded `ui.failed`/`ui.recovered` events enter the same semantic feed without changing world revision. Consecutive identical status/path/messages are deduplicated durably. They are advisory client reports, not trusted game rules; a failed/offline reporting request never blocks controls.
+
 A custom ESM module exports `createUI({root,dispatch,asset,escapeHTML})` and returns `update(session)` plus optional `dispose()`. The host supplies a frozen snapshot and named-action dispatch, not a mutable server world. The built-in renderer remains available if a custom module fails. Local UI code is trusted, not a security sandbox; see [security](security.md).
 
 ## Persistence and limits
@@ -82,4 +84,4 @@ By default `.data/games.sqlite` stores sessions, full successful retry results, 
 
 This release is designed for **one server process**. SQLite protects transactions, but broadcast listeners and scheduling are process-local. Do not run two servers against one database. There are no cross-process leases, distributed pub/sub, autoscaling, or multiplayer authorization roles.
 
-World state is capped at 2 MB; request bodies at 512 KB; author batches at 100 operations; emitted events at 200 per transaction. Media belongs in files/URLs. Journal and dedupe tables do not yet compact; disk usage grows with play. Structural validation does not prove that authored story branches are all reachable or every custom rule is semantically correct. Play the game and inspect failures.
+World state is capped at 2 MB; request bodies at 512 KB; author batches at 100 operations; emitted events at 200 per transaction and 8,000 characters per event text (explicitly marked if truncated). Media belongs in files/URLs. Journal and dedupe tables do not yet compact; disk usage grows with play. Structural validation does not prove that authored story branches are all reachable or every custom rule is semantically correct. Play the game and inspect failures.
