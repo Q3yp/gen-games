@@ -22,7 +22,7 @@ Select the browser's session ID, then follow [the agent quick loop](AGENTS.md) o
 ## Two playable worlds, one engine
 
 - **Ember Vault**: three tactical dungeon floors, deterministic combat, opponent pathfinding, equipment, consumables, authored skills, loot, locked progression, a boss, and victory/death.
-- **Signal House**: a conversation-driven lighthouse mystery with eight scenes, relationship/flag conditions, inventory, branching endings, free-text player input, and a custom coded UI. Unknown speech becomes an explicit request for a connected director; an agent can respond live through `narrative.reply`.
+- **Signal House**: a conversation-driven lighthouse mystery with eight scenes, relationship/flag conditions, inventory, branching endings, free-text player input, and a custom coded UI. Unknown speech becomes an explicit request for a connected director. Enable `narrative.mode` director routing to send all free text to the agent; `narrative.reply` can publish prose and world edits atomically.
 
 Both packs are editable examples, not special cases hidden in the engine. The shared plugins implement movement, inventory, combat, narrative, conditions, and effects. Add a third pack or replace the UI without forking the runtime.
 

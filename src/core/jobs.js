@@ -29,7 +29,7 @@ export function manageJob(engine, args) {
     engine.emit('commit', { sessionId: session.id, revision: session.revision, patches: [], events: [event], cursor: event.seq }); return { id: job.id, status: job.status };
   }
   check(args.op === 'commit', 'INVALID_JOB_OPERATION', 'Use start, list, cancel, or commit.');
-  return engine.transact(args, ctx => {
+  try { return engine.transact(args, ctx => {
     const current = store.job(job.id);
     check(current.status === 'running', 'JOB_NOT_RUNNING', `Job is ${current.status}; late completion rejected. No changes.`, 'Start a new job from current context.');
     check(typeof args.token === 'string' && args.token === current.token, 'JOB_TOKEN_MISMATCH', 'The generation token does not match this job.');
@@ -42,4 +42,8 @@ export function manageJob(engine, args) {
     ctx.emit('job.committed', `${current.label} applied.`, { jobId: current.id });
     return { id: current.id, status: current.status };
   }, { requireRevision: job.mode !== 'content' });
+  } catch (error) {
+    if (error.code === 'STALE_REVISION' && job.mode !== 'content') error.hint = 'Observe new events, discard this stale proposal, and start a fresh context job. Do not change the revision on the old job to force a commit.';
+    throw error;
+  }
 }

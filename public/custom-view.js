@@ -3,6 +3,7 @@ import { $, state, world, game, freeze, clone, asset, escapeHTML, dispatch, setT
 
 function syncInteraction() {
   const owned = Boolean(state.custom?.instance?.ownsInteraction && !state.custom.paused && !$('#custom-renderer').hidden);
+  $('#play-surface').classList.toggle('has-custom', owned);
   $('.command-panel').hidden = owned;
   $('#scene-description').hidden = owned;
 }

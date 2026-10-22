@@ -41,6 +41,12 @@ Read the server's text error and `Fix:`/`Hint:`. On a revision conflict, observe
 reassess; never blindly replace the revision on stale generated work. On network
 timeout/cancellation, the mutation may have applied: inspect before retrying and
 keep its original request ID. Use `discover` to repair invalid action arguments.
+For example, `STALE_REVISION: Expected revision 4; current revision is 5`
+means run `observe --after LAST_DELIVERED_CURSOR`, inspect the affected object,
+and decide a new action at revision 5 with a new request ID. `INVALID_PATH`
+means inspect the parent and create it before setting its child; do not retry
+the same malformed operation.
+
 Use jobs for asynchronous proposals; cancelled or stale context jobs must not
 commit. Content-mode jobs can guard exact asset/skill targets while tolerating
 unrelated player/tick changes; read the content-mode contract before using them.
@@ -48,6 +54,11 @@ unrelated player/tick changes; read the content-mode contract before using them.
 `--json '{...}'` and `--file path.json` accept full tool argument objects. `--raw`
 returns machine JSON; `TOOL --help` prints its schema. Full examples, MCP setup,
 job commits, checkpoints, and output limits are in `docs/agent-tools.md`.
+
+For a live story director, enable `narrative.mode` with `{"mode":"director"}`
+so authored keywords do not resolve creative text. `narrative.reply` accepts
+optional atomic `operations` to deliver prose and new choices/world edits together.
+See `docs/authoring.md` for the asset import and normal ESM UI/plugin contracts.
 
 ## Implementation boundaries
 

@@ -10,7 +10,10 @@ async function body(request) {
   check(request.headers['content-type']?.startsWith('application/json'), 'CONTENT_TYPE', 'Use Content-Type: application/json.');
   let size = 0, text = '';
   for await (const part of request) { size += part.length; check(size <= 512000, 'BODY_TOO_LARGE', 'Request body exceeds 512 KB.'); text += part; }
-  try { return JSON.parse(text); } catch { check(false, 'INVALID_JSON', 'Request body is not valid JSON.'); }
+  let value;
+  try { value = JSON.parse(text); } catch { check(false, 'INVALID_JSON', 'Request body is not valid JSON.'); }
+  check(value && typeof value === 'object' && !Array.isArray(value), 'INVALID_REQUEST', 'Request body must be a JSON object.');
+  return value;
 }
 function publicPack(pack) { const { initial, ...metadata } = pack; return metadata; }
 function stream(request, response, engine, sessionId, url) {

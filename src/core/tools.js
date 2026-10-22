@@ -1,4 +1,4 @@
-import { applyOperations, atPath } from './validate.js';
+import { applyOperations, atPath, isRecord } from './validate.js';
 import { requireValue as check, errorInfo } from './errors.js';
 import { manageJob } from './jobs.js';
 import { observe, summary, compact } from './context.js';
@@ -6,7 +6,7 @@ import { observe, summary, compact } from './context.js';
 export class ToolService {
   constructor(engine) { this.engine = engine; }
   async call(tool, args = {}) {
-    try { const result = await this.execute(tool, args); return { ok: true, ...result }; }
+    try { check(typeof tool === 'string' && isRecord(args), 'INVALID_REQUEST', 'Provide a tool name and an arguments object.'); const result = await this.execute(tool, args); return { ok: true, ...result }; }
     catch (error) { const info = errorInfo(error); return { ok: false, text: `${info.code}: ${info.message}${info.hint ? `\nFix: ${info.hint}` : ''}`, error: info }; }
   }
   async execute(tool, args) {

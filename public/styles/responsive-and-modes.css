@@ -1,0 +1,476 @@
+@media(min-width:1500px) {
+  .workspace {
+    grid-template-columns:245px minmax(400px,1fr) 290px;
+    gap:36px;
+    padding:36px
+  }
+  .topbar {
+    padding-left:max(36px,calc((100vw - 1588px)/2));
+    padding-right:max(36px,calc((100vw - 1588px)/2))
+  }
+  .director-card {
+    padding:25px
+  }
+  .scene-stage {
+    height:550px
+  }
+  .world-summary h1 {
+    font-size:33px
+  }
+}
+@media(max-width:1180px) {
+  .workspace {
+    grid-template-columns:195px minmax(340px,1fr) 230px;
+    gap:20px;
+    padding:24px
+  }
+  .topbar {
+    gap:18px;
+    padding:18px 24px
+  }
+  .brand {
+    min-width:190px
+  }
+  .brand>span {
+    font-size:21px
+  }
+  .brand small {
+    font-size:7px
+  }
+  .select-field {
+    padding:0 8px;
+    gap:7px
+  }
+  .select-field>span {
+    display:none
+  }
+  select {
+    max-width:160px
+  }
+  .director-card {
+    padding:17px
+  }
+  .director-card h2 {
+    font-size:23px
+  }
+  .scene-stage {
+    min-height:360px
+  }
+  .renderer,.custom-renderer {
+    padding-left:16px;
+    padding-right:16px
+  }
+  .stage-bottomline {
+    left:16px;
+    right:16px
+  }
+  .stage-bottomline>span:first-child {
+    max-width:65%
+  }
+  .new-session {
+    padding:10px 12px
+  }
+  .connection {
+    font-size:10px
+  }
+  .command-panel {
+    padding:19px
+  }
+}
+@media(max-width:1000px) {
+  .workspace {
+    grid-template-columns:190px minmax(0,1fr);
+    gap:24px
+  }
+  .inspector-rail {
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:24px;
+    align-items:start
+  }
+  .director-card {
+    margin:0
+  }
+  .inspector-rail .panel {
+    padding-top:15px
+  }
+  .inspector-footer {
+    grid-column:1/-1
+  }
+  .topbar {
+    flex-wrap:wrap;
+    gap:15px
+  }
+  .session-controls {
+    order:3;
+    flex-basis:100%
+  }
+  .connection {
+    margin-left:auto
+  }
+  .select-field {
+    flex:1
+  }
+  .select-field>span {
+    display:inline
+  }
+  select {
+    max-width:none;
+    flex:1;
+    width:100%
+  }
+  .scene-stage {
+    height:440px
+  }
+  .director-card h2 {
+    font-size:23px
+  }
+  .story-text {
+    font-size:19px
+  }
+}
+@media(max-width:700px) {
+  .workspace {
+    display:flex;
+    flex-direction:column;
+    padding:20px 16px;
+    gap:26px
+  }
+  .topbar {
+    padding:16px;
+    min-height:0
+  }
+  .brand img {
+    width:32px;
+    height:32px
+  }
+  .brand small {
+    font-size:6px
+  }
+  .brand>span {
+    font-size:20px
+  }
+  .session-controls {
+    gap:7px
+  }
+  .select-field {
+    padding:0 9px;
+    max-width:calc((100% - 89px)/2)
+  }
+  .select-field>span {
+    display:none
+  }
+  .select-field select {
+    min-width:0;
+    font-size:10px;
+    padding-right:0
+  }
+  .new-session {
+    font-size:10px;
+    padding:10px;
+    gap:3px
+  }
+  .new-session>span {
+    font-size:15px
+  }
+  .player-rail {
+    display:contents
+  }
+  .world-summary {
+    order:0;
+    padding:0;
+    display:none
+  }
+  .play-column {
+    order:1
+  }
+  .player-panel {
+    order:2
+  }
+  .player-rail>.panel:not(.player-panel) {
+    order:3
+  }
+  .player-rail>.rail-footer {
+    display:none
+  }
+  .inspector-rail {
+    order:4;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px
+  }
+  .director-card {
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:25px
+  }
+  .director-top {
+    grid-column:1/-1;
+    margin-bottom:18px
+  }
+  .director-card>.eyebrow {
+    grid-column:1
+  }
+  .director-card>h2 {
+    grid-column:1;
+    grid-row:3/5
+  }
+  .director-card>p:not(.eyebrow) {
+    grid-column:2;
+    grid-row:2/5;
+    margin-bottom:8px
+  }
+  .agent-status {
+    grid-column:1/-1
+  }
+  .runtime-metrics {
+    grid-column:1/-1;
+    justify-content:flex-start;
+    gap:40px
+  }
+  .scene-heading h2 {
+    font-size:25px
+  }
+  .scene-stage {
+    height:405px;
+    min-height:350px
+  }
+  .scene-heading {
+    margin-bottom:17px
+  }
+  .command-panel {
+    padding:18px
+  }
+  .action-row {
+    gap:12px
+  }
+  .say-form input {
+    font-size:11px
+  }
+  .stage-topline {
+    left:15px;
+    right:15px
+  }
+  .stage-bottomline {
+    font-size:8px
+  }
+  .local-motion {
+    font-size:6px
+  }
+  .panel {
+    padding-top:20px;
+    padding-bottom:0
+  }
+  .player-panel #player-card {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 24px
+  }
+  .character-identity {
+    grid-row:1/3;
+    margin-bottom:0
+  }
+  .minor-stats {
+    grid-column:1/-1;
+    justify-content:flex-end;
+    margin:5px 0 0
+  }
+  .item-list,.skill-list {
+    grid-template-columns:1fr 1fr
+  }
+  .inspector-footer {
+    grid-column:1/-1
+  }
+  .control-note {
+    font-size:8px
+  }
+  .entity-token .entity-sprite {
+    font-size:22px
+  }
+  .scene-description {
+    font-size:11px
+  }
+  .event-list {
+    max-height:200px
+  }
+  .story-text {
+    font-size:19px
+  }
+  .story-illustration {
+    height:100px;
+    margin-bottom:20px
+  }
+  .story-orb {
+    width:93px;
+    height:93px
+  }
+  .story-arch {
+    height:115px;
+    width:160px
+  }
+  .story-character {
+    height:42px;
+    width:37px
+  }
+  .dialogue-scene {
+    padding-top:15px
+  }
+  .story-location {
+    margin-bottom:12px
+  }
+  .story-speaker {
+    margin-top:10px
+  }
+}
+@media(max-width:390px) {
+  .workspace {
+    padding:17px 12px
+  }
+  .topbar {
+    padding:14px 12px
+  }
+  .scene-stage {
+    height:360px;
+    min-height:330px
+  }
+  .renderer {
+    padding:50px 10px 43px
+  }
+  .stage-bottomline {
+    left:12px;
+    right:12px
+  }
+  .stage-bottomline .local-motion {
+    display:none
+  }
+  .stage-bottomline>span:first-child {
+    max-width:100%
+  }
+  .item-list,.skill-list {
+    grid-template-columns:1fr
+  }
+  .inspector-rail {
+    display:block
+  }
+  .director-card,.inspector-rail>.panel {
+    margin-bottom:23px
+  }
+  .movement {
+    grid-template-columns:repeat(3,26px);
+    grid-template-rows:repeat(2,24px)
+  }
+  .command-panel {
+    padding:15px
+  }
+  .say-form input {
+    padding-left:4px;
+    font-size:10px
+  }
+  .entity-token .entity-sprite {
+    font-size:17px
+  }
+  .story-text {
+    font-size:17px
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*:before,*:after {
+    animation:none!important;
+    transition:none!important;
+    scroll-behavior:auto!important
+  }
+}
+.scene-tools {
+  display:flex;
+  gap:9px;
+  align-items:center
+}
+.dialog-error {
+  color:var(--coral);
+  font-size:11px
+}
+
+/* A pack owns its content, but never forces the studio column wider. */
+.custom-renderer, .custom-renderer > .pack-view {
+  min-width: 0;
+  min-height: 0;
+  align-self: start;
+}
+
+/* Player-first layout: implementation details are an explicit Studio opt-in. */
+.workspace.inspector-hidden {
+  grid-template-columns: 224px minmax(360px, 1fr);
+}
+.workspace.inspector-hidden .inspector-rail {
+  display: none;
+}
+.studio-toggle {
+  color: var(--muted);
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 10px;
+  gap: 7px;
+}
+.studio-toggle[aria-expanded="true"] {
+  color: var(--lime);
+  border-color: #71865b;
+  background: #26352b;
+}
+.studio-toggle span {
+  font-family: ui-monospace, monospace;
+  color: var(--lime);
+}
+@media (min-width: 1500px) {
+  .workspace.inspector-hidden {
+    grid-template-columns: 245px minmax(400px, 1fr);
+  }
+}
+@media (max-width: 1180px) and (min-width: 701px) {
+  .workspace.inspector-hidden {
+    grid-template-columns: 195px minmax(340px, 1fr);
+  }
+}
+@media (max-width: 1000px) {
+  .studio-toggle {
+    margin-left: auto;
+  }
+  .connection {
+    margin-left: 0;
+  }
+}
+@media (max-width: 700px) {
+  .studio-toggle {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+}
+
+/* Full-interaction pack views use the document's scroll, not a nested viewport. */
+.scene-stage.has-custom {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: hidden;
+}
+.scene-stage.has-custom .custom-renderer {
+  display: block;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+  padding: 54px 18px 43px;
+}
+.scene-stage.has-custom .custom-renderer > .pack-view {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+@media (max-width: 700px) {
+  .scene-stage.has-custom .custom-renderer {
+    padding: 48px 9px 40px;
+  }
+}

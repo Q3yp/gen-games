@@ -81,7 +81,7 @@ export class Engine extends EventEmitter {
       const hooks = game.plugins.filter(plugin => typeof plugin.tick === 'function'); if (!hooks.length) continue;
       try {
         const session = structuredClone(original), pending = [], context = this.context(session, pending);
-        for (const plugin of hooks) plugin.tick(context, deltaMs);
+        for (const plugin of hooks) { const result = plugin.tick(context, deltaMs); check(!result || typeof result.then !== 'function', 'ASYNC_HANDLER', `${plugin.id} tick must be synchronous. Use jobs for asynchronous work.`); }
         if (!pending.length && !diff(original, session).length) continue;
         this.transact({ sessionId: session.id, requestId: randomUUID(), expectedRevision: original.revision }, ctx => {
           Object.assign(ctx.session, session); for (const event of pending) ctx.emit(event.type, event.text, event.data);

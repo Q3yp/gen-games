@@ -15,7 +15,10 @@ Manual HTTP sessions, CLI processes, and MCP stdio calls exercised:
 - Observe bootstrap, independent consumers, delivered-versus-acknowledged cursors, two-row/256-character pagination, `hasMore`, valid acknowledgement, and rejection of a future acknowledgement.
 - A content-mode asset job started, an unrelated tactical turn occurred, and the guarded asset committed successfully without overwriting world changes.
 - A contextual job started, world revision changed, and late commit returned `STALE_JOB`.
-- Cancellation followed by late commit returned `JOB_NOT_RUNNING`.
+- Cancellation followed by late commit returned `JOB_NOT_RUNNING`; a pending job was observed as `interrupted` after an actual server restart.
+- A synchronous clock plugin ran on a real 100 ms interval for five ticks (world revision 5, simulated 500 ms). A guarded asset job then committed at revision 6; the older context proposal was rejected.
+- A two-second long-poll returned about 109 ms after a new player action woke it.
+- Director mode bypassed a known Mara keyword, an atomic reply committed text plus an asset/flag edit, and an invalid scene edit rolled the entire reply back. Data-SVG was accepted; a javascript: asset returned `UNSUPPORTED_ASSET_URL` and a repair hint.
 - Named checkpoint save, subsequent play, and restoration to a new revision with a monotonic event cursor.
 - Newly authored opponent, item, skill, learned-skill entry, inventory entry, and asset registry record through the tools. The player cast the new skill, defeated the new opponent, used the new item, and inspected the resulting state.
 - SSE subscription received revisioned patches and semantic events, without a full `session` snapshot in the stream payload.
@@ -40,7 +43,7 @@ A separate browser player and director agent shared the same live Signal House s
 2. Director observed incremental events, inspected scene context, authored a new visual/choices/objective, and replied in-character.
 3. Player continued with another original action; director responded again.
 
-That exercise found concrete friction and drove changes: current-scene inspection defaults, IDs in bootstrap, changed-path summaries, explicit director routing instead of substring keyword interference, atomic reply plus world edits, wider player layout, hidden spoilers/inspector by default, no duplicate custom/shell inputs, and source-reload controls. The final browser recheck and completion of the updated director-mode flow are recorded below when finished.
+That exercise found concrete friction and drove changes: current-scene inspection defaults, IDs in bootstrap, changed-path summaries, explicit director routing instead of substring keyword interference, atomic reply plus world edits, wider player layout, hidden spoilers/inspector by default, no duplicate custom/shell inputs, and source-reload controls. After restart, the browser resumed the same live-authored branch; the new data-SVG loaded successfully and explicit director mode suppressed the old keyword response. Completion of the updated play flow and custom-component fallback recheck are recorded below when finished.
 
 Browser combat interaction also exercised movement and a Spark attack; the opponent died and mana/experience updated. Source-refactored frontend routes, session persistence/status, movement, dialogue, choices, and inventory effects were exercised over HTTP.
 
