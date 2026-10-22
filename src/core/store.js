@@ -38,6 +38,7 @@ export class Store {
     return row && { fingerprint: row.fingerprint, result: JSON.parse(row.result) };
   }
   remember(id, requestId, fingerprint, result) { this.db.prepare('INSERT INTO requests VALUES(?,?,?,?)').run(id, requestId, fingerprint, JSON.stringify(result)); }
+  updateRequestResult(id, requestId, result) { this.db.prepare('UPDATE requests SET result=? WHERE session_id=? AND request_id=?').run(JSON.stringify(result), id, requestId); }
   consumer(id, name) { return this.db.prepare('SELECT name,ack,delivered FROM consumers WHERE session_id=? AND name=?').get(id, name) || { name, ack: 0, delivered: 0 }; }
   consumers(id) { return this.db.prepare('SELECT name,ack,delivered FROM consumers WHERE session_id=?').all(id); }
   saveConsumer(id, consumer) { this.db.prepare('INSERT INTO consumers VALUES(?,?,?,?) ON CONFLICT(session_id,name) DO UPDATE SET ack=MAX(ack,excluded.ack),delivered=MAX(delivered,excluded.delivered)').run(id, consumer.name, consumer.ack, consumer.delivered); }

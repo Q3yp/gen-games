@@ -1,6 +1,6 @@
 # gen-games
 
-**A real game runtime for coding agents and human players.** Build a world with code and data, play it in a browser, and let a coding agent direct or extend that same running world without receiving a giant state dump every turn.
+**Live wiring for coding agents and human players.** Keep arbitrary game code running in the browser while an attached agent responds to player interactions through scoped commands and compact state, without publishing a new game for every turn.
 
 No model API, subscription, cloud service, bundler, or production dependency is required. Node.js **24+** supplies HTTP, SQLite, and the runtime.
 
@@ -10,15 +10,17 @@ No model API, subscription, cloud service, bundler, or production dependency is 
 npm start
 ```
 
-Open **http://127.0.0.1:3000** and choose **Menu → Mossfall** to start the
-continuing RPG example. In a second terminal:
+Open **http://127.0.0.1:3000**. A fresh browser opens **Live Canvas**, an empty
+game-owned surface awaiting a live director, not a scripted demo. Any valid
+remembered session takes precedence. Authored examples remain available in Menu.
+In a second terminal:
 
 ```sh
 npm run agent -- discover
 npm run agent -- session --op list
 ```
 
-Select the browser's session ID, then follow [the agent quick loop](AGENTS.md) or [CLI/MCP setup](docs/agent-tools.md). A coding agent is not bundled or silently started: connect your own agent through the CLI, MCP stdio bridge, or HTTP tools.
+Select the browser's session ID, then follow [the live director contract](docs/live-runtime.md), [the agent quick loop](AGENTS.md), or [CLI/MCP setup](docs/agent-tools.md). A coding agent is not bundled or silently started: connect your own agent through the CLI, MCP stdio bridge, or HTTP tools.
 
 ## An open canvas for game-making agents
 
@@ -28,6 +30,10 @@ The host agent can author a new mechanic in source, publish an immutable release
 and observe whether the playing browser activated it. It is not limited to a
 fixed genre, choice schema, effect list, or chat interface.
 
+- **Live Canvas** is the small engine-first probe: an empty world with optional
+  projection, version, and command hooks. Its own display/object choices are not
+  engine schemas. Attach a real director to create a character/environment and
+  react to player input; no model or canned plot starts automatically.
 - **Mossfall** is a code-owned continuing RPG: explore connected areas, choose
   an oath, trade weapon reach against damage, read enemy intentions, rescue a
   keeper and bring the living seed home. The same character and world continue
@@ -44,13 +50,13 @@ fixed genre, choice schema, effect list, or chat interface.
 ## Runtime boundaries
 
 Code games run continuously in the browser without waiting for model turns.
-The browser owns frame state; the server persists coarse saves and checkpoints,
-release metadata, bounded inspection summaries, command results, and semantic
-events. A saved summary is not an authoritative live frame read. Legacy packs
+The browser owns frame state; the server persists periodic saves and atomic
+command applications (save, result, and emitted events together), source release
+metadata, compact versioned projections, and immediate semantic events. A saved summary is not an authoritative live frame read. Legacy packs
 instead retain server-authoritative transactions and incremental state patches.
 
 Agent tools include `discover`, `session`, `observe`, `inspect`, `publish`,
-`command`, and `checkpoint`. Legacy packs additionally use `act`, `author`, and
+`command`, `director`, `work`, `asset`, and `checkpoint`. Legacy packs additionally use `act`, `author`, and
 `jobs`. Discovery supplies the current schemas. Publication and command delivery
 are asynchronous: a `PENDING` response does not prove activation or execution.
 Inspect acknowledgments and the actual browser before reporting success.
@@ -79,9 +85,10 @@ Declare `runtime: "code"`, `entry`,
 The entry exports a factory with required `serialize` and `dispose` hooks and
 optional simulation, rendering, inspection, and game-defined command hooks.
 
-Build a direct interaction, a meaningful tradeoff, and readable consequences.
-Prove a new mechanic by editing and publishing code, then exercise it through
-player controls. Inspect a screenshot after activation and replay with a different
+Start the live director loop and respond through discovered commands first.
+Keep player input and local frames responsive while external work runs separately.
+Publish source when adding genuinely new behavior, preserving the current save;
+then exercise it through player controls. Inspect a screenshot after activation and replay with a different
 strategy. Visual polish, syntax checks, and successful publication are useful
 evidence, but none alone demonstrates enjoyable play.
 
@@ -105,6 +112,7 @@ The repository intentionally has no test suite or test files. Actual manual runt
 
 ## Read next
 
+- [Live director, commands, scopes, and background work](docs/live-runtime.md)
 - [Architecture and guarantees](docs/architecture.md)
 - [Authoring, plugins, assets, and coded UI](docs/authoring.md)
 - [Agent tools and error recovery](docs/agent-tools.md)

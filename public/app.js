@@ -84,9 +84,9 @@ async function init() {
     state.games = games.games || []; state.sessions = sessions.sessions || []; renderSelectors();
     if (!state.games.length) { connection('No worlds installed'); $('#standard-renderer').innerHTML = '<div class="stage-empty"><h3>No game packs found</h3><p>Add a game pack to the games directory and restart the runtime.</p></div>'; return; }
     const saved = state.sessions.find(session => session.id === savedSession.get() && state.games.some(pack => pack.id === session.gameId));
-    const firstWorld = state.games.find(pack => pack.id === 'lumen-weave') || state.games.find(pack => pack.runtime === 'code') || state.games[0];
+    const firstWorld = state.games.find(pack => pack.id === 'live-canvas') || state.games.find(pack => pack.runtime === 'code') || state.games[0];
     const latest = state.sessions.filter(session => session.gameId === firstWorld.id).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];
-    // Remembered play wins; a fresh browser enters the primary game, not a legacy pack.
+    // Remembered play wins; a fresh browser enters the live director surface when installed.
     if (saved || latest) await loadSession((saved || latest).id); else await createSession(firstWorld.id);
   } catch (error) {
     connection('Runtime unavailable'); notify(`Could not open the world. ${error.message} Check that the local server is running, then reload.`, false, true);

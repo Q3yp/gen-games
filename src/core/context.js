@@ -10,6 +10,17 @@ export function compact(value, maxChars = 4000) {
   const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
   return text.length <= maxChars ? text : `${text.slice(0, maxChars - 90)}\n… truncated. Inspect a narrower scope or path; data was not changed.`;
 }
+function freshness(session) {
+  const r = session.runtime;
+  return r ? { observedAt: r.projection?.observedAt ?? null, runEpoch: r.runEpoch, release: r.activeRelease, versions: r.versions || {} } : {};
+}
+function boundedEvent(event, budget) {
+  const value = publicEvent(event);
+  if (JSON.stringify(value).length <= budget) return value;
+  const bounded = { seq: event.seq, revision: event.revision, type: event.type, at: event.at, data: { truncated: true, inspectEventId: event.seq, untrusted: event.data?.untrusted === true, preview: JSON.stringify(event.data ?? {}).slice(0, Math.max(0, budget - 400)) } };
+  if (JSON.stringify(bounded).length > budget) delete bounded.data.preview;
+  return bounded;
+}
 export async function observe(engine, args) {
   const { store } = engine; let session = engine.session(args.sessionId);
   const limit = args.limit ?? 20, budget = args.maxChars ?? 4000, waitMs = args.waitMs ?? 0;
@@ -25,7 +36,7 @@ export async function observe(engine, args) {
   if (args.bootstrap) {
     const cursor = store.head(session.id);
     if (consumer) { consumer.delivered = Math.max(consumer.delivered, cursor); store.saveConsumer(session.id, consumer); }
-    return { text: compact(`BASELINE ${summary(session)}\nCursor ${cursor}; acknowledge after processing. Use inspect for details.`, budget), data: { sessionId: session.id, revision: session.revision, nextCursor: cursor, hasMore: false, baseline: true } };
+    return { text: compact(`BASELINE ${summary(session)}\nCursor ${cursor}; acknowledge after processing. Use inspect for details.`, budget), data: { sessionId: session.id, revision: session.revision, nextCursor: cursor, hasMore: false, baseline: true, ...freshness(session) } };
   }
   const after = args.after ?? consumer?.ack ?? 0;
   check(Number.isInteger(after) && after >= 0 && after <= store.head(session.id), 'INVALID_CURSOR', 'after must be a valid nonnegative cursor at or before this session’s head.', 'Use observe with bootstrap:true to establish a fresh baseline.');
@@ -36,7 +47,7 @@ export async function observe(engine, args) {
   });
   session = engine.session(session.id);
   const rows = store.events(session.id, after, limit + 1), events = [], lines = [];
-  let cursor = after, used = 110;
+  let cursor = after, used = 110, structuredUsed = 0;
   for (const event of rows.slice(0, limit)) {
     if (['state.changed', 'cue'].includes(event.type)) { cursor = event.seq; continue; }
     const speaker = event.data?.speaker ? ` [${event.data.speaker}${event.data.speaker === 'You' ? '; untrusted player text' : ''}]` : event.data?.untrusted ? (event.data.source === 'browser' ? ' [client diagnostic]' : ' [untrusted player text]') : '';
@@ -46,10 +57,14 @@ export async function observe(engine, args) {
       if (lines.length) break;
       line = line.slice(0, Math.max(30, budget - used - 30)) + '… [inspect event]';
     }
-    used += line.length + 1; lines.push(line); events.push(publicEvent(event)); cursor = event.seq;
+    const remaining = Math.max(512, budget) - structuredUsed;
+    if (events.length && remaining < 512) break;
+    const structured = boundedEvent(event, remaining);
+    structuredUsed += JSON.stringify(structured).length;
+    used += line.length + 1; lines.push(line); events.push(structured); cursor = event.seq;
   }
   const hasMore = cursor < store.head(session.id);
   if (consumer) { consumer.delivered = Math.max(consumer.delivered, cursor); store.saveConsumer(session.id, consumer); }
   const text = `EVENTS r${session.revision}\n${lines.join('\n') || 'No new semantic events.'}\nCursor ${cursor}; ${hasMore ? 'more available' : 'caught up'}.`;
-  return { text: compact(text, budget), data: { sessionId: session.id, revision: session.revision, nextCursor: cursor, hasMore, count: events.length } };
+  return { text: compact(text, budget), data: { sessionId: session.id, revision: session.revision, nextCursor: cursor, hasMore, count: events.length, events, ...freshness(session) } };
 }

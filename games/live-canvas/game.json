@@ -1,0 +1,10 @@
+{
+  "id": "live-canvas",
+  "title": "Live Canvas",
+  "description": "An empty, game-owned surface for a live director. No predefined world or story.",
+  "version": "0.1.0",
+  "runtime": "code",
+  "entry": "./main.js",
+  "saveVersion": 1,
+  "initial": {}
+}

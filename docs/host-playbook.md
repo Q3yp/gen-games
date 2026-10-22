@@ -1,9 +1,20 @@
-# Host playbook: build a game, then learn from play
+# Host playbook: keep a live world responsive
 
 Use the repository skill at `.agents/skills/game-host/SKILL.md` for the host role.
 This playbook connects that role to operational evidence. Exact runtime contracts
 live in [agent-tools.md](agent-tools.md) and [authoring.md](authoring.md); discover
 the running server rather than assuming a saved example matches its version.
+
+## Start with the live loop
+
+Fresh installs open Live Canvas; valid remembered sessions stay selected. Discover
+the actual game's capabilities and focused projection, then attach a real director
+with the [live runtime contract](live-runtime.md). Listen, interpret player input,
+apply guarded game-owned commands, await durable acknowledgment, and listen again.
+A model is not silently started by opening the page. Do not substitute another
+one-shot authored demo for this loop. Publish code only when a desired behavior is
+not available through the game's commands. The optional probe is not an engine
+scene or component schema; arbitrary code packs remain free to expose their own.
 
 ## Select the host profile before authoring
 

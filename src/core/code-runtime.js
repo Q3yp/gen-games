@@ -1,5 +1,14 @@
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
+import { resolve, dirname, extname, sep } from 'node:path';
+import { validateDirectorToken } from './director.js';
 import { requireValue as check } from './errors.js';
-import { validateJSONState, validateEnvelope } from './validate.js';
+import {
+  validateJSONState,
+  validateEnvelope,
+  validateSchema,
+  isRecord
+} from './validate.js';
 import { snapshotRelease } from './source-release.js';
 
 // Preserve the existing registry import while source handling lives separately.
@@ -97,6 +106,10 @@ export class CodeRuntime {
         ) {
           command.status = 'canceled';
           command.error = 'Run ownership changed before acknowledgement.';
+          store.updateRequestResult(id, command.id, {
+            text: `CANCELED ${command.id}`,
+            data: command
+          });
         }
       }
       this.leases.set(id, {
@@ -120,16 +133,23 @@ export class CodeRuntime {
         runtime.saveRelease = input.release;
         runtime.saveEntry = runtime.entry;
       }
+      if (input.capabilities !== undefined) {
+        this.capabilities(input.capabilities);
+        runtime.capabilities = input.capabilities;
+      } else delete runtime.capabilities;
       runtime.activeRelease = input.release;
       runtime.activeEntry = runtime.entry;
       runtime.activeSaveVersion = runtime.saveVersion;
       runtime.activatedAt = new Date().toISOString();
-      if (input.summary !== undefined)
-        runtime.summary = this.summary(input.summary);
+      this.telemetry(runtime, input);
       for (const command of runtime.commands || []) {
         if (command.status === 'pending' && command.release !== input.release) {
           command.status = 'canceled';
           command.error = 'The active release changed before acknowledgement.';
+          store.updateRequestResult(id, command.id, {
+            text: `CANCELED ${command.id}`,
+            data: command
+          });
         }
       }
       store.save(session);
@@ -151,6 +171,25 @@ export class CodeRuntime {
       'STALE_RELEASE',
       'Save or event belongs to a different active release.'
     );
+    if (input.op === 'authorize') {
+      const command = runtime.commands?.find(
+        (item) => item.id === input.commandId
+      );
+      check(
+        command?.status === 'pending',
+        'COMMAND_NOT_PENDING',
+        'Command is no longer pending.'
+      );
+      check(
+        command.runEpoch === runtime.runEpoch &&
+          command.release === runtime.activeRelease,
+        'STALE_RUN',
+        'Command belongs to an older run or release.'
+      );
+      if (command.directorToken)
+        validateDirectorToken(this.engine, id, command.directorToken);
+      return { ok: true, commandId: command.id };
+    }
     if (input.op === 'checkpoint') {
       check(
         Number.isInteger(input.checkpointSeq) &&
@@ -163,11 +202,21 @@ export class CodeRuntime {
       runtime.checkpointSeq = input.checkpointSeq;
       runtime.saveRelease = input.release;
       runtime.saveEntry = runtime.activeEntry;
-      if (input.summary !== undefined)
-        runtime.summary = this.summary(input.summary);
+      this.telemetry(runtime, input);
       runtime.savedAt = new Date().toISOString();
       store.save(session);
     } else if (input.op === 'result') {
+      const key = `application:${runtime.runEpoch}:${input.commandId}`;
+      const existing = store.request(id, key);
+      const fingerprint = JSON.stringify(input);
+      if (existing) {
+        check(
+          existing.fingerprint === fingerprint,
+          'IDEMPOTENCY_CONFLICT',
+          'Application ID was already committed with different data.'
+        );
+        return { ...existing.result, replayed: true };
+      }
       const command = runtime.commands?.find(
         (item) => item.id === input.commandId
       );
@@ -179,19 +228,62 @@ export class CodeRuntime {
         'COMMAND_NOT_PENDING',
         'Command is unknown or already acknowledged.'
       );
+      check(
+        input.applicationId === undefined || input.applicationId === command.id,
+        'INVALID_APPLICATION_ID',
+        'applicationId must equal commandId.'
+      );
+      check(
+        runtime.capabilities === undefined || input.save !== undefined,
+        'APPLICATION_SAVE_REQUIRED',
+        'Registered commands commit their result and serialized save together.'
+      );
+      if (input.save !== undefined) {
+        check(
+          Number.isInteger(input.checkpointSeq) &&
+            input.checkpointSeq > runtime.checkpointSeq,
+          'STALE_CHECKPOINT',
+          'Command save must follow the last durable checkpoint.'
+        );
+        validateJSONState(input.save);
+        session.state = input.save;
+        runtime.checkpointSeq = input.checkpointSeq;
+        runtime.saveRelease = input.release;
+        runtime.saveEntry = runtime.activeEntry;
+        runtime.savedAt = new Date().toISOString();
+      }
+      this.telemetry(runtime, input);
       command.status = input.error ? 'failed' : 'applied';
+      command.applicationId = input.applicationId || command.id;
       command.result = this.summary(input.result ?? null);
       command.error = input.error ? String(input.error).slice(0, 1000) : null;
+      command.errorCode = input.errorCode || null;
+      command.completedAt = new Date().toISOString();
+      command.queueToCommitMs = Number.isFinite(command.queuedAtMs)
+        ? Math.max(0, Date.now() - command.queuedAtMs)
+        : null;
+      store.updateRequestResult(id, command.id, {
+        text: `${command.status.toUpperCase()} ${command.id}`,
+        data: command
+      });
       store.save(session);
-      this.event(
+      const acceptedEventIds = this.events(session, input.events || []);
+      const event = this.event(
         session,
         'runtime.command.result',
         `${command.name}: ${command.status}`,
-        {
-          commandId: command.id,
-          ...command
-        }
+        { ...command, commandId: command.id }
       );
+      const result = {
+        ok: true,
+        acceptedEventIds,
+        applicationId: command.applicationId,
+        checkpointSeq: runtime.checkpointSeq,
+        cursor: event.seq,
+        status: command.status
+      };
+      store.remember(id, key, fingerprint, result);
+      return result;
     } else {
       check(
         input.op === 'events' || input.op === 'status',
@@ -199,10 +291,13 @@ export class CodeRuntime {
         'Use connect, checkpoint, events, applied, result, or status.'
       );
     }
-    this.events(session, input.events || []);
+    this.telemetry(runtime, input);
+    const acceptedEventIds = this.events(session, input.events || []);
+    store.save(session);
     return {
       ok: true,
       checkpointSeq: runtime.checkpointSeq,
+      acceptedEventIds,
       cursor: store.head(id),
       runtime
     };
@@ -223,6 +318,7 @@ export class CodeRuntime {
       'EVENT_LIMIT',
       'Batch at most 30 semantic events.'
     );
+    const accepted = [];
     for (const item of events) {
       check(
         typeof item.type === 'string' &&
@@ -238,12 +334,194 @@ export class CodeRuntime {
         'Use event text up to 2000 characters.'
       );
       this.summary(item.data ?? {});
-      this.event(session, item.type, item.text, {
+      let key, fingerprint;
+      if (item.id !== undefined) {
+        check(
+          typeof item.id === 'string' && /^[\w.:-]{1,160}$/.test(item.id),
+          'INVALID_EVENT_ID',
+          'Semantic event id must be a short stable identifier.'
+        );
+        key = `event:${session.runtime.runEpoch}:${item.id}`;
+        fingerprint = JSON.stringify(item);
+        const existing = this.engine.store.request(session.id, key);
+        if (existing) {
+          check(
+            existing.fingerprint === fingerprint,
+            'IDEMPOTENCY_CONFLICT',
+            'Event ID reused with different content.'
+          );
+          accepted.push(item.id);
+          continue;
+        }
+      }
+      const event = this.event(session, item.type, item.text, {
         ...item.data,
+        eventId: item.id,
         source: 'browser',
         untrusted: true
       });
+      if (key) {
+        this.engine.store.remember(session.id, key, fingerprint, {
+          cursor: event.seq
+        });
+        accepted.push(item.id);
+      }
     }
+    return accepted;
+  }
+
+  capabilities(value) {
+    check(
+      Array.isArray(value) && value.length <= 100,
+      'INVALID_CAPABILITIES',
+      'Expose at most 100 game-defined commands.'
+    );
+    const names = new Set();
+    for (const item of value) {
+      check(
+        isRecord(item) &&
+          typeof item.name === 'string' &&
+          /^[\w.:-]{1,100}$/.test(item.name) &&
+          !names.has(item.name),
+        'INVALID_CAPABILITIES',
+        'Each capability needs a unique name.'
+      );
+      names.add(item.name);
+      check(
+        item.inputSchema === undefined || isRecord(item.inputSchema),
+        'INVALID_CAPABILITIES',
+        'inputSchema must be an object.'
+      );
+      check(
+        item.scopes === undefined ||
+          (Array.isArray(item.scopes) &&
+            item.scopes.every(
+              (scope) => typeof scope === 'string' && scope.length <= 100
+            )),
+        'INVALID_CAPABILITIES',
+        'scopes must contain game-defined version names.'
+      );
+    }
+    check(
+      Buffer.byteLength(JSON.stringify(value)) <= 48000,
+      'CAPABILITIES_TOO_LARGE',
+      'Keep capability descriptions below 48 KB.'
+    );
+  }
+
+  telemetry(runtime, input) {
+    if (input.summary === undefined && input.versions === undefined) return;
+    const sequence = input.telemetrySeq ?? 0;
+    check(
+      Number.isSafeInteger(sequence) && sequence >= 0,
+      'INVALID_TELEMETRY_SEQUENCE',
+      'telemetrySeq must be a nonnegative safe integer.'
+    );
+    const previous = runtime.projection;
+    if (
+      previous?.runEpoch === runtime.runEpoch &&
+      previous.release === input.release &&
+      sequence < previous.telemetrySeq
+    )
+      return;
+    if (input.versions !== undefined) {
+      check(
+        isRecord(input.versions) &&
+          Object.entries(input.versions).length <= 100 &&
+          Object.values(input.versions).every(
+            (value) =>
+              typeof value === 'string' ||
+              (typeof value === 'number' && Number.isFinite(value))
+          ),
+        'INVALID_VERSIONS',
+        'versions must map game-defined scopes to string or finite number tokens.'
+      );
+      runtime.versions = this.summary(input.versions);
+    }
+    if (input.summary !== undefined)
+      runtime.summary = this.summary(input.summary);
+    runtime.projection = {
+      summary: runtime.summary,
+      versions: runtime.versions || {},
+      observedAt: new Date().toISOString(),
+      runEpoch: runtime.runEpoch,
+      release: input.release,
+      telemetrySeq: sequence
+    };
+  }
+
+  async asset(args) {
+    validateEnvelope(args);
+    const session = this.session(args.sessionId);
+    const key = `asset:${args.requestId}`;
+    const fingerprint = JSON.stringify(args);
+    const previous = this.engine.store.request(session.id, key);
+    if (previous) {
+      check(
+        previous.fingerprint === fingerprint,
+        'IDEMPOTENCY_CONFLICT',
+        'Asset request ID reused for different arguments.'
+      );
+      return previous.result;
+    }
+    check(
+      typeof args.path === 'string' &&
+        !args.path.split(/[\\/]/).some((part) => part.startsWith('.')),
+      'INVALID_ASSET_PATH',
+      'Use a relative asset path inside this game directory.'
+    );
+    const base = await realpath(resolve(this.directory, session.gameId));
+    const source = await realpath(resolve(base, args.path));
+    check(
+      source.startsWith(base + sep),
+      'INVALID_ASSET_PATH',
+      'Asset must remain inside this game directory.'
+    );
+    const extension = extname(source).toLowerCase();
+    check(
+      [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.webp',
+        '.avif',
+        '.wav',
+        '.mp3'
+      ].includes(extension),
+      'UNSUPPORTED_ASSET',
+      'Use a raster image or audio file. Executable assets require source publication.'
+    );
+    const bytes = await readFile(source);
+    check(
+      bytes.length <= 20_000_000,
+      'ASSET_TOO_LARGE',
+      'Assets must be below 20 MB.'
+    );
+    const hash = createHash('sha256').update(bytes).digest('hex');
+    const directory = resolve(dirname(this.output), 'assets');
+    await mkdir(directory, { recursive: true });
+    await writeFile(resolve(directory, `${hash}${extension}`), bytes, {
+      flag: 'wx'
+    }).catch((error) => {
+      if (error.code !== 'EEXIST') throw error;
+    });
+    const result = {
+      text: `ASSET ${hash}: ready for a game-defined binding command; no source publication required.`,
+      data: { hash, url: `/assets/${hash}${extension}`, bytes: bytes.length }
+    };
+    // Concurrent identical imports are harmless and retain a single durable request.
+    this.engine.store.transaction(() => {
+      const replay = this.engine.store.request(session.id, key);
+      if (replay)
+        check(
+          replay.fingerprint === fingerprint,
+          'IDEMPOTENCY_CONFLICT',
+          'Asset request ID reused for different arguments.'
+        );
+      else this.engine.store.remember(session.id, key, fingerprint, result);
+    });
+    return result;
   }
 
   async publish(args) {
@@ -351,6 +629,58 @@ export class CodeRuntime {
       'STALE_RELEASE',
       'Command must target the active release.'
     );
+    if (args.expectedRunEpoch !== undefined)
+      check(
+        args.expectedRunEpoch === session.runtime.runEpoch,
+        'STALE_RUN',
+        'Command targets a different browser run. Observe and reassess.'
+      );
+    if (args.directorToken)
+      validateDirectorToken(this.engine, session.id, args.directorToken);
+    if (args.causeEventId !== undefined)
+      check(
+        typeof args.causeEventId === 'string' &&
+          /^[\w.:-]{1,160}$/.test(args.causeEventId),
+        'INVALID_CAUSE_EVENT',
+        'causeEventId must be a stable semantic event ID from observe.'
+      );
+    const capability = session.runtime.capabilities?.find(
+      (item) => item.name === args.name
+    );
+    if (session.runtime.capabilities !== undefined) {
+      check(
+        Number.isInteger(args.expectedRunEpoch),
+        'RUN_EPOCH_REQUIRED',
+        'Registered commands require expectedRunEpoch from current projection.'
+      );
+      check(
+        capability,
+        'UNKNOWN_COMMAND',
+        'Command is not registered by the active game. Use discover.'
+      );
+      validateSchema(args.args || {}, capability.inputSchema);
+      for (const scope of capability.scopes || [])
+        check(
+          Object.hasOwn(args.expectedVersions || {}, scope),
+          'SCOPE_VERSION_REQUIRED',
+          `Command requires expectedVersions.${scope}. Inspect projection first.`
+        );
+    }
+    if (args.expectedVersions !== undefined) {
+      check(
+        isRecord(args.expectedVersions),
+        'INVALID_VERSIONS',
+        'expectedVersions must be a scope-to-version object.'
+      );
+      for (const [scope, expected] of Object.entries(args.expectedVersions))
+        check(
+          session.runtime.versions?.[scope] === expected,
+          'STALE_SCOPE',
+          `Scope ${scope} changed; inspect projection and reassess.`,
+          undefined,
+          { scope, expected, current: session.runtime.versions?.[scope] }
+        );
+    }
     const old = session.runtime.commands?.find(
       (command) => command.id === args.requestId
     );
@@ -374,6 +704,10 @@ export class CodeRuntime {
       name: args.name,
       args: args.args || {},
       status: 'pending',
+      queuedAtMs: Date.now(),
+      expectedVersions: args.expectedVersions || {},
+      directorToken: args.directorToken,
+      causeEventId: args.causeEventId,
       runEpoch: session.runtime.runEpoch,
       release: session.runtime.activeRelease
     };

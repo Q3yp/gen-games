@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { AgentError, boundedText, callTool, errorEnvelope, isObject } from './transport.js';
 import { TOOL_NAMES } from './schemas.js';
 
-const HELP = `gen-games agent: discover | session | observe | inspect | act | author | jobs | checkpoint
+const HELP = `gen-games agent: discover | session | observe | inspect | director | work | asset | publish | command | act | author | jobs | checkpoint
 Usage: node src/agent/cli.js <tool> [options]
 
   --session ID       Session ID (or GEN_GAMES_SESSION)
@@ -20,6 +20,11 @@ Usage: node src/agent/cli.js <tool> [options]
   --scope NAME       Targeted inspect; --id ID or --path '["entities","hero"]'
   --op NAME          session: list/create/open; jobs: start/list/cancel/commit
                      checkpoint: save/list/restore
+  --release ID       Observed active release for command; desired release for publish
+  --run N            Observed run epoch; --versions OBJECT scope version guards
+  --director-token T Current director turn token from wait
+  --cursor N         Exact delivered cursor for director finish
+  --lease N          Director lease duration in ms (35000–300000)
   --token TOKEN      Job commit token; --label TEXT job label; --name TEXT checkpoint
   --raw              Full JSON result envelope; default is bounded readable text
   --url URL          Server URL (or GEN_GAMES_URL; default http://127.0.0.1:3000)
@@ -42,10 +47,11 @@ const valueFlags = {
   session: 'sessionId', game: 'gameId', seed: 'seed', after: 'after', consumer: 'consumer', ack: 'ack', limit: 'limit',
   chars: 'maxChars', wait: 'waitMs', action: 'action', revision: 'expectedRevision',
   request: 'requestId', scope: 'scope', id: 'id', path: 'path', op: 'op', token: 'token',
+  release: 'expectedRelease', run: 'expectedRunEpoch', versions: 'expectedVersions', 'director-token': 'directorToken', cursor: 'cursor', lease: 'leaseMs',
   label: 'label', name: 'name', args: 'args', operations: 'operations',
 };
-const numberFlags = new Set(['after', 'ack', 'limit', 'chars', 'wait', 'revision', 'seed']);
-const jsonFlags = new Set(['path', 'args', 'operations']);
+const numberFlags = new Set(['after', 'ack', 'limit', 'chars', 'wait', 'revision', 'seed', 'run', 'cursor', 'lease']);
+const jsonFlags = new Set(['path', 'args', 'operations', 'versions']);
 
 function usageError(message, hint = 'Run node src/agent/cli.js --help for supported options.') {
   return new AgentError('CLI_USAGE', message, hint);
@@ -114,7 +120,7 @@ export async function parseArguments(argv, env = process.env) {
       if (flag === 'limit' && parsed === 0) throw usageError('--limit must be at least 1.');
       if (flag === 'chars' && (parsed < 256 || parsed > 12000)) throw usageError('--chars must be between 256 and 12000.');
     } else if (jsonFlags.has(flag)) {
-      parsed = parseJSON(value, `--${flag}`, flag === 'args' ? 'object' : 'array');
+      parsed = parseJSON(value, `--${flag}`, ['args', 'versions'].includes(flag) ? 'object' : 'array');
     }
     overrides[valueFlags[flag]] = parsed;
   }

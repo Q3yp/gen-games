@@ -8,8 +8,8 @@ only when not using `http://127.0.0.1:3000`.
 Use `.agents/skills/game-host/SKILL.md` and `docs/host-playbook.md` when creating
 or hosting a game. A code pack (`runtime: "code"`) owns its canvas/DOM, input,
 frame simulation, and arbitrary serializable save. The server coordinates immutable
-source releases, browser activation, coarse durable checkpoints, commands, and
-semantic events. An inspected save or summary is not a live frame snapshot.
+source releases, browser activation, durable applications/checkpoints, discoverable
+game-defined commands, and immediate reliable semantic events. An inspected save or summary is not a live frame snapshot.
 
 Edit source in `games/<id>/`, inspect the session's `runtime`, then use `publish`
 with the observed `runtime.release` as `expectedRelease`. A `PENDING` publication
@@ -17,7 +17,10 @@ requires a `runtime.activated` acknowledgment; `ui.failed` means investigate rat
 than assume success. Game-defined `command` calls target `runtime.activeRelease`
 and likewise require result acknowledgment. Read the playbook for exact CLI calls.
 
-Author new executable mechanics, not merely parameters for built-in effects.
+Prioritize responsive live player→director→game interaction and scoped state management.
+Reuse the transport and durability wiring, not a mandatory scene/entity/component catalog.
+Use discoverable game commands for current capabilities; publish source only to add
+new executable behavior. See docs/live-runtime.md for the live contract.
 Preserve saves across releases, inspect the actual browser after activation, and
 judge the resulting play through real input and alternative strategies. Code packs
 are trusted local JavaScript, not a sandbox for untrusted uploads or player text.
@@ -97,4 +100,4 @@ See `docs/authoring.md` for the asset import and normal ESM UI/plugin contracts.
 - Respect explicit revision checks, atomic mutations, event delivery/acknowledgement,
   stable request IDs, and stale-job rejection when changing runtime behavior.
 - Do not add tests or test files for this task. Use syntax checks and manual
-  CLI/browser walkthroughs. Do not commit or push unless explicitly requested.
+  CLI/browser walkthroughs. The user has explicitly authorized commits and pushes to Q3yp/gen-games.
