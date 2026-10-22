@@ -9,7 +9,10 @@ this pack's stats, effect registry, encounter model or rendering.
 
 ## Play
 
-- J / Strike: 16 breath, 0.48s recovery. Full Power during OPENING, otherwise 3.
+- J / Strike: 16 breath, 0.48s recovery. Each OPENING permits two ordinary
+  full-Power strikes. Later strikes in that opening, or against a closed guard,
+  glance for 3 damage and still spend breath. A spent opening preserves Ember
+  Edge for the next clean strike. Bell Return and skill damage do not spend hits.
 - Hold K / Guard: drains 7 breath/s; catches slash and sweep for 12 breath.
   A fresh press within 300ms of impact (scaled by timing + equipment Parry ms)
   parries for 4 breath, deals 8 damage and extends the opening by 0.6s.
@@ -145,3 +148,84 @@ All pack JavaScript syntax checked. Pure combat/character transitions manually
 exercised via Node. Browser visuals, actual key/pointer timing, focus loss, real
 QTE hold/miss/resume, source activation and reload still require root/player
 validation. Do not call the initial pack independently play-tested.
+
+## Bell Return: game-owned held counter
+
+`counterStance` adds a new input rule, not a damage-buff alias. Nothing is learned,
+paid, healed or reset merely by loading this release. The host can define and grant
+an earned skill through `content.define`, for example:
+
+```json
+{"type":"skill","definition":{"id":"bell-return","name":"Bell Return","description":"12 MP: arm next block/parry. Keep holding K to charge, release during the opening for 1.25–3× Power. Minimum 0.3s, full 0.9s (× timing). Charging costs 18 breath/s plus guard drain. J/Space cancels.","mp":12,"effects":{"counterStance":{"minHold":0.3,"maxHold":0.9,"breathPerSecond":18,"minPower":1.25,"maxPower":3}}},"grant":1}
+```
+
+- Using the skill pays its defined MP through the ordinary ability path. Its next
+  block/parry while holding K starts charge at zero; dodging never triggers it.
+- Keep K (or the guard button) held after defense. Release voluntarily during that
+  same recovery to hit. At ×1.5, minimum/full charge take 0.45/1.35 real seconds;
+  at ×2 they take 0.6/1.8 seconds. Recovery also uses the player's timing setting.
+- From minimum to full charge, damage interpolates linearly from minPower to
+  maxPower times current Power, rounded to an integer. It does not consume or
+  multiply Ember Edge. Normal parry still deals its own 8 damage.
+- Charging drains configured breath/s in real time, in addition to ordinary guard
+  drain. At full charge, holding still costs breath. Early release, exhaustion,
+  taking damage, an expired opening, J or Space cancels without MP refund. J/Space
+  may perform their usual action if affordable/off cooldown, but never cash in the
+  counter. A successful release imposes at least 0.48s ordinary attack cooldown.
+- Pausing, blur, hidden document and pointer cancellation clear physical inputs
+  WITHOUT firing. Armed/charged state serializes. Reload pauses; retained charge
+  requires a fresh K press and a subsequent voluntary release in the remaining
+  opening. QTE entry, retry, encounter change, victory and defeat end the stance.
+- Canvas center and the DOM cue strip display charge and release instructions;
+  no status-panel spacing changes. `inspect().encounter.counter` exposes stage,
+  suspended-hold status and progress. Semantic events: `combat.counter-ready`,
+  `combat.counter`, `combat.counter-cancel`, never per-frame charge telemetry.
+- Config validation: minHold 0.1–1s, maxHold 0.2–2s and greater than minHold;
+  breathPerSecond 1–40; minPower 0.5–3; maxPower 1–6 and at least minPower.
+  Unknown fields reject before mutation. Reusing the skill replaces its stance.
+
+Kit DOM refresh also observes the discrete character version, so a keyboard
+victory immediately updates earned XP, Power, inventory and skill buttons. It
+never rebuilds for ordinary frame, breath or held-key updates.
+
+Implementation syntax-checked only here; actual charge timing, pointer behavior,
+focus-loss/reload continuity and browser visuals require live player verification.
+
+## Live iteration: short clash aftermath
+
+After real play exposed six free strikes following a partial clash, QTE recovery
+now uses the next pattern attack’s recovery capped at 1.2 base seconds, scaled by
+the player timing setting. No earned outcome or resource was rewritten.
+
+## Live iteration: two clean strikes per opening
+
+Ordinary strikes now spend a two-hit allowance per recovery. The DOM and canvas
+show remaining hits as OPENING 2/2, then OPENING SPENT and a conserve-breath cue.
+Bell Return charge/release instructions retain priority. An overextended strike
+records “Opening spent; defend rather than overextend.” and deals only 3 damage
+for the usual 16 breath. Counter release, parry damage and offensive skills do not
+spend the allowance, so the earned counter remains distinct from repeated J.
+
+`state.openingHits` persists the used hits; `combat.view()` and
+`inspect().encounter` expose `openingHits` and `openingMax` (2). Only entering a
+new recovery from another phase resets the allowance. Pause, resume, timing
+changes and reload do not. A legacy save already in recovery with no hit count
+conservatively treats that opening as spent until the next recovery; no HP, MP,
+XP, inventory or previous rewards change. Syntax validation only for this change;
+the live host owns browser validation and publication.
+
+## Stormglass Regent finale
+
+Encounter ID `sg-stormglass-regent` opts into the local `regent.js` campaign module.
+It does not alter other encounters or grant progress on load. On encounter setup,
+it stores the original pattern and fresh attempt-local seals. Successful sweep
+block/parry lights Bell; successful thrust evasion lights Prism. Both together
+once deal 24 damage and restore 20 breath; ordinary damage remains viable without
+this bonus. The visible strip explains both conditions and phase before starting.
+At half HP, the next recovery boundary changes to a preauthored thrust/sweep/slash
+cadence with full normal windups. It never changes a committed attack or waits for
+host replies. Seal and phase state serialize. Retry resets only this fight's phase
+and seals, restores its original pattern, and retains character/world progress.
+Actual victory sets a persistent completed ending and ordinary once-only rewards.
+Duplicate canvas stat bars were removed; DOM combat HUD is the single stats panel.
+Syntax checked; live player validation remains required before claiming success.

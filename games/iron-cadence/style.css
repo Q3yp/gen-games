@@ -1,3 +1,367 @@
-.ic{height:100%;min-height:640px;overflow:auto;background:#0d1420;color:#dce8e9;font:14px system-ui,sans-serif}.ic *{box-sizing:border-box}.ic canvas{display:block;width:100%;max-height:69vh;aspect-ratio:1100/650;object-fit:contain;background:#101824;outline:none}.ic-controls,.ic-kit,.ic-settings{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:9px;padding:10px 20px}.ic-controls{background:#17212d;border-top:1px solid #516371}.ic button,.ic select,.ic input{font:inherit;color:#dae9e9;background:#253543;border:1px solid #567078;border-radius:5px;padding:9px 13px}.ic button{cursor:pointer;touch-action:none}.ic button:hover,.ic button:focus-visible{background:#37525b;border-color:#9ae0cf}.ic button:active{background:#598a83}.ic button:disabled{opacity:.45}.ic-controls button[data-action]{min-width:150px;color:#ffe7bc;border-color:#8b785d}.ic-kit{justify-content:flex-start;border-top:1px solid #ffffff12;padding-bottom:16px}.ic-kit p{margin:3px 0;color:#b1bec9;width:100%}.ic-kit strong{color:#e9d7b8}.ic-kit button{font-size:12px}.ic-settings{font-size:12px;justify-content:flex-start;color:#b5c7ce}.ic-settings input{width:130px}.ic-note{min-height:26px;padding:0 20px 8px;color:#f5d89f;font-size:13px}.ic-help{max-width:1150px;margin:auto;color:#aebbc5;line-height:1.6;padding:0 20px 12px;font-size:12px}.ic-help b{color:#e6d0ac}
+/* The shell menu stays above this bounded, combat-first viewport. */
+.ic {
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  padding-top: max(58px, calc(env(safe-area-inset-top) + 48px));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #0d1420;
+  color: #dce8e9;
+  font:
+    14px system-ui,
+    sans-serif;
+}
+.ic * {
+  box-sizing: border-box;
+}
+.ic-hud {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 7px 16px;
+  background: #111f2a;
+  border-bottom: 1px solid #ffffff18;
+  font-size: 12px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.ic-hud > div {
+  min-width: 0;
+}
+.ic-hud strong,
+.ic-hud span {
+  display: block;
+}
+.ic-hud strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #d8fff6;
+}
+.ic-hud span {
+  color: #bde4da;
+}
+.ic-enemy-hud {
+  text-align: right;
+}
+.ic-enemy-hud strong,
+.ic-enemy-hud span {
+  color: #f0d7af;
+}
+.ic-breath-hud {
+  color: #ead19f;
+  white-space: nowrap;
+}
+.ic canvas {
+  display: block;
+  flex: 1 1 0;
+  min-height: 96px;
+  height: 0;
+  width: 100%;
+  object-fit: contain;
+  background: #101824;
+  outline: none;
+}
+.ic canvas:focus-visible {
+  outline: 2px solid #9ae0cf;
+  outline-offset: -2px;
+}
+/* Only the action deck scrolls on very small displays, never the arena/HUD. */
+.ic-combat-deck {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 54%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #567078 #14232c;
+}
+.ic-controls,
+.ic-kit,
+.ic-settings,
+.ic-equipment {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+}
+.ic button,
+.ic select,
+.ic input {
+  font: inherit;
+  color: #dae9e9;
+  background: #253543;
+  border: 1px solid #567078;
+  border-radius: 6px;
+  padding: 7px 10px;
+  min-height: 36px;
+}
+.ic button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ic button[data-action] {
+  touch-action: none;
+}
+.ic button:hover,
+.ic button:focus-visible {
+  background: #37525b;
+  border-color: #9ae0cf;
+}
+.ic button:focus-visible,
+.ic select:focus-visible,
+.ic input:focus-visible,
+.ic summary:focus-visible {
+  outline: 2px solid #9ae0cf;
+  outline-offset: 2px;
+}
+.ic button:active {
+  background: #598a83;
+}
+.ic button:disabled {
+  opacity: 0.45;
+}
+.ic-cue {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  align-items: center;
+  gap: 2px;
+  height: 64px;
+  padding: 5px 16px;
+  overflow: auto;
+  text-align: center;
+  background: #202d3c;
+  color: #f0f0d6;
+  font-size: 13px;
+  line-height: 1.35;
+  border-top: 1px solid #516371;
+  scrollbar-width: thin;
+}
+.ic-cue > * {
+  flex-shrink: 0;
+}
+.ic-cue output {
+  color: #a7f1d9;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ic-cue output:empty {
+  display: none;
+}
+.ic-controls {
+  justify-content: center;
+  background: #17212d;
+}
+.ic-controls button {
+  font-size: 12px;
+}
+.ic-controls button[data-action] {
+  min-width: 124px;
+  min-height: 40px;
+  font-size: 14px;
+  color: #ffe7bc;
+  border-color: #8b785d;
+}
+.ic-kit {
+  flex-wrap: nowrap;
+  align-items: stretch;
+  background: #14232c;
+  border-top: 1px solid #ffffff18;
+  border-bottom: 1px solid #ffffff18;
+}
+.ic-skills {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.ic-skills:empty,
+.ic-consumables:empty {
+  display: none;
+}
+.ic-consumables {
+  flex: 0 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 30%;
+}
+.ic-kit button {
+  min-width: 0;
+  min-height: 42px;
+  font-size: 12px;
+  line-height: 1.3;
+  border-color: #527c78;
+  overflow-wrap: anywhere;
+}
+.ic-consumables button {
+  flex: 1 1 auto;
+  color: #ffd8c6;
+  border-color: #976e66;
+}
+.ic-note {
+  padding: 6px 16px;
+  color: #f5d89f;
+  font-size: 13px;
+}
+.ic-note:empty {
+  display: none;
+}
+/* Opening preparation overlays the arena instead of pushing combat offscreen. */
+.ic-drawer {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
+  background: #17212d;
+}
+.ic-drawer > summary {
+  cursor: pointer;
+  min-height: 36px;
+  padding: 9px 16px;
+  color: #b8ccd2;
+  border-top: 1px solid #405661;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.ic-drawer[open] > summary {
+  color: #d8fff6;
+  background: #253543;
+}
+.ic-drawer-body {
+  position: absolute;
+  bottom: 100%;
+  left: 8px;
+  right: 8px;
+  max-height: min(60dvh, 440px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 6px 0;
+  border: 1px solid #567078;
+  border-radius: 8px 8px 0 0;
+  background: #14212ff7;
+  box-shadow: 0 -8px 28px #0008;
+  scrollbar-width: thin;
+  scrollbar-color: #567078 #14232c;
+}
+.ic-settings {
+  font-size: 12px;
+  color: #b5c7ce;
+}
+.ic-settings label {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.ic-settings input {
+  width: 130px;
+  max-width: 100%;
+}
+.ic-character-summary {
+  margin: 4px 12px;
+  color: #b1bec9;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.ic-equipment button {
+  font-size: 12px;
+}
+.ic-help {
+  color: #aebbc5;
+  line-height: 1.5;
+  padding: 6px 12px 10px;
+  font-size: 12px;
+}
+.ic-help b {
+  color: #e6d0ac;
+}
+@media (max-width: 680px) {
+  .ic {
+    font-size: 13px;
+  }
+  .ic-hud {
+    padding: 6px 10px;
+    gap: 7px;
+    font-size: 11px;
+  }
+  .ic-controls,
+  .ic-kit,
+  .ic-settings,
+  .ic-equipment {
+    padding: 6px 8px;
+    gap: 5px;
+  }
+  .ic-controls button[data-action] {
+    min-width: 0;
+    flex: 1 1 28%;
+    font-size: 12px;
+  }
+  .ic-controls button {
+    min-height: 40px;
+  }
+  .ic-controls button:not([data-action]) {
+    flex: 1 1 auto;
+    padding: 6px;
+  }
+  .ic-cue {
+    height: 96px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .ic-kit {
+    flex-direction: column;
+  }
+  .ic-skills {
+    flex-basis: auto;
+    gap: 4px;
+  }
+  .ic-kit button {
+    padding: 6px 5px;
+    font-size: 11px;
+  }
+  .ic-consumables {
+    max-width: none;
+    gap: 4px;
+  }
+  .ic-consumables button {
+    min-height: 36px;
+  }
+  .ic-combat-deck {
+    max-height: 65%;
+  }
+}
+@media (max-height: 520px) {
+  .ic-hud {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .ic-cue {
+    height: auto;
+    min-height: 50px;
+  }
+  .ic-combat-deck {
+    max-height: 55%;
+  }
+}
 
-.ic-cue{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px;min-height:44px;padding:10px 16px;background:#202d3c;color:#e6e7cc;font-size:14px}.ic-cue output{color:#93e4cd;font-variant-numeric:tabular-nums}
+.ic-boss {
+  padding: 8px 12px;
+  border: 1px solid #bba27366;
+  border-radius: 8px;
+  background: #172335;
+  color: #f0d59f;
+  font: 600 12px/1.45 system-ui;
+}
+.ic-boss[hidden] {
+  display: none;
+}

@@ -31,6 +31,7 @@ function entry(engine, session) {
     sessionId: session.id, workspaceId: workspace.id, title: workspace.title,
     progress: workspace.progress, gameProgress: boundedProgress(session.runtime?.summary?.progress), status: session.status, createdAt: session.createdAt,
     lastPlayedAt: runtime?.savedAt || session.updatedAt, workspaceVersion: workspace.version,
+    workspaceUpdatedAt: workspace.updatedAt,
     available: engine.games.has(session.gameId), revision: session.revision,
     runEpoch: runtime?.runEpoch ?? null, checkpointSeq: runtime?.checkpointSeq ?? null,
     savedAt: runtime?.savedAt ?? null, url: `/?session=${encodeURIComponent(session.id)}`

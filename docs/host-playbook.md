@@ -301,4 +301,24 @@ read current capabilities and only missing saved fields before attaching. Preser
 custom character, inventory, skills and progress through the game's own save/command
 contract. Before leaving, update the workspace brief, decisions, unresolved work and
 artifact references with its observed version. See [library-workspaces.md](library-workspaces.md)
-for the full durable library and cross-session handoff workflow.
+for the full durable library and cross-session handoff workflow. Compare the brief's
+`basedOn` freshness with current save, projection and active release. Treat an old
+brief as intent/history, not permission to overwrite newer resources or outcomes.
+If the source changed, rediscover capabilities before continuing an old plan.
+
+## Local combat and flexible authored rules
+
+The director can invent an encounter or timed sequence, but local code executes
+input judgment and consequences. Use the optional [timed-cue helper](live-runtime.md#optional-local-timed-cues)
+when useful, or implement a different local mechanic. Do not wait for a model turn
+between cues. Character stats, items, skills and effects remain game-owned code
+and save data; [Iron Cadence](../games/iron-cadence/AUTHORING.md) is one extensible
+example, not a fixed component schema. New tooltip text is not new executable logic.
+
+For action combat, keep threats legible, openings bounded and defenses worthwhile;
+for RPG combat, let those costs affect preparation and the next encounter. Avoid
+turning every interaction into a timed sequence. Author new source/assets separately,
+then bind or activate at a safe encounter boundary without changing a committed
+attack's meaning. Validate rapid input, defense, resource costs, interruption and
+resume through normal controls. See [combat-session-notes.md](combat-session-notes.md)
+for measured live play and explicit limits on what it establishes.

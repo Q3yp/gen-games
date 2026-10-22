@@ -9,12 +9,19 @@ async function tool(name, args) {
 }
 function progressText(value) {
   if (typeof value === 'string') return value;
-  if (value && typeof value === 'object') return Object.entries(value).map(([key, item]) => `${key}: ${typeof item === 'object' ? JSON.stringify(item) : item}`).join(' · ');
+  if (value && typeof value === 'object') {
+    const format = item => typeof item === 'object' ? JSON.stringify(item) : String(item);
+    const headlineKeys = ['label', 'location', 'objective'];
+    const headline = headlineKeys.filter(key => value[key] != null && value[key] !== '').map(key => format(value[key]));
+    const remaining = Object.entries(value).filter(([key]) => !headlineKeys.includes(key)).map(([key, item]) => `${key.replace(/([a-z])([A-Z])/g, '$1 $2').replaceAll('_', ' ')}: ${format(item)}`);
+    return [...headline, ...remaining].join(' · ');
+  }
   return '';
 }
 function card(item) {
   const date = new Date(item.lastPlayedAt).toLocaleString();
-  return `<article><div class="card-top"><span class="eyebrow">${escape(item.gameTitle)}</span><span class="status">${escape(item.status || 'saved')}</span></div><h3>${escape(item.title)}</h3><p class="progress">${escape(progressText(item.gameProgress) || item.progress || 'Ready to continue. Your game owns its progress and character data.')}</p>${item.progress && item.gameProgress ? `<p class="host-note">Host note: ${escape(item.progress)}</p>` : ''}<p class="last-played">Last saved play · ${escape(date)}</p><div class="card-bottom">${item.available ? `<a class="resume" href="${escape(item.url)}">Continue campaign ↗</a>` : '<span>Game source unavailable</span>'}<button class="copy" data-workspace="${escape(item.workspaceId)}">Copy host ID</button></div><details><summary>Campaign & host identity</summary><dl><dt>Workspace</dt><dd>${escape(item.workspaceId)}</dd><dt>Campaign / save</dt><dd>${escape(item.sessionId)}</dd><dt>Game / source</dt><dd>games/${escape(item.gameId)}/</dd><dt>Save freshness</dt><dd>revision ${item.revision} · run ${item.runEpoch ?? 'structured'} · checkpoint ${item.checkpointSeq ?? 'n/a'}</dd></dl><p>Give the workspace ID to a fresh agent. It can read the handoff and attach without replaying history or resetting your save.</p></details></article>`;
+  const briefDate = item.workspaceUpdatedAt ? new Date(item.workspaceUpdatedAt).toLocaleString() : 'date unavailable';
+  return `<article><div class="card-top"><span class="eyebrow">${escape(item.gameTitle)}</span><span class="status">${escape(item.status || 'saved')}</span></div><h3>${escape(item.title)}</h3><p class="progress">${escape(progressText(item.gameProgress) || 'Ready to continue. Your game owns its progress and character data.')}</p>${item.progress ? `<p class="host-note"><span>Host brief · updated ${escape(briefDate)} · may be outdated</span><br>${escape(item.progress)}</p>` : ''}<p class="last-played">Last saved play · ${escape(date)}</p><div class="card-bottom">${item.available ? `<a class="resume" href="${escape(item.url)}">Continue campaign ↗</a>` : '<span>Game source unavailable</span>'}<button class="copy" data-workspace="${escape(item.workspaceId)}">Copy host ID</button></div><details><summary>Campaign & host identity</summary><dl><dt>Workspace</dt><dd>${escape(item.workspaceId)}</dd><dt>Campaign / save</dt><dd>${escape(item.sessionId)}</dd><dt>Game / source</dt><dd>games/${escape(item.gameId)}/</dd><dt>Save freshness</dt><dd>revision ${item.revision} · run ${item.runEpoch ?? 'structured'} · checkpoint ${item.checkpointSeq ?? 'n/a'}</dd></dl><p>Give the workspace ID to a fresh agent. It can read the handoff and attach without replaying history or resetting your save.</p></details></article>`;
 }
 async function load(append = false) {
   const data = await tool('library', { op: 'list', offset: append ? nextOffset : 0, limit: 30 });

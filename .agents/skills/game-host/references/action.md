@@ -15,6 +15,10 @@ The player improves at move, aim, dodge, strike, block or time. Prioritize contr
 
 Serialize durable encounter/progression state; do not require the host to process individual frames. Summarize current threat, player condition, recent damage/failure cause and available tactical alternatives. Keep timing rules stable mid-encounter, guard inactive input and release held controls on focus loss where applicable. Publish disruptive changes at a safe boundary rather than during a committed attack.
 
+Judge windups, parries, holds and release windows locally; the director authors circumstances and follows up on outcomes, not individual timed inputs. Use optional timed cues sparingly for a distinct clash or flourish. Leave enough ordinary control between them for mastery. Bound attack openings so repeated tapping is a deliberate tradeoff rather than the dominant answer to every threat.
+
+Verify pause/blur/reload during a held cue: inactive input cannot progress the game, releasing while paused must not leave a stuck key, and resume must neither award a free hit nor synthesize a miss. Save gameplay progress, not an assumption that a physical key remains held. On a fresh-host return, inspect current encounter phase and capabilities before applying an older plan. Prepare new code/art separately and activate at a safe boundary; visual flourish must not obscure the next actionable cue.
+
 ## Play evaluation
 
 Exercise controls under actual browser timing, including rapid inputs and a defensive maneuver. Can the player identify why they were hit before seeing a log? Compare two tools or movement strategies; distinguish tactical choice from execution difficulty. Verify that effects and UI do not conceal threats. A scripted command that wins an encounter does not validate action controls.

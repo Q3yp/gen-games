@@ -19,6 +19,10 @@ Persist stable character identity, chosen build, resources, inventory/equipment,
 
 Summarize only the relevant party/build, immediate quest, known routes, resource pressure, relationship commitments, and last irreversible outcome. Keep undiscovered secrets separate from player-facing summaries. Host additions should extend unresolved hooks and respect past choices, not replace the campaign or introduce arbitrary counters to the player's build. Changes to existing abilities need clear notice and safe migration.
 
+For a returning host, reconcile the workspace brief with the latest saved build, reward flags and active source; do not re-award an encounter or restore yesterday's HP/MP from prose. Keep item/skill descriptions aligned with executable effects. Author arbitrary character and equipment rules in the game's code rather than forcing a universal stats/component schema.
+
+Pace combat as an arc: readable threat, a useful defense, a bounded opening, then a recovery or resource decision. Alternate intensity with preparation and consequences. A special timed clash should express the encounter or build, not replace every ordinary attack. Check whether repeated basic strikes dominate skill use; narrow the opening or clarify costs based on observed play, without retroactively cancelling earned outcomes. Distinguish an authored setup command from player-earned progression in evidence.
+
 ## Play evaluation
 
 Play through at least two connected encounters and revisit a changed place. Can the player explain who they are, what they want next, and why an ability/item matters? Does an earlier choice change a later approach or outcome? Compare two strategies, check readable combat costs if present, and verify reload continuity. Report which of identity, progression and world consequence is demonstrated versus merely planned. A map, XP bar and dialogue box alone do not prove RPG depth.

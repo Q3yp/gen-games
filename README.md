@@ -34,6 +34,12 @@ fixed genre, choice schema, effect list, or chat interface.
   projection, version, and command hooks. Its own display/object choices are not
   engine schemas. Attach a real director to create a character/environment and
   react to player input; no model or canned plot starts automatically.
+- **Iron Cadence** is a live-directed action RPG: readable duels, persistent
+  character/build progression, optional locally judged timed cues, and new
+  executable combat abilities authored during play. Character stats, equipment,
+  skills and effects belong to its code, not an engine-wide template. See its
+  [authoring guide](games/iron-cadence/AUTHORING.md) and bounded
+  [live combat evidence](docs/combat-session-notes.md).
 - **Mossfall** is a code-owned continuing RPG: explore connected areas, choose
   an oath, trade weapon reach against damage, read enemy intentions, rescue a
   keeper and bring the living seed home. The same character and world continue
@@ -56,7 +62,7 @@ metadata, compact versioned projections, and immediate semantic events. A saved 
 instead retain server-authoritative transactions and incremental state patches.
 
 Agent tools include `discover`, `session`, `observe`, `inspect`, `publish`,
-`command`, `director`, `work`, `asset`, and `checkpoint`. Legacy packs additionally use `act`, `author`, and
+`command`, `director`, `work`, `asset`, `checkpoint`, `library`, and `workspace`. Legacy packs additionally use `act`, `author`, and
 `jobs`. Discovery supplies the current schemas. Publication and command delivery
 are asynchronous: a `PENDING` response does not prove activation or execution.
 Inspect acknowledgments and the actual browser before reporting success.
@@ -92,6 +98,12 @@ then exercise it through player controls. Inspect a screenshot after activation 
 strategy. Visual polish, syntax checks, and successful publication are useful
 evidence, but none alone demonstrates enjoyable play.
 
+For timed interactions, use the optional [local cue helper](docs/live-runtime.md#optional-local-timed-cues)
+or write game-local timing logic. It does not define combat consequences or a
+character schema. [Iron Cadence’s wiring](games/iron-cadence/AUTHORING.md) shows
+one flexible character/item/skill/effect implementation; new behavior can extend
+source rather than fit a closed list of engine effects.
+
 The [authoring guide](docs/authoring.md) also documents the legacy plugin/UI and
 structured-data route. Legacy server plugin changes load on restart; code-runtime
 publication is a distinct operation and does not require treating gameplay as
@@ -118,7 +130,9 @@ The repository intentionally has no test suite or test files. Actual manual runt
 - [Agent tools and error recovery](docs/agent-tools.md)
 - [Exact shared contracts](docs/contracts.md)
 - [Security boundary and limitations](docs/security.md)
+- [Library, progress and durable host workspaces](docs/library-workspaces.md)
 - [Actual player + director playthrough](docs/playthrough.md)
+- [Live combat, timed cues and fresh-host evidence](docs/combat-session-notes.md)
 - [Design research and sources](docs/research.md)
 
 ## Scope
