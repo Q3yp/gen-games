@@ -82,6 +82,7 @@ export default function create(host, { save }) {
   listen(window, 'blur', pause);
   listen(document, 'visibilitychange', () => { if (document.hidden) pause(); });
   let previousHp = s.player.hp, previousDefeated = s.defeated;
+  const impactStates = new Map();
   return {
     step(dt) {
       if (disposed || !host.active) return;
@@ -89,6 +90,12 @@ export default function create(host, { save }) {
       sim.step(Math.min(dt, 0.04));
       if (s.player.hp < previousHp) audio.play('hurt');
       if (s.defeated > previousDefeated) audio.play('break');
+      for (const enemy of s.enemies) {
+        const old = impactStates.get(enemy.id) || { hit: 0, block: 0 };
+        if ((enemy.blockFlash || 0) > old.block + .04) audio.play('block');
+        else if ((enemy.flash || 0) > old.hit + .04) audio.play('hit');
+        impactStates.set(enemy.id, { hit: enemy.flash || 0, block: enemy.blockFlash || 0 });
+      }
       previousHp = s.player.hp;
       previousDefeated = s.defeated;
     },

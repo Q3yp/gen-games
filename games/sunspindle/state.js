@@ -1,8 +1,10 @@
+import { enterThreadmill } from './rooms.js';
+
 const enemy = (id, kind, x, y, timer) => ({
-  id, kind, x, y, hp: kind === 'ram' ? 3 : 2, maxHp: kind === 'ram' ? 3 : 2,
-  radius: kind === 'ram' ? 29 : 24, angle: Math.PI, phase: 'watch', timer,
+  id, kind, x, y, hp: kind === 'archer' ? 2 : 3, maxHp: kind === 'archer' ? 2 : 3,
+  radius: kind === 'guardian' ? 40 : kind === 'ram' ? 29 : 24, angle: Math.PI, phase: 'watch', timer,
   phaseDuration: timer, flash: 0, vx: 0, vy: 0, aimX: -1, aimY: 0,
-  aimDistance: 400, crashCooldown: 0, down: 0
+  aimDistance: 400, crashCooldown: 0, down: 0, blockFlash: 0, turnRate: 0.9, shieldArc: Math.PI / 2
 });
 
 function fresh() {
@@ -13,7 +15,8 @@ function fresh() {
       flight: 0, hits: [], trail: [], distanceLeft: 0 },
     enemies: [enemy('red-horn', 'ram', 640, 450, 1.8), enemy('reed-bow', 'archer', 900, 570, 2.8)],
     props: [{ id: 'bird-prism', x: 890, y: 340, r: 38, hp: 2, maxHp: 2, kind: 'crystal', flash: 0 }],
-    shots: [], particles: [], rings: [], clock: 0, paused: true, room: 1,
+    shots: [], particles: [], rings: [], clock: 0, paused: true, room: 1, rooms: {},
+    roomName: 'Sun Court', entry: { x: 270, y: 490 },
     defeated: 0, rescue: false, exitReady: false, exitAsked: false, awaitingHost: false,
     exit: { x: 1030, y: 245 }, story: [], versions: { world: 0 }, seen: {},
     shake: 0, hitstop: 0, respawn: 0, timeFlow: 0.06,
@@ -40,15 +43,17 @@ export function initial(save) {
   s.enemies = s.enemies.map(e => ({ ...enemy(e.id, e.kind, e.x, e.y, 1), ...e }));
   s.props = s.props.map(p => ({ maxHp: p.kind === 'crystal' ? 2 : 1, flash: 0, ...p }));
   // A migration may add defaults, never restore already-broken props or slain guards.
-  if (s.rescue) s.exitReady = true;
+  if (s.rescue && s.room === 1) s.exitReady = true;
   if (s.player.hp <= 0 && !(s.respawn > 0)) s.respawn = 0.9;
+  enterThreadmill(s);
   return s;
 }
 
 export function projection(s) {
   return {
-    progress: { label: 'Sunspindle', location: `Sun court · ${s.room}`,
+    progress: { label: 'Sunspindle', location: `${s.roomName || 'Sun Court'} · ${s.room}`,
       objective: s.awaitingHost ? 'The rescued bird is waiting at the open arch.'
+        : s.room === 2 ? s.exitReady ? 'Reach the open Threadmill gate.' : 'Break the two sunseals holding the far gate.'
         : s.rescue ? 'Reach the east arch with the bird.' : 'Break the crystal holding the sunbird.',
       status: s.awaitingHost ? 'awaiting-next-room' : s.paused ? 'paused' : 'playing',
       rescued: s.rescue, exitReady: s.exitReady, defeated: s.defeated },

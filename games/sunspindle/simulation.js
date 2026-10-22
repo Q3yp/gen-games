@@ -2,6 +2,7 @@ import { clamp, confine, direction, distance, separate } from './physics.js';
 import { effects } from './effects.js';
 import { combat } from './combat.js';
 import { enemies } from './enemies.js';
+import { enterThreadmill } from './rooms.js';
 
 export function simulation(s, emit = () => {}) {
   const keys = new Set(), fx = effects(s);
@@ -77,7 +78,7 @@ export function simulation(s, emit = () => {}) {
   function returnToSafety(dt) {
     s.respawn = Math.max(0, s.respawn - dt);
     if (s.respawn > 0) return;
-    Object.assign(s.player, { x: 270, y: 490, hp: s.player.maxHp, grace: 3, flash: 0, trail: [] });
+    Object.assign(s.player, { ...(s.entry || { x: 270, y: 490 }), hp: s.player.maxHp, grace: 3, flash: 0, trail: [] });
     held(); s.shots = [];
     for (const e of s.enemies) if (e.hp > 0) {
       e.phase = 'recover'; e.timer = e.phaseDuration = 2.4; e.vx = e.vy = 0;
@@ -118,7 +119,12 @@ export function simulation(s, emit = () => {}) {
     weight(dt); guards.step(dt, dt * s.timeFlow); confine(p, 18); objectives();
   }
   function step(dt) {
+    if (s.room === 1 && s.awaitingHost && enterThreadmill(s)) keys.clear();
     if (s.paused || !Number.isFinite(dt) || dt <= 0) return;
+    if (s.arrivalPending) {
+      record('room.entered', 'The keeper and sunbird entered the Threadmill.', s.arrivalPending);
+      delete s.arrivalPending;
+    }
     dt = Math.min(dt, 0.1);
     fx.step(dt);
     if (s.hitstop > 0) { s.hitstop = Math.max(0, s.hitstop - dt); return; }
