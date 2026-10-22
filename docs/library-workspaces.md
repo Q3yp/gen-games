@@ -94,3 +94,19 @@ Game code may expose a compact `inspect().progress` string or object. The librar
 displays this as game-owned progress, separate from the agent's optional handoff
 progress note. Shape and meaning belong to the game. Character, items, skills,
 HP/MP, level and arbitrary stats remain in the game's existing serializable save.
+
+### Register independently generated source without restarting
+
+Author an arbitrary code game under a new `games/<unique-id>/` directory with its
+matching manifest, then call `library --op register --game <unique-id>`. Registration
+validates and snapshots that source into the running registry without replacing
+existing IDs or sessions. Create the campaign after registration. An already-open
+play-page New run selector refreshes on reload/navigation; the Library Refresh
+control refreshes its own game list.
+
+Source authoring still happens in the coding workspace. Registration is discovery
+and immutable snapshotting, not an integrated source editor, model generator or
+fixed component factory. Use `publish` for an existing campaign's live release.
+Simulation, controls, mechanics, rendering and save schema remain game-owned;
+the engine provides lifecycle, persistence, observation and guarded delivery.
+Acceptance is not browser activation, and activation is not evidence of good play.

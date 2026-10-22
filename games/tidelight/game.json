@@ -1,0 +1,10 @@
+{
+  "id": "tidelight",
+  "title": "Tidelight",
+  "description": "A small boat, a stolen sun, and the things that follow it beneath a drowned city.",
+  "version": "0.1.0",
+  "runtime": "code",
+  "entry": "./main.js",
+  "saveVersion": 1,
+  "initial": {}
+}

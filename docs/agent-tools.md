@@ -23,6 +23,31 @@ The structured actions, authoring, and jobs examples below apply to legacy packs
 Session, observation, checkpoint, and transport conventions remain shared where
 the discovered tool schema supports the selected runtime.
 
+## Register a newly generated game
+
+Author trusted source in a new `games/<unique-id>/` directory with a code-runtime
+`game.json` (matching `id`, `title`, `version`, `runtime: "code"`, `entry`, positive
+`saveVersion`, and arbitrary JSON `initial`) and its JavaScript entry module.
+Then register that directory with the running server and create a campaign:
+
+```sh
+node src/agent/cli.js library --op register --game UNIQUE_ID
+node src/agent/cli.js library --op create --game UNIQUE_ID --title "Campaign title"
+```
+
+Registration validates and snapshots the new code pack, making it available to
+`discover`, `library list`, and session creation without restarting the server.
+It does not create a session or replace an already registered ID. Repeating it
+returns `ALREADY_REGISTERED` without rereading source; use guarded `publish` for
+an existing session. Invalid or incomplete source is not added to the registry.
+
+Use a distinct directory and game ID for each independently authored campaign.
+`library create` alone creates an independent save and host context, not a source
+fork: campaigns with the same game ID share editable files, though each session
+retains its pinned immutable release. No template or scene schema is required.
+Registration does not execute the entry module or prove that it renders correctly;
+verify activation and play in the browser. Keep the directory for server restarts.
+
 ## Start and discover
 
 Run the server from the repository root in one terminal:

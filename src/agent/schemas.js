@@ -76,8 +76,8 @@ const mutation = {
 export const TOOL_DEFINITIONS = [
   {
     name: 'library', title: 'Discover saved campaigns',
-    description: 'List durable campaigns and game definitions; create a new save or open an existing workspace without resetting it. List is paginated and never returns game saves.',
-    inputSchema: object({ op: { type: 'string', enum: ['list', 'create', 'open'] }, sessionId,
+    description: 'List durable campaigns and game definitions; register a newly authored code pack without restart (never reloads existing IDs); create a new save or open an existing workspace without resetting it. List is paginated and never returns game saves.',
+    inputSchema: object({ op: { type: 'string', enum: ['list', 'register', 'create', 'open'] }, sessionId,
       workspaceId: { type: 'string' }, gameId: { type: 'string' }, title: { type: 'string', maxLength: 120 },
       seed: { type: 'integer', minimum: 0, maximum: 4294967295 }, limit: { type: 'integer', minimum: 1, maximum: 100 }, offset: { type: 'integer', minimum: 0 } }),
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }

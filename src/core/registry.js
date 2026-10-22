@@ -1,4 +1,4 @@
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir, readFile, lstat } from 'node:fs/promises';
 import { resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { requireValue as check } from './errors.js';
@@ -43,4 +43,34 @@ export async function loadGames(directory, builtins, releaseDirectory = resolve(
   }
   check(games.size, 'NO_GAMES', `No game packs found under ${directory}.`);
   return games;
+}
+
+/** Add a newly authored code pack without touching registered games or live sessions. */
+export async function registerCodeGame(engine, gameId) {
+  check(typeof gameId === 'string' && /^[a-z0-9-]+$/.test(gameId),
+    'INVALID_GAME_ID', 'Use a lowercase game directory ID containing letters, numbers, or hyphens.');
+  const existing = engine.games.get(gameId);
+  if (existing) return { game: existing, registered: false };
+  const host = engine.codeRuntime;
+  check(host, 'CODE_RUNTIME_UNAVAILABLE', 'Code runtime must be configured before registering a game.');
+  let folder;
+  try { folder = await lstat(resolve(host.directory, gameId)); }
+  catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    check(false, 'GAME_NOT_FOUND', `No source directory games/${gameId}/.`,
+      'Author a new code pack with a matching game.json, then call library register.');
+  }
+  check(folder.isDirectory() && !folder.isSymbolicLink(), 'INVALID_PACK',
+    'New code packs must be real directories within games/, not symbolic links.');
+  const release = await snapshotRelease(host.directory, host.output, gameId);
+  const pack = release.pack;
+  check(typeof pack.title === 'string' && typeof pack.version === 'string',
+    'INVALID_PACK', `${gameId} needs title and version.`);
+  // Another registration may have completed while source was being snapshotted.
+  // Never replace its release or affect any sessions already created from it.
+  const concurrent = engine.games.get(gameId);
+  if (concurrent) return { game: concurrent, registered: false };
+  const game = { pack, plugins: [], actions: new Map(), release };
+  engine.games.set(gameId, game);
+  return { game, registered: true };
 }

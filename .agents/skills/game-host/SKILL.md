@@ -59,3 +59,25 @@ Prepare live changes while the player acts; introduce them at natural boundaries
 After activation, inspect a fresh screenshot and exercise the changed mechanic through player controls. Correlate input, visible response and recorded state/events. A publication response or beautiful screenshot is not play evidence. If access is missing, label what remains unverified.
 
 Capture a short trace: intent → input → response → consequence → recovery or next decision. When available, give an independent reviewer only player-facing controls and goal, then ask for a genuinely different strategy without coaching. Label self-play honestly. Use the selected profile's evaluation questions, measure actual host turnaround separately from engine transport, report exact friction rather than invented enjoyment, fix the largest demonstrated problem, and replay the affected loop. Deliver the entry point, controls, verified behavior and remaining uncertainty.
+
+## Player-only review boundary
+
+When another agent is the player, the host owns engineering, private state inspection,
+source audits, debugging and skill improvements. Give the player the entry point,
+ordinary controls and the visible premise only. Do not send future encounters,
+optimal inputs, hidden conditions or implementation plans. Take boredom, confusion,
+voluntary experimentation and a desire to continue seriously; finishing a scripted
+sequence, winning a boss or passing validation is not evidence of fun.
+
+At first meaningful play, ask what invited an idea, what was confusing and whether
+the player wants to continue. An unplanned action should be able to produce a
+persistent playable consequence while the existing world remains usable. If every
+choice requires a host response, or surprises only change captions/numbers, revise
+the local loop. Separate reliability evidence from player-experience evidence.
+
+For a new generated game, author an independent `games/<unique-id>/` source pack
+and register it with `library --op register --game <unique-id>`, then create its
+campaign. Do not inherit an example's scene schema, HUD or combat skeleton merely
+because it exists. The default Live Canvas is an optional composition example,
+not the engine's creative boundary. Reuse lifecycle/transport/save wiring and
+preserve immutable releases; generate the world's concrete verbs and presentation.

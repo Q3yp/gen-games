@@ -1,3 +1,4 @@
+import { registerCodeGame } from './registry.js';
 import { requireValue as check } from './errors.js';
 import { isRecord, validateJSONState } from './validate.js';
 import { compact } from './context.js';
@@ -98,7 +99,16 @@ export async function manageWorkspace(engine, args) {
   });
   return openWorkspace(engine, args);
 }
-export function manageLibrary(engine, args) {
+export async function manageLibrary(engine, args) {
+  if (args.op === 'register') {
+    const { game, registered } = await registerCodeGame(engine, args.gameId);
+    return {
+      text: `${registered ? 'REGISTERED' : 'ALREADY_REGISTERED'} ${game.pack.id}: ${game.pack.title}. No existing sessions changed. Use library create to start a campaign; publish to update an existing session.`,
+      data: { gameId: game.pack.id, title: game.pack.title, registered,
+        runtime: game.pack.runtime || 'structured', release: game.release?.release ?? null,
+        editablePath: `games/${game.pack.id}/` }
+    };
+  }
   if (args.op === 'open') return openWorkspace(engine, args);
   if (args.op === 'create') {
     if (args.title !== undefined) check(typeof args.title === 'string' && args.title.trim() && args.title.length <= 120, 'INVALID_TITLE', 'Title must contain 1–120 characters.');
@@ -108,7 +118,7 @@ export function manageLibrary(engine, args) {
     engine.store.saveWorkspace(workspace);
     return openWorkspace(engine, { sessionId: result.session.id });
   }
-  check(!args.op || args.op === 'list', 'INVALID_LIBRARY_OPERATION', 'Use list, create, or open.');
+  check(!args.op || args.op === 'list', 'INVALID_LIBRARY_OPERATION', 'Use list, register, create, or open.');
   const limit = args.limit ?? 30, offset = args.offset ?? 0;
   check(Number.isInteger(limit) && limit >= 1 && limit <= 100 && Number.isInteger(offset) && offset >= 0, 'INVALID_PAGE', 'Use limit 1–100 and nonnegative offset.');
   const all = engine.store.sessions().filter(s => !args.gameId || s.gameId === args.gameId).map(s => entry(engine, s)).sort((a,b) => String(b.lastPlayedAt).localeCompare(String(a.lastPlayedAt)) || a.sessionId.localeCompare(b.sessionId));
