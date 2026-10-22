@@ -1,0 +1,6 @@
+{
+  "name": "gen-games", "version": "0.1.0", "private": true, "type": "module",
+  "description": "A local-first interactive game runtime designed for coding agents and human players.",
+  "engines": {"node": ">=24"},
+  "scripts": {"start": "node src/server/main.js", "dev": "node --watch src/server/main.js", "agent": "node src/agent/cli.js", "mcp": "node src/agent/mcp.js", "check": "node scripts/check.js"}
+}
