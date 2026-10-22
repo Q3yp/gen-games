@@ -33,7 +33,8 @@ one session, while other sessions keep their existing immutable releases. Curren
 editable files may differ from either the pinned active release or save release;
 check the returned release identities before changing source. For
 independent authored games, copy code into a distinct game directory and change
-its manifest ID before loading/restarting the server. Creating another campaign
+its manifest ID, then register it with `library --op register --game <unique-id>`
+without restarting the server. Creating another campaign
 alone isolates save state, not source. This intentionally avoids a new branching,
 cloud-sync or multi-user source management framework.
 

@@ -64,3 +64,39 @@ and target changes, plus actual hits, releases and player actions; continuous
 animation remains in saved local simulation. No fixed combat component was added
 to the generic engine. Source registration and stale-publication repair are generic;
 Tidelight mechanics and art remain generated campaign-owned modules.
+
+## Voyage outcome
+
+An independent agent played through visible browser controls only. These are
+agent-player impressions, not human user research. After the clearer shell opening,
+the player stopped repeated bell presses, relocated lights and formed a new
+hypothesis about attraction. They freed the swimmer with one hull light remaining
+and explicitly wanted to continue. The next chosen action was carrying its light
+to the distant empty arch. The host authored a persistent shortcut back to the
+original bell tower, preserving the old world rather than replacing the campaign.
+
+The player then wanted to bring the rescued swimmer home. Cross-region transfer
+now preserves carried light and nearby companions; a live migration brought the
+already-crossed swimmer through the new shortcut. The player reported that the
+rescue felt more meaningful because the swimmer remained in the world, and chose
+to sail back to the first arch with it. This is specific evidence of a satisfying
+rescue payoff. It does not erase earlier repetitive combat or establish addiction.
+
+The latest source changes are still generated Tidelight content, not reusable
+engine rules. Avoid turning the light/arch/companion sequence into a mandatory
+host recipe. A future host should preserve the player's established world and
+ask what they actually choose to investigate next.
+
+## Final reassessment: unsuccessful iteration
+
+The final player verdict supersedes the optimistic interpretation of isolated
+moments above: too much of the run was slow sailing, unclear interaction and
+repeated bell presses. The player would not choose another run of this version.
+Discovery and the rescue payoff briefly worked, but did not sustain an enjoyable
+moment-to-moment game. Treat this saved voyage and demo as an unsuccessful
+iteration, not a successful fun validation. Visual refinement alone is not the fix.
+
+The next experiment must earn interest through immediately readable, consequential
+local decisions before depending on host-authored surprises. Preserve this ending
+unchanged, create a separate campaign, and evaluate whether the player voluntarily
+continues for the activity itself rather than to complete the demonstration.

@@ -15,7 +15,8 @@ Preserve the save and established physical rules. Author additions in response t
 what the player actually tries. Do not prewrite a whole encounter chain or explain
 all interactions in a dashboard. `world.change` can place new creatures/lights or
 brief diegetic cues without remounting; new executable behaviors require source
-publication guarded by the current release and observed world version.
+publication guarded by the current release. Game commands use observed world
+versions and the current director turn to reject stale intentions.
 
 Pure player review: the player sees only the world, controls and a brief premise.
 Never coach the hidden solution or measure enjoyment by successful completion.

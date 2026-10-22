@@ -19,3 +19,12 @@ Persist visited places, discovered connections, inventory, examined clues, solve
 ## Play evaluation
 
 Ask an uncoached player to choose a next lead and explain why. Follow a clue across locations and revisit a changed place. Check that a wrong but reasonable idea receives informative feedback. Distinguish exploration from aimless traversal, and deduction from exhaustively clicking every object.
+
+## Live-world acceptance gates
+
+A newly inviting doorway must actually be traversable when its visual promise appears.
+Stage its destination and save transition before lighting the entrance. Preserve
+carried objects, nearby companions and previously changed places across crossings.
+A rescue should leave someone or something in the world the player can care about,
+not only an achievement flag. Let the player choose a natural stopping point; do
+not immediately replace a satisfying return home with a compulsory new threat.

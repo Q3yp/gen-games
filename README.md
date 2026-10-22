@@ -132,6 +132,9 @@ The repository intentionally has no test suite or test files. Actual manual runt
 - [Security boundary and limitations](docs/security.md)
 - [Library, progress and durable host workspaces](docs/library-workspaces.md)
 - [Actual player + director playthrough](docs/playthrough.md)
+- [Tidelight: captured agent-player demo](docs/demo/tidelight/README.md)
+- [Recover the completed Tidelight voyage](docs/demo/tidelight/SAVE.md)
+- [Player-first hosting audit and honest remaining friction](docs/player-first-host-audit.md)
 - [Live combat, timed cues and fresh-host evidence](docs/combat-session-notes.md)
 - [Design research and sources](docs/research.md)
 

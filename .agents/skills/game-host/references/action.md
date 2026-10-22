@@ -22,3 +22,14 @@ Verify pause/blur/reload during a held cue: inactive input cannot progress the g
 ## Play evaluation
 
 Exercise controls under actual browser timing, including rapid inputs and a defensive maneuver. Can the player identify why they were hit before seeing a log? Compare two tools or movement strategies; distinguish tactical choice from execution difficulty. Verify that effects and UI do not conceal threats. A scripted command that wins an encounter does not validate action controls.
+
+## When the player reports guesswork
+
+Fix the visible cause and consequence before adding another encounter. A bright
+windup alone is insufficient if closed armor, exposed vulnerability, impact and
+recovery look interchangeable. Make resource loss readable without consulting a
+log. Observe whether the player forms a prediction or merely repeats the same key.
+Do not count an eventual win as resolution of this problem. Support a spatial or
+preparatory idea when appropriate, and avoid repeating an identical solved loop
+just because the first version is now reliable. Preserve an already announced
+attack; activate revised behavior between attacks or while voluntarily paused.

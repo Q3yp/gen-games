@@ -58,7 +58,7 @@ Prepare live changes while the player acts; introduce them at natural boundaries
 
 After activation, inspect a fresh screenshot and exercise the changed mechanic through player controls. Correlate input, visible response and recorded state/events. A publication response or beautiful screenshot is not play evidence. If access is missing, label what remains unverified.
 
-Capture a short trace: intent → input → response → consequence → recovery or next decision. When available, give an independent reviewer only player-facing controls and goal, then ask for a genuinely different strategy without coaching. Label self-play honestly. Use the selected profile's evaluation questions, measure actual host turnaround separately from engine transport, report exact friction rather than invented enjoyment, fix the largest demonstrated problem, and replay the affected loop. Deliver the entry point, controls, verified behavior and remaining uncertainty.
+Capture a short trace: intent → input → response → consequence → recovery or next decision. When available, give an independent reviewer only player-facing controls and goal, then observe whether they voluntarily try a different approach. Do not assign a route merely to produce validation evidence. Label self-play honestly. Use the selected profile's evaluation questions, measure actual host turnaround separately from engine transport, report exact friction rather than invented enjoyment, fix the largest demonstrated problem, and replay the affected loop. Deliver the entry point, controls, verified behavior and remaining uncertainty.
 
 ## Player-only review boundary
 

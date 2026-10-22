@@ -282,7 +282,6 @@ async function mount(current, session, force = false) {
       console.warn(error);
     }
     // Clear both the visual notice and its live-region copy after confirmed activation.
-    notify('');
     current.activationNotice?.();
     current.activationNotice = null;
     $('#announcer').textContent = 'Game is running.';
@@ -413,6 +412,7 @@ async function syncRuntime(current) {
     // A response started before a publication must not roll back the stream.
     if (state.session?.id !== session.id) return;
     if (session.revision < state.session.revision) return;
+    if (session.runtime?.runEpoch < state.session.runtime?.runEpoch) return;
     state.session = session;
     if (
       current.reconnectRequired ||

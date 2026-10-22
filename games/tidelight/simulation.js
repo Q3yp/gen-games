@@ -1,6 +1,7 @@
 import { distance } from './state.js';
 import { tendHaven } from './haven.js';
 import { createShadows } from './shadows.js';
+import { restoreFarArch } from './restoration.js';
 import { crossArch } from './regions.js';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export function simulation(s, emit) {
@@ -125,7 +126,7 @@ export function simulation(s, emit) {
         }
       }
       const d = distance(p, island);
-      if (d < island.r * 0.65 && !(island.id === 'home' && island.bloom)) {
+      if (d < island.r * 0.65 && !island.bloom) {
         const a = Math.atan2(p.y - island.y, p.x - island.x);
         p.x = island.x + Math.cos(a) * island.r * 0.65;
         p.y = island.y + Math.sin(a) * island.r * 0.65;
@@ -179,6 +180,7 @@ export function simulation(s, emit) {
     }
     tendHaven(s, dt, { record, notice });
     shadows.step(dt);
+    restoreFarArch(s, { record, notice });
     crossArch(s, { record, notice });
     s.ripples = s.ripples.filter((r) => (r.age += dt) < (r.pulse ? 2 : 1.8));
   }
