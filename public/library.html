@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Your library · gen / games</title><link rel="icon" href="/mark.svg"><link rel="stylesheet" href="/library.css"><script type="module" src="/library.js"></script></head>
+<body><main><header><a class="brand" href="/">gen / games</a><span>LOCAL-FIRST · SAVED ON THIS SERVER</span></header>
+<section class="intro"><p class="eyebrow">YOUR LIBRARY</p><h1>Worlds worth returning to.</h1><p>Your campaigns, progress and host context stay together, even when the agent changes.</p></section>
+<section class="new-world"><div><h2>Begin another story</h2><p>New campaigns never replace your existing saves.</p></div><form id="new-campaign"><label>Game<select id="game" required></select></label><label>Campaign title<input id="title" maxlength="120" placeholder="Optional, e.g. The northern expedition"></label><button type="submit">New campaign ↗</button></form></section>
+<section aria-labelledby="campaign-heading"><div class="section-heading"><h2 id="campaign-heading">Saved campaigns</h2><button id="refresh" type="button">Refresh</button></div><p id="notice" role="status">Opening your library…</p><div id="campaigns"></div><button id="more" hidden>Load more campaigns</button></section>
+<footer>Game definition = editable code. Campaign = durable save. Workspace = the next host’s brief.<br>Campaigns of the same game share source files, but keep independent saves and immutable published releases.</footer>
+</main></body></html>

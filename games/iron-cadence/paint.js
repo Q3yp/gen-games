@@ -1,0 +1,33 @@
+import {stats} from './character.js';
+export function paint(c,s,combat,time,fx,q){
+ const W=1100,H=650,st=stats(s),v=combat.view(),a=combat.threat();
+ c.clearRect(0,0,W,H);const bg=c.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#111722');bg.addColorStop(.65,'#343c46');bg.addColorStop(1,'#141923');c.fillStyle=bg;c.fillRect(0,0,W,H);
+ // Mist, ruined aqueduct, and the warm forge establish a place, not a dashboard.
+ c.fillStyle='#a6b8c01b';c.beginPath();c.arc(840,120,67,0,Math.PI*2);c.fill();
+ for(let i=0;i<8;i++){const x=i*170-50;c.fillStyle='#141e2c';c.fillRect(x,180,45,290);c.fillRect(x,180,180,35);c.beginPath();c.arc(x+105,285,60,Math.PI,0);c.lineTo(x+165,460);c.lineTo(x+45,460);c.fill();}
+ for(let i=0;i<4;i++){c.fillStyle=`rgba(190,208,214,${.025+i*.008})`;c.beginPath();c.ellipse(500+Math.sin(time*.12+i)*90,370+i*22,700,30,0,0,Math.PI*2);c.fill();}
+ c.fillStyle='#292c31';c.beginPath();c.moveTo(0,470);c.lineTo(1100,470);c.lineTo(1100,650);c.lineTo(0,650);c.fill();c.strokeStyle='#68717b44';c.lineWidth=1;
+ for(let i=0;i<11;i++){c.beginPath();c.moveTo(550+(i-5)*70,470);c.lineTo(550+(i-5)*200,650);c.stroke();}for(let i=0;i<4;i++){c.beginPath();c.moveTo(0,480+i*i*15);c.lineTo(1100,480+i*i*15);c.stroke();}
+ for(const x of [100,1000]){c.fillStyle='#141a23';c.fillRect(x-10,362,20,110);const glow=c.createRadialGradient(x,350,3,x,350,65);glow.addColorStop(0,'#ffc477aa');glow.addColorStop(1,'#ff9c3000');c.fillStyle=glow;c.fillRect(x-65,285,130,130);c.fillStyle='#ffbe70';c.beginPath();c.ellipse(x,350+Math.sin(time*7)*3,8,16,0,0,7);c.fill();}
+ const wind=s.phase==='windup',p=wind?1-s.remaining/s.phaseTotal:0;
+ const hit=fx.life>0&&['hit','strike','parry','hurt'].includes(fx.kind);
+ const shake=fx.kind==='hurt'&&fx.life>0?Math.sin(time*70)*fx.life*14:0;c.save();c.translate(shake,0);
+ let px=340-(v.dodge>0?Math.sin(Math.min(1,v.dodge/(.46*s.timing))*Math.PI)*90:0),ex=760;
+ if(s.phase==='recovery'&&fx.life>.1&&fx.kind==='hurt')ex-=60*fx.life;
+ figure(px,452,1,'#79d9d0',v.guard?-1:fx.life>0&&['hit','strike','glance'].includes(fx.kind)?.9:-.3,false);
+ figure(ex,452,-1,'#d5a975',wind?-1.5+p*.5:s.phase==='recovery'?.7:-.4,true);
+ if(v.guard){c.strokeStyle='#9ff9e9';c.lineWidth=5;c.beginPath();c.arc(px+15,380,72,-1.25,1.25);c.stroke();}
+ if(wind){const col=a.kind==='thrust'?'#ff7c8c':a.kind==='sweep'?'#b3a0ff':'#ffc96f';c.strokeStyle=col;c.lineWidth=5;c.setLineDash([7,9]);c.beginPath();if(a.kind==='thrust'){c.moveTo(ex-70,370);c.lineTo(px+50,370);}else{c.ellipse(550,a.kind==='sweep'?443:365,145,30,0,0,Math.PI*2);}c.stroke();c.setLineDash([]);text(a.kind.toUpperCase(),550,230,17,col);text(a.label,550,260,23,'#fff3dc');bar(400,282,300,7,p,col,'#ffffff18');text(a.kind==='thrust'?'DODGE · SPACE':a.kind==='sweep'?'GUARD · K':'GUARD / DODGE',550,319,13,col);}
+ if(s.phase==='recovery'){text('OPENING',550,260,22,'#8ff2c6');text('STRIKE · J',550,288,14,'#cfffe9');bar(430,306,240,6,s.remaining/s.phaseTotal,'#8ff2c6','#ffffff18');}
+ if(fx.life>0){for(let i=0;i<14;i++){const angle=i*2.4,rad=(1-fx.life)*110;c.fillStyle=fx.kind==='hurt'?'#ff8f86':'#ffe0a1';c.fillRect((fx.kind==='hurt'?px:ex-30)+Math.cos(angle)*rad,370+Math.sin(angle)*rad,3+fx.life*4,3+fx.life*4);}if(hit){c.strokeStyle='#fff1cc';c.lineWidth=6*fx.life;c.beginPath();c.moveTo(520,300);c.lineTo(710,420);c.stroke();}}
+ c.restore();
+ text('IRON CADENCE',44,40,14,'#d2ad7a','left');text(s.location,44,65,12,'#9caeba','left');text(s.enemy.name,1055,40,18,'#f5dfbc','right');bar(760,57,295,9,s.enemy.hp/s.enemy.maxHp,'#d5a975','#ffffff15');text(`${Math.ceil(s.enemy.hp)} / ${s.enemy.maxHp}`,1055,85,12,'#b6b4b3','right');
+ text(`${s.character.name} · LV ${s.character.level}`,44,110,20,'#d8fff6','left');bar(44,128,280,10,s.hp/st.maxHp,'#79d9b4','#ffffff18');text(`HP ${Math.ceil(s.hp)} / ${st.maxHp}`,44,158,12,'#b3e7d6','left');bar(44,172,190,5,s.character.mp/st.maxMp,'#a8a0ff','#ffffff18');text(`MP ${s.character.mp} / ${st.maxMp}`,244,180,12,'#bbb6f3','left');
+ bar(260,508,580,9,s.stamina/100,'#e6c58c','#ffffff18');text(`BREATH ${Math.floor(s.stamina)}   ·   ${s.character.empower?'EMBER EDGE READY':'Strike 16  /  Dodge 25  /  Guard 12'}`,550,540,12,'#dac6a6');
+ text(s.outcomes.at(-1)?.text||s.caption,550,580,16,'#d5dfe1');
+ if(s.phase==='qte'&&q){c.fillStyle='#0b1429ec';c.fillRect(250,205,600,240);text(s.sequence?.sequence?.label||'CLASH OF BLADES',550,242,15,'#e8c8a0');text(q.cue?.label||q.cue?.action||'Prepare',550,288,25,'#f2ede6');text(`${q.phase.toUpperCase()} · ${(q.remainingMs/1000).toFixed(1)}s`,550,324,17,'#9df0de');text(q.cue?.kind==='hold'?'HOLD THROUGH THE WINDOW':'PRESS WHEN THE WINDOW OPENS',550,360,12,'#c9c5ea');text(`${(q.index||0)+1} / ${q.total||0}  ·  J strike  /  K guard  /  Space dodge`,550,395,13,'#aab9cb');}
+ if(s.paused||['victory','defeat'].includes(s.phase)){c.fillStyle='#0a1325b8';c.fillRect(220,200,660,260);text(s.phase==='victory'?'OPPONENT YIELDS':s.phase==='defeat'?'TAKE A BREATH':s.phase==='ready'?'THE CINDER GATE':'PAUSED',550,260,29,'#f2e8d4');text(s.phase==='victory'?'Your progress is saved. Rest, equip, and await the next encounter.':s.phase==='defeat'?'Retry this opponent. Your character and earned rewards remain.':'Read the intent. Defend with purpose. Strike the opening.',550,305,16,'#c6d5df');text(s.phase==='defeat'?'Retry below':s.phase==='victory'?'The road continues with your live host':'Enter / Start to continue · P pauses',550,350,15,'#9ce9d4');text(`Timing ×${s.timing} · wider windows, same consequences`,550,390,12,'#e1c392');}
+ function text(t,x,y,size,color,align='center'){c.fillStyle=color;c.font=`${size>=20?'600 ':''}${size}px system-ui, sans-serif`;c.textAlign=align;c.fillText(String(t).slice(0,125),x,y);}
+ function bar(x,y,w,h,f,color,back){c.fillStyle=back;c.fillRect(x,y,w,h);c.fillStyle=color;c.fillRect(x,y,w*Math.max(0,Math.min(1,f)),h);}
+ function figure(x,y,dir,color,sword,enemy){c.save();c.translate(x,y);c.scale(dir,1);c.fillStyle='#03081177';c.beginPath();c.ellipse(0,4,62,12,0,0,7);c.fill();c.strokeStyle='#111724';c.lineWidth=24;c.lineCap='round';c.beginPath();c.moveTo(-17,-55);c.lineTo(-30,0);c.moveTo(15,-55);c.lineTo(35,0);c.stroke();c.fillStyle=enemy?'#564f4b':'#263b4c';c.beginPath();c.moveTo(-25,-125);c.lineTo(23,-123);c.lineTo(34,-47);c.lineTo(-35,-47);c.fill();c.fillStyle=color;c.fillRect(-26,-123,50,12);c.fillStyle='#1d2634';c.beginPath();c.arc(0,-149,24,0,7);c.fill();c.fillStyle=color;c.fillRect(4,-151,23,5);c.strokeStyle=color;c.lineWidth=10;c.beginPath();c.moveTo(17,-111);c.lineTo(44,-89);c.stroke();c.translate(45,-91);c.rotate(sword);c.fillStyle='#b7cbd4';c.fillRect(0,-5,95,7);c.fillStyle='#e2ba75';c.fillRect(-7,-16,8,30);c.fillStyle='#272b33';c.fillRect(-27,-5,25,8);c.restore();}
+}

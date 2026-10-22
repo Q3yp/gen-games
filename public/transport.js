@@ -54,6 +54,7 @@ async function loadSession(id) {
   const { session, cursor } = await request(`/api/sessions/${encodeURIComponent(id)}`);
   if (generation !== state.generation) return;
   state.session = session; state.cursor = cursor || 0; savedSession.set(id);
+  const url = new URL(location.href); url.searchParams.set('session', id); history.replaceState(null, '', url);
   if (!state.sessions.some(item => item.id === id)) state.sessions.unshift(session);
   render(); renderJournal(); openStream(generation); void refreshStatus();
 }

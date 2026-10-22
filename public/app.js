@@ -83,6 +83,8 @@ async function init() {
     const [games, sessions] = await Promise.all([request('/api/games'), request('/api/sessions')]);
     state.games = games.games || []; state.sessions = sessions.sessions || []; renderSelectors();
     if (!state.games.length) { connection('No worlds installed'); $('#standard-renderer').innerHTML = '<div class="stage-empty"><h3>No game packs found</h3><p>Add a game pack to the games directory and restart the runtime.</p></div>'; return; }
+    const requestedId = new URLSearchParams(location.search).get('session');
+    if (requestedId) { await loadSession(requestedId); return; }
     const saved = state.sessions.find(session => session.id === savedSession.get() && state.games.some(pack => pack.id === session.gameId));
     const firstWorld = state.games.find(pack => pack.id === 'live-canvas') || state.games.find(pack => pack.runtime === 'code') || state.games[0];
     const latest = state.sessions.filter(session => session.gameId === firstWorld.id).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];

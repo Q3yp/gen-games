@@ -175,3 +175,104 @@ validation, so an already-applied command still reports its durable receipt afte
 the turn expires. Changing omitted guards to explicit guards changes that raw request
 and is not an identical retry. The snapshot is bounded metadata, not another world
 save, and is not repeated in each command response.
+
+## Optional local timed cues
+
+`/code-qte.js` exports `createQTE`, `validateQTE` and `qteSequenceSchema(actions)`.
+It is an opt-in input judge, not a renderer, combat model, scene catalog or timeline
+language. Games choose action names, visuals, consequences and command names. The
+agent sends readable cue data once; timing and judgment never wait for an LLM or
+server response. See Iron Cadence for a complete game-owned integration.
+
+```js
+import { createQTE, qteSequenceSchema } from '/code-qte.js';
+const actions = ['strike', 'guard', 'dodge'];
+const qte = createQTE({ actions, onResult(result) {
+  // Apply game-owned consequences synchronously, once per result.id.
+  // Store the receipt and consequences TOGETHER in your serialized game state.
+  // Cancellation is not a combat failure or reward.
+  applyResultOnce(result);
+  host.emit('combat.qte.result', 'Timed sequence resolved.', result);
+  host.requestSave();
+} });
+// A game-defined guarded command, not a new engine command:
+qte.start({ id: 'bridge-riposte-1', label: 'Break the guard', timeScale: 1.25,
+  cues: [
+    { action: 'guard', kind: 'hold', prepareMs: 900, windowMs: 1400, holdMs: 600 },
+    { action: 'strike', kind: 'tap', prepareMs: 650, windowMs: 900 }
+  ]
+}, { expectedId: null });
+// In the game's existing local step/input/save/dispose hooks:
+qte.step(dt); // Seconds, active simulation time only.
+qte.input('guard', true, { repeat: event.repeat });
+qte.input('guard', false); // Deliver release edges even when host.active is false.
+qte.status(); // Small presentation snapshot; do not emit it every frame.
+qte.serialize(); // Include under any game-owned save field.
+qte.dispose();
+```
+
+Declare the command's sequence property as `qteSequenceSchema(actions)` and scopes
+such as `['encounter', 'qte']`. The host's simple validator is not a full nested JSON
+Schema validator: the helper validates the entire sequence before replacing anything.
+`INVALID_QTE` names the invalid field, including a cue index. Require observed scope
+versions and bump the game-owned QTE version at meaningful boundaries (start, terminal,
+cancel), not each frame. A local `expectedId` guard additionally prevents accidental
+replacement: pass null for idle/completed state, or the exact active sequence ID.
+`cancel(expectedId, reason)` requires that same active ID. A replacement emits one
+cancelled result before installing the new, already-validated sequence. An identical
+start of the helper's current/latest ID is a no-op; changed data under that ID fails.
+Older IDs are not retained: use unique authored IDs and a game-owned receipt ledger.
+
+Sequence contract:
+- Required `id` (1–80 characters) and `cues` (1–24). Optional `label` (1–160),
+  `prepareMs` (250–5000; default 800) and `timeScale` (0.5–3; default 1).
+- Each cue requires an allowed `action`, `kind: 'tap' | 'hold'`, and `windowMs`
+  (200–10000). Optional unique `id`, `label` and `prepareMs` override presentation
+  or preparation. Holds require `holdMs` (100–8000), no longer than their window.
+- All durations are multiplied by timeScale. Larger values are more forgiving.
+  Show the complete upcoming cue during preparation, the remaining window and hold
+  progress during execution; supply readable text and non-color-only feedback.
+- Only a fresh press in the window counts. Repeats and already-held keys cannot
+  satisfy a cue. Early presses and other actions are ignored, not penalized. A hold
+  must begin in the window and finish before its deadline; early release misses.
+  Release before pressing the same action again, including between adjacent cues.
+- Each resolved cue advances to a new full preparation, without carrying frame
+  overshoot forward. All cues play; terminal outcome is success, partial, failed,
+  or cancelled. One bounded callback contains cue outcomes and reasons; there are
+  no per-frame/per-key network messages. `offsetMs` is press time after window-open
+  in scaled local simulation milliseconds, not server wall time.
+
+Lifecycle and fair interruption:
+- Call step only from the game simulation and fence press handling with `host.active`.
+  The helper automatically pauses on blur or hidden document, never times out in a
+  background tab, and owns/removes those two listeners. `pause(reason)` and `resume()`
+  support game menus. Resume is explicit, never automatic; render a clear Resume
+  control. The current cue restarts its full preparation; completed cue results stay.
+- Pausing abandons partial hold progress without a miss. A key known to be held at
+  pause may have been released outside the tab: explicit resume clears stale key
+  tracking. Keyboard adapters must forward KeyboardEvent.repeat; a still-held key
+  produces repeats, which cannot count, while a genuinely fresh press can. Do not
+  synthesize fresh presses from polled held controls after resume.
+  Explicit resume cannot run while the document is hidden. Input bindings and touch
+  alternatives remain the game's responsibility; map all of them to semantic actions.
+- `step(dt > 0.25)` pauses as `frame-gap` only when the caller supplies that large
+  delta. The existing host caps dt and Iron Cadence uses fixed substeps: these paths
+  do not detect real-time frame stalls. QTE time follows their slowed simulation,
+  without a surprise timeout or free hold progress from wall-clock elapsed time.
+  This helper has no monotonic wall-clock stall observer. No wall-clock timer
+  runs while host frames are paused for durable command acknowledgment or a menu.
+- `restore(serializedQte)` restores completed cue results, but resumes no live timer:
+  unfinished sequences start paused with reason `restored`, then replay the current
+  cue preparation on explicit resume. Terminal results are not callback-replayed.
+  Reload never subtracts time spent outside the tab or resets unrelated world state.
+
+Durability is deliberately the existing runtime contract, not a new event log.
+Starting/cancelling in a synchronous game command is included in its atomic command,
+save and event acknowledgment. Later local input outcomes request an ordinary
+checkpoint; checkpoint and semantic event delivery are not atomic with one another.
+Store reward receipt IDs and all world consequences in the same save, and deduplicate
+external follow-up by sequence ID. A crash before that save reaches the server can
+lose recent local progress and replay its unfinished cue on recovery; queued browser
+events can also be lost. This helper does not claim crash-proof exactly-once rewards,
+a durable offline outbox, or release-versioned helper code. Its root-relative module
+is shared engine code; game source releases alone do not pin this helper's revision.

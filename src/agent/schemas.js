@@ -75,6 +75,25 @@ const mutation = {
 
 export const TOOL_DEFINITIONS = [
   {
+    name: 'library', title: 'Discover saved campaigns',
+    description: 'List durable campaigns and game definitions; create a new save or open an existing workspace without resetting it. List is paginated and never returns game saves.',
+    inputSchema: object({ op: { type: 'string', enum: ['list', 'create', 'open'] }, sessionId,
+      workspaceId: { type: 'string' }, gameId: { type: 'string' }, title: { type: 'string', maxLength: 120 },
+      seed: { type: 'integer', minimum: 0, maximum: 4294967295 }, limit: { type: 'integer', minimum: 1, maximum: 100 }, offset: { type: 'integer', minimum: 0 } }),
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
+  },
+  {
+    name: 'workspace', title: 'Resume durable host context',
+    description: 'Read bounded handoff context, attach through existing director leases, or update selected sections with optimistic version guard. Context is not gameplay state. Update requires current connection token while a director is attached. afterVersion returns only changed context sections. Read capabilities and save using returned scoped APIs before acting.',
+    inputSchema: object({ op: { type: 'string', enum: ['read', 'update', 'attach'] }, sessionId,
+      workspaceId: { type: 'string' }, scope: { type: 'string', enum: ['all', 'metadata', 'brief', 'decisions', 'unresolved', 'references'] },
+      afterVersion: { type: 'integer', minimum: 0 }, expectedVersion: { type: 'integer', minimum: 0 },
+      patch: object({ title: { type: 'string', maxLength: 120 }, progress: { type: 'string', maxLength: 500 }, brief: { type: 'string', maxLength: 6000 },
+        decisions: { type: 'array', maxItems: 40 }, unresolved: { type: 'array', maxItems: 40 }, references: { type: 'array', maxItems: 40 } }),
+      consumer: { type: 'string' }, token: { type: 'string' }, leaseMs: { type: 'integer', minimum: 35000, maximum: 300000 } }),
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
+  },
+  {
     name: 'asset',
     title: 'Publish immutable media',
     description:
@@ -306,6 +325,7 @@ export const TOOL_DEFINITIONS = [
             'commands',
             'command',
             'projection',
+            'save',
             'timings',
             'capabilities',
             'versions',

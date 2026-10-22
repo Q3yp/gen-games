@@ -1,3 +1,4 @@
+import { manageLibrary, manageWorkspace } from './library.js';
 import { commandSummary, commandList } from './code-command.js';
 import { authorEdits } from './authoring.js';
 import { atPath, isRecord } from './validate.js';
@@ -32,12 +33,14 @@ export class ToolService {
   async execute(tool, args) {
     const engine = this.engine,
       store = engine.store;
+    if (tool === 'library') return manageLibrary(engine, args);
+    if (tool === 'workspace') return manageWorkspace(engine, args);
     if (tool === 'discover') {
       let capabilities;
       const lines = [
         'gen-games · local game tools',
         'session → observe → inspect → act/author → observe. Acknowledge only after processing.',
-        'Tools: session, discover, observe, inspect, director, work, asset, publish, command, act, author, jobs, checkpoint.'
+        'Tools: library, workspace, session, discover, observe, inspect, director, work, asset, publish, command, act, author, jobs, checkpoint.'
       ];
       if (!args.sessionId)
         for (const { pack } of engine.games.values())
@@ -64,6 +67,8 @@ export class ToolService {
         text: compact(lines.join('\n'), 10000),
         data: {
           tools: [
+            'library',
+            'workspace',
             'session',
             'discover',
             'observe',
@@ -128,7 +133,8 @@ export class ToolService {
     if (tool === 'inspect') {
       let value;
       const scope = args.scope || 'session';
-      if (scope === 'director') value = directorFor(engine).status(session.id);
+      if (scope === 'save') value = session.state;
+      else if (scope === 'director') value = directorFor(engine).status(session.id);
       else if (session.runtime && scope === 'timings')
         value = session.runtime.timings || { spans: [], observedAt: null };
       else if (session.runtime && scope === 'capabilities')

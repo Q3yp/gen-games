@@ -292,3 +292,13 @@ immediate beam feedback, but losing the boat gives no warning; add a danger wake
 before tuning difficulty.” Avoid “Everything is fun and polished.” Fix the most
 important evidenced problem and replay that interaction. Keep deeper architecture
 changes tied to a concrete limitation in what the player or host can do.
+
+## Returning with a fresh agent
+
+Start with `library list`, then `workspace read` using the intended stable host ID.
+This returns bounded handoff context, source identity and exact save/release freshness;
+read current capabilities and only missing saved fields before attaching. Preserve
+custom character, inventory, skills and progress through the game's own save/command
+contract. Before leaving, update the workspace brief, decisions, unresolved work and
+artifact references with its observed version. See [library-workspaces.md](library-workspaces.md)
+for the full durable library and cross-session handoff workflow.

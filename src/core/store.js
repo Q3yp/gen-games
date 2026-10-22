@@ -7,6 +7,7 @@ export class Store {
     mkdirSync(dirname(filename), { recursive: true });
     this.db = new DatabaseSync(filename);
     this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;
+      CREATE TABLE IF NOT EXISTS workspaces (session_id TEXT PRIMARY KEY, body TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, body TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS events (seq INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL, revision INTEGER NOT NULL, type TEXT NOT NULL, text TEXT NOT NULL, data TEXT NOT NULL, at TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS event_sessions ON events(session_id, seq);
@@ -48,5 +49,7 @@ export class Store {
   checkpoint(id, name) { const row = this.db.prepare('SELECT body FROM checkpoints WHERE session_id=? AND name=?').get(id, name); return row && JSON.parse(row.body); }
   checkpoints(id) { return this.db.prepare('SELECT name,created_at AS createdAt FROM checkpoints WHERE session_id=? ORDER BY created_at DESC').all(id); }
   saveCheckpoint(session, name) { this.db.prepare('INSERT OR REPLACE INTO checkpoints VALUES(?,?,?,?)').run(session.id, name, JSON.stringify(session), new Date().toISOString()); }
+  workspace(id) { const row = this.db.prepare('SELECT body FROM workspaces WHERE session_id=?').get(id); return row && JSON.parse(row.body); }
+  saveWorkspace(value) { this.db.prepare('INSERT INTO workspaces(session_id,body) VALUES(?,?) ON CONFLICT(session_id) DO UPDATE SET body=excluded.body').run(value.sessionId, JSON.stringify(value)); }
   close() { this.db.close(); }
 }

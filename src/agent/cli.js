@@ -4,9 +4,12 @@ import { pathToFileURL } from 'node:url';
 import { AgentError, boundedText, callTool, errorEnvelope, isObject } from './transport.js';
 import { TOOL_NAMES } from './schemas.js';
 
-const HELP = `gen-games agent: discover | session | observe | inspect | director | work | asset | publish | command | act | author | jobs | checkpoint
+const HELP = `gen-games agent: discover | library | workspace | session | observe | inspect | director | work | asset | publish | command | act | author | jobs | checkpoint
 Usage: node src/agent/cli.js <tool> [options]
 
+  --workspace ID     Stable host workspace ID from library list
+  --workspace-version N  Observed version for workspace update; use --json for patch
+  --title TEXT       Campaign title for library create; --offset N pages library
   --session ID       Session ID (or GEN_GAMES_SESSION)
   --game ID          Game ID for session create; --seed N deterministic seed
   --json OBJECT      Full tool arguments as JSON; --file PATH reads them from a file
@@ -44,13 +47,13 @@ Examples:
 Exit codes: 0 success/help, 1 server/transport failure, 2 invalid CLI input.
 `;
 const valueFlags = {
-  session: 'sessionId', game: 'gameId', seed: 'seed', after: 'after', consumer: 'consumer', ack: 'ack', limit: 'limit',
+  workspace: 'workspaceId', 'workspace-version': 'expectedVersion', offset: 'offset', title: 'title', session: 'sessionId', game: 'gameId', seed: 'seed', after: 'after', consumer: 'consumer', ack: 'ack', limit: 'limit',
   chars: 'maxChars', wait: 'waitMs', action: 'action', revision: 'expectedRevision',
   request: 'requestId', scope: 'scope', id: 'id', path: 'path', op: 'op', token: 'token',
   release: 'expectedRelease', run: 'expectedRunEpoch', versions: 'expectedVersions', 'director-token': 'directorToken', cursor: 'cursor', lease: 'leaseMs',
   label: 'label', name: 'name', args: 'args', operations: 'operations',
 };
-const numberFlags = new Set(['after', 'ack', 'limit', 'chars', 'wait', 'revision', 'seed', 'run', 'cursor', 'lease']);
+const numberFlags = new Set(['workspace-version', 'offset', 'after', 'ack', 'limit', 'chars', 'wait', 'revision', 'seed', 'run', 'cursor', 'lease']);
 const jsonFlags = new Set(['path', 'args', 'operations', 'versions']);
 
 function usageError(message, hint = 'Run node src/agent/cli.js --help for supported options.') {

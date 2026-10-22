@@ -124,3 +124,11 @@ The repository intentionally has no test suite or test files. Actual manual runt
 ## Scope
 
 This is an extensible local-first v1, not a production multiplayer server or a universal game editor. JavaScript game packs are trusted local code, not sandboxed user uploads. There is no built-in LLM, remote matchmaking, automatic content migration, procedural dungeon generator, or automatic image generation. The open code runtime permits game-specific simulations; it does not supply every genre's physics, networking, editor, or mechanics out of the box.
+
+## Library and returning hosts
+
+Open `/library.html` for saved campaigns and their progress. Agents can use
+`library list` and `workspace read/attach` to return across sessions without
+resetting arbitrary character, inventory, skill or story state. See
+[Library and durable workspaces](docs/library-workspaces.md) for scoped handoffs,
+source-sharing boundaries and the fresh-host protocol.
