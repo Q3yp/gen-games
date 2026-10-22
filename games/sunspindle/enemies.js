@@ -1,4 +1,4 @@
-import { confine, direction, distance, separate, segmentHits } from './physics.js';
+import { confine, direction, distance, separate } from './physics.js';
 
 export function enemies(s, fight, fx) {
   function phase(e, name, time) { e.phase = name; e.timer = e.phaseDuration = time; }
@@ -13,14 +13,16 @@ export function enemies(s, fight, fx) {
     e.aimDistance = Math.min(470, distance(e, s.player) + 80);
   }
   function volley(e) {
-    const artillery = e.kind === 'artillery';
-    const spread = artillery ? 0.34 : 0.17, speed = artillery ? 220 : 285;
-    const muzzle = artillery ? e.radius + 14 : 31;
-    for (const offset of [-spread, 0, spread]) {
+    const artillery = e.kind === 'artillery', rainbolt = artillery && e.projectileKind === 'rainbolt';
+    const spread = artillery ? 0.34 : 0.17, speed = rainbolt ? 185 : artillery ? 220 : 285;
+    const muzzle = rainbolt ? e.radius + 20 : artillery ? e.radius + 14 : 31;
+    for (const offset of rainbolt ? [0] : [-spread, 0, spread]) {
       const angle = e.angle + offset, x = Math.cos(angle), y = Math.sin(angle);
-      s.shots.push({ id: `${artillery ? 'shell' : 'reed'}-${++s.shotSerial}`, x: e.x + x * muzzle, y: e.y + y * muzzle,
-        vx: x * speed, vy: y * speed, r: artillery ? 12 : 7, angle,
-        life: artillery ? 6 : 4.5, kind: artillery ? 'shell' : 'arrow' });
+      s.shots.push({ id: `${rainbolt ? 'rainbolt' : artillery ? 'shell' : 'reed'}-${++s.shotSerial}`,
+        x: e.x + x * muzzle, y: e.y + y * muzzle,
+        vx: x * speed, vy: y * speed, r: rainbolt ? 18 : artillery ? 12 : 7, angle,
+        life: rainbolt ? 7 : artillery ? 6 : 4.5, kind: rainbolt ? 'rainbolt' : artillery ? 'shell' : 'arrow',
+        ...(rainbolt ? { ownerId: e.id, friendly: false } : {}) });
     }
     fx.burst(e.x + e.aimX * 30, e.y + e.aimY * 30, '#edaa6c', 5, 65);
   }
@@ -31,7 +33,7 @@ export function enemies(s, fight, fx) {
       if (e.kind === 'ram' || e.kind === 'guardian') {
         phase(e, 'lunge', e.aimDistance / (e.lungeSpeed || 470)); e.hitPlayer = false;
         fx.ring(e.x, e.y, '#ed9570', 42, 0.25);
-      } else { volley(e); phase(e, 'recover', e.kind === 'artillery' ? 2.4 : 2.1); }
+      } else { volley(e); phase(e, 'recover', e.projectileKind === 'rainbolt' ? 1.9 : e.kind === 'artillery' ? 2.4 : 2.1); }
       return;
     }
     if (e.phase === 'lunge') {
@@ -50,9 +52,9 @@ export function enemies(s, fight, fx) {
     const d = distance(e, s.player), n = direction(e, s.player, e.angle);
     if (e.kind === 'artillery') {
       // This planted creature commits to one readable direction, never tracking
-      // during its windup. Any ordinary hit cancels that commitment.
+      // during its windup. Ordinary hits never reset a rainbolt kiln's rhythm.
       e.angle = Math.atan2(n.y, n.x);
-      if (e.timer <= 0) { aim(e); phase(e, 'windup', 2); }
+      if (e.timer <= 0) { aim(e); phase(e, 'windup', e.projectileKind === 'rainbolt' ? 1.5 : 2); }
       return;
     }
     if (e.kind === 'guardian') {
@@ -95,16 +97,7 @@ export function enemies(s, fight, fx) {
       if (e.phase !== 'lunge') separate(e, s.player, e.radius + 18);
       confine(e, e.radius);
     }
-    for (const shot of s.shots) {
-      const previous = { x: shot.x, y: shot.y };
-      shot.x += shot.vx * hostileDt; shot.y += shot.vy * hostileDt; shot.life -= hostileDt;
-      if (segmentHits(previous, shot, s.player, shot.r + 16)) {
-        fight.playerHit(previous, shot.kind === 'shell' ? 'artillery volley' : 'reed volley'); shot.life = 0;
-      }
-      if (s.props.some(p => p.hp > 0 && segmentHits(previous, shot, p, p.r + shot.r))) shot.life = 0;
-      if (confine(shot, shot.r)) shot.life = 0;
-    }
-    s.shots = s.shots.filter(shot => shot.life > 0);
+    fight.stepShots(dt, hostileDt);
   }
   return { step };
 }

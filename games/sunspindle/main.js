@@ -34,6 +34,7 @@ export default function create(host, { save }) {
   const off = [];
   const emit = (type, text, data) => {
     host.emit(type, text, data);
+    if (type === 'projectile.reflected') audio.play('reflect');
     host.requestSave();
   };
   const sim = simulation(s, emit);
@@ -105,10 +106,11 @@ export default function create(host, { save }) {
       const w = Math.floor(b.width * dpr), h = Math.floor(b.height * dpr);
       if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      root.dataset.palette = s.presentation === 'rain-balcony' ? 'moon' : 'sun';
       paint(ctx, s, { width: b.width, height: b.height, time, pointer });
       health.textContent = '◆'.repeat(Math.max(0, Math.ceil(s.player.hp))) + '◇'.repeat(Math.max(0, s.player.maxHp - Math.ceil(s.player.hp)));
       health.setAttribute('aria-label', `Health ${s.player.hp} of ${s.player.maxHp}`);
-      notice.textContent = s.paused ? (s.clock < .1 ? 'Click to enter the courtyard' : 'Paused · click to return') : s.noticeLife > 0 ? s.notice : '';
+      notice.textContent = s.paused ? (s.clock < .1 ? 'Click to enter' : 'Paused · click to return') : s.noticeLife > 0 ? s.notice : '';
     },
     serialize: () => structuredClone(s),
     inspect: () => projection(s),

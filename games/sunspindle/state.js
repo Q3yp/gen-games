@@ -1,5 +1,5 @@
 import { enterThreadmill, atSafeExit, pendingBlocker } from './rooms.js';
-import { glassworks } from './blast-room.js';
+import { rainBalcony } from './rain-room.js';
 
 const enemy = (id, kind, x, y, timer) => ({
   id, kind, x, y, hp: kind === 'archer' ? 2 : 3, maxHp: kind === 'archer' ? 2 : 3,
@@ -30,7 +30,7 @@ function fresh() {
 export function initial(save) {
   const base = fresh();
   if (!save || typeof save !== 'object' || !save.sunspindle) {
-    Object.assign(base, glassworks.build(glassworks.validate({ room: 3 })));
+    Object.assign(base, rainBalcony.build(rainBalcony.validate({ room: 5 })));
     Object.assign(base.player, base.entry);
     Object.assign(base.orb, { x: base.entry.x + 29, y: base.entry.y });
     base.rescue = true;
@@ -60,10 +60,10 @@ export function initial(save) {
 }
 
 export function projection(s) {
-  const complete = s.roomKey === 'glassworks' && s.awaitingHost && !s.pendingRoom;
+  const complete = (s.finishAtExit || s.roomKey === 'glassworks') && s.awaitingHost && !s.pendingRoom;
   return {
     progress: { label: 'Sunspindle', location: `${s.roomName || 'Sun Court'} · ${s.room}`,
-      objective: complete ? 'The glassworks are quiet. The sunbird rests at the garden gate.'
+      objective: complete ? s.endNotice || 'The glassworks are quiet. The sunbird rests at the garden gate.'
         : s.awaitingHost ? 'The rescued bird is waiting at the open arch.'
         : s.objective ? s.objective[s.exitReady ? 'open' : 'locked']
         : s.room === 2 ? s.exitReady ? 'Reach the open Threadmill gate.' : 'Break the two sunseals holding the far gate.'

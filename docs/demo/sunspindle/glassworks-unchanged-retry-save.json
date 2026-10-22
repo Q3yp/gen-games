@@ -1,0 +1,274 @@
+{
+  "gameId": "sunspindle",
+  "saveVersion": 1,
+  "sourceRelease": "4c8f8277a1010f9a5a006cff",
+  "capturedAt": "2026-10-22T10:19:56.152318+00:00",
+  "save": {
+    "sunspindle": 1,
+    "player": {
+      "x": 1047.134254678909,
+      "y": 607.8289312612351,
+      "angle": 0,
+      "hp": 4,
+      "maxHp": 5,
+      "dash": 0,
+      "grace": 0,
+      "flash": 0,
+      "trail": []
+    },
+    "orb": {
+      "x": 1076.134254678909,
+      "y": 607.8289312612351,
+      "vx": 0,
+      "vy": 0,
+      "radius": 19,
+      "mode": "held",
+      "spin": 902.5660800003564,
+      "flight": 10,
+      "hits": [],
+      "trail": [],
+      "distanceLeft": 217.98750000002428
+    },
+    "enemies": [
+      {
+        "kind": "artillery",
+        "x": 930,
+        "y": 290,
+        "id": "glassworks-3-0",
+        "radius": 55,
+        "hp": 0,
+        "maxHp": 3,
+        "angle": 2.8120188868232505,
+        "phase": "recover",
+        "timer": 1.25,
+        "phaseDuration": 1.25,
+        "flash": 0,
+        "vx": 0,
+        "vy": 0,
+        "aimX": -0.9461803754959661,
+        "aimY": 0.3236397642847877,
+        "aimDistance": 470,
+        "crashCooldown": 0,
+        "down": 0,
+        "hitPlayer": false,
+        "blastShake": 0,
+        "blockFlash": 0
+      },
+      {
+        "kind": "ram",
+        "x": 241.57794667085594,
+        "y": 427.9333672384966,
+        "id": "glassworks-3-1",
+        "radius": 29,
+        "hp": 0,
+        "maxHp": 2,
+        "angle": 0.7255768074920085,
+        "phase": "recover",
+        "timer": 1.25,
+        "phaseDuration": 1.25,
+        "flash": 0,
+        "vx": -189.81780005270085,
+        "vy": -269.94296209227775,
+        "aimX": 0.7481167959803794,
+        "aimY": 0.6635670723989033,
+        "aimDistance": 315.7279140512835,
+        "crashCooldown": 0,
+        "down": 0,
+        "hitPlayer": false,
+        "blastShake": 0,
+        "blockFlash": 0
+      },
+      {
+        "kind": "ram",
+        "x": 363.66182095633263,
+        "y": 466.4328834817428,
+        "id": "glassworks-3-2",
+        "radius": 29,
+        "hp": 0,
+        "maxHp": 2,
+        "angle": 0.946309326693354,
+        "phase": "recover",
+        "timer": 1.25,
+        "phaseDuration": 1.25,
+        "flash": 0,
+        "vx": -189.81780005270076,
+        "vy": -269.9429620922778,
+        "aimX": 0.5846811719710509,
+        "aimY": 0.8112631676235268,
+        "aimDistance": 187.75664147915484,
+        "crashCooldown": 0,
+        "down": 0,
+        "hitPlayer": false,
+        "blastShake": 0,
+        "blockFlash": 0
+      }
+    ],
+    "props": [
+      {
+        "x": 650,
+        "y": 350,
+        "id": "glass-3-0",
+        "kind": "blastjar",
+        "r": 28,
+        "hp": 0,
+        "maxHp": 1,
+        "flash": 0,
+        "blastRadius": 175
+      },
+      {
+        "x": 810,
+        "y": 560,
+        "id": "glass-3-1",
+        "kind": "blastjar",
+        "r": 28,
+        "hp": 0,
+        "maxHp": 1,
+        "flash": 0,
+        "blastRadius": 175
+      }
+    ],
+    "shots": [],
+    "particles": [],
+    "rings": [],
+    "clock": 439.8601999997763,
+    "paused": true,
+    "room": 3,
+    "rooms": {},
+    "roomName": "The Glassworks",
+    "roomKey": "glassworks",
+    "presentation": "glassworks",
+    "entry": {
+      "x": 260,
+      "y": 490
+    },
+    "pendingRoom": null,
+    "enteredStages": [],
+    "departures": {},
+    "defeated": 3,
+    "rescue": true,
+    "exitReady": true,
+    "exitAsked": true,
+    "awaitingHost": true,
+    "exit": {
+      "x": 1040,
+      "y": 650
+    },
+    "story": [
+      {
+        "type": "sunweight.first_throw",
+        "text": "A bright weight flies freely across the courtyard.",
+        "at": 0.1
+      },
+      {
+        "type": "combat.first_hit",
+        "text": "The sunweight knocked a guard out of its attack.",
+        "target": "glassworks-3-1",
+        "source": "sunweight",
+        "at": 0.4
+      },
+      {
+        "type": "sunweight.first_recall",
+        "text": "The sunweight returns to its keeper\u2019s new position.",
+        "from": {
+          "x": 1091,
+          "y": 480
+        },
+        "to": {
+          "x": 260,
+          "y": 533
+        },
+        "at": 33.6
+      },
+      {
+        "type": "combat.collision",
+        "text": "One guard bowled into the other.",
+        "guard": "glassworks-3-1",
+        "target": "glassworks-3-2",
+        "at": 91.9
+      },
+      {
+        "type": "enemy.defeated",
+        "text": "A guard fell; its place in the courtyard is clear.",
+        "id": "glassworks-3-2",
+        "kind": "ram",
+        "source": "sunweight",
+        "at": 99.3
+      },
+      {
+        "type": "enemy.defeated",
+        "text": "A guard fell; its place in the courtyard is clear.",
+        "id": "glassworks-3-1",
+        "kind": "ram",
+        "source": "sunweight",
+        "at": 99.4
+      },
+      {
+        "type": "player.first_hurt",
+        "text": "A committed attack landed. Move across its path, not along it.",
+        "source": "artillery volley",
+        "at": 125.5
+      },
+      {
+        "type": "blastjar.burst",
+        "text": "A clay sunjar burst outward across the courtyard.",
+        "id": "glass-3-0",
+        "radius": 175,
+        "targets": [],
+        "at": 183.2
+      },
+      {
+        "type": "blastjar.burst",
+        "text": "A clay sunjar burst outward across the courtyard.",
+        "id": "glass-3-1",
+        "radius": 175,
+        "targets": [],
+        "at": 346.7
+      },
+      {
+        "type": "enemy.defeated",
+        "text": "A guard fell; its place in the courtyard is clear.",
+        "id": "glassworks-3-0",
+        "kind": "artillery",
+        "source": "sunweight",
+        "at": 370.9
+      },
+      {
+        "type": "room.cleared",
+        "text": "The guards are gone. The courtyard belongs to the keeper.",
+        "rescue": true,
+        "at": 370.9
+      },
+      {
+        "type": "game.decision_due",
+        "text": "The keeper and rescued sunbird reached the open arch.",
+        "reason": "open-exit",
+        "rescued": true,
+        "guardsRemaining": 0,
+        "at": 401.7
+      }
+    ],
+    "versions": {
+      "world": 12,
+      "route": 1
+    },
+    "seen": {
+      "sunweight.first_throw": true,
+      "combat.first_hit": true,
+      "sunweight.first_recall": true,
+      "player.first_hurt": true
+    },
+    "shake": 0,
+    "hitstop": 0,
+    "respawn": 0,
+    "timeFlow": 0.06,
+    "notice": "The sunbird rests at the garden gate.",
+    "noticeLife": 0,
+    "choices": [],
+    "shotSerial": 15,
+    "cleared": true,
+    "objective": {
+      "locked": "Clear the glassworks with the sunbird.",
+      "open": "The glassworks are quiet. The garden is open."
+    }
+  }
+}

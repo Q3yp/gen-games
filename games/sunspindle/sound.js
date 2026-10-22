@@ -11,7 +11,7 @@ export function sound() {
     play(kind) {
       if (!audio || audio.state !== 'running') return;
       const t = audio.currentTime;
-      const tones = { throw: [380, 90, .13], recall: [180, 680, .19], hurt: [110, 40, .22], break: [740, 130, .28], hit: [250, 55, .1], block: [1900, 650, .2] };
+      const tones = { throw: [380, 90, .13], recall: [180, 680, .19], hurt: [110, 40, .22], break: [740, 130, .28], hit: [250, 55, .1], block: [1900, 650, .2], reflect: [620, 1500, .32] };
       const [start, end, duration] = tones[kind] || tones.throw;
       const osc = audio.createOscillator(), gain = audio.createGain();
       osc.type = kind === 'hurt' ? 'triangle' : 'sine';

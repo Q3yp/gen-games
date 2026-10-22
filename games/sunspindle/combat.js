@@ -1,21 +1,26 @@
-import { direction, distance, segmentHits } from './physics.js';
+import { direction, distance } from './physics.js';
+import { countershots } from './countershots.js';
+import { weightSweep } from './weight-combat.js';
 
 export function combat(s, record, once, fx, notice) {
   function enemyHit(e, damage, push, source = 'sunweight') {
     if (e.hp <= 0) return;
+    const uninterrupted = e.kind === 'artillery' && e.projectileKind === 'rainbolt' && source === 'sunweight';
     e.hp = Math.max(0, e.hp - damage); e.flash = 0.18;
-    e.phase = 'recover'; e.timer = e.phaseDuration = 1.25;
+    if (!uninterrupted || e.hp <= 0) { e.phase = 'recover'; e.timer = e.phaseDuration = 1.25; }
     const shove = e.kind === 'artillery' ? 0 : e.kind === 'guardian' ? 155 : e.kind === 'ram' ? 330 : 430;
     e.vx = push.x * shove; e.vy = push.y * shove;
     if (e.kind === 'artillery') e.blastShake = source === 'blastjar' ? 0.45 : 0.2;
     s.shake = Math.max(s.shake, 4); s.hitstop = Math.max(s.hitstop, 0.035);
     fx.burst(e.x, e.y, '#fff2ac', 12); fx.ring(e.x, e.y, '#ffdf86', 44, 0.22);
-    once('combat.first_hit', 'The sunweight knocked a guard out of its attack.', { target: e.id, source });
+    once('combat.first_hit', uninterrupted ? 'The kiln took the hit, but its rainbolt rhythm did not break.'
+      : 'The sunweight knocked a guard out of its attack.', { target: e.id, source });
     if (e.kind === 'guardian') once('guardian.exposed_hit', 'The sunweight found the unshielded bronze.', { target: e.id });
     if (e.hp === 0) {
       e.down = 0.7; s.defeated++;
       fx.burst(e.x, e.y, e.kind === 'ram' ? '#e88965' : '#68bcb5', 20, 220);
-      record('enemy.defeated', 'A guard fell; its place in the courtyard is clear.', { id: e.id, kind: e.kind, source });
+      record('enemy.defeated', 'A guard fell; its place in the courtyard is clear.', { id: e.id, kind: e.kind, source,
+        ...(source === 'reflected-rainbolt' ? { attackSource: source, cause: 'countershot' } : {}) });
     }
   }
   function burstJar(p) {
@@ -42,6 +47,15 @@ export function combat(s, record, once, fx, notice) {
       return;
     }
     p.hp = Math.max(0, p.hp - damage); p.flash = 0.24;
+    if (p.kind === 'stone-screen') {
+      fx.burst(p.x, p.y, '#dacdc1', p.hp ? 12 : 34, p.hp ? 150 : 290);
+      fx.ring(p.x, p.y, p.hp ? '#f6e7ce' : '#ffffff', p.hp ? 58 : 105, p.hp ? 0.28 : 0.6);
+      s.shake = Math.max(s.shake, p.hp ? 4 : 8);
+      record(p.hp ? 'stone-screen.hit' : 'stone-screen.broken', p.hp
+        ? 'The stone screen cracked under the impact.' : 'The stone screen broke apart; its path is permanently clear.',
+      { id: p.id, attackSource: source, cause: source === 'reflected-rainbolt' ? 'countershot' : 'impact', hp: p.hp });
+      return;
+    }
     fx.burst(p.x, p.y, '#b7ffec', p.hp ? 10 : 28, p.hp ? 140 : 250);
     fx.ring(p.x, p.y, '#caffef', p.hp ? 55 : 150, p.hp ? 0.3 : 0.75);
     s.shake = Math.max(s.shake, p.hp ? 4 : 7);
@@ -92,23 +106,6 @@ export function combat(s, record, once, fx, notice) {
     once('guardian.shield_blocked', 'Bronze rang out: the guardian’s front shield knocked the weight away.', { target: e.id });
     return true;
   }
-  function sweep(from, to) {
-    const o = s.orb, n = direction(from, to, s.player.angle);
-    for (const e of s.enemies) {
-      if (e.hp <= 0 || o.hits.includes(e.id) || !segmentHits(from, to, e, e.radius + o.radius)) continue;
-      o.hits.push(e.id);
-      if (shieldBlock(e, from, n)) return;
-      enemyHit(e, 1, n);
-    }
-    for (const p of s.props) {
-      if (p.hp <= 0 || o.hits.includes(p.id) || !segmentHits(from, to, p, p.r + o.radius)) continue;
-      o.hits.push(p.id); propHit(p, 1, 'sunweight');
-    }
-    s.shots = s.shots.filter(shot => {
-      if (!segmentHits(from, to, shot, shot.r + o.radius)) return true;
-      fx.burst(shot.x, shot.y, '#ffc875', 5, 80); return false;
-    });
-  }
   function collisions(e, previous) {
     if (e.hp <= 0) return;
     const speed = Math.hypot(e.vx, e.vy), charging = e.phase === 'lunge';
@@ -134,5 +131,7 @@ export function combat(s, record, once, fx, notice) {
       record('combat.collision', 'One guard bowled into the other.', { guard: e.id, target: other.id });
     }
   }
-  return { enemyHit, propHit, playerHit, sweep, collisions };
+  const shots = countershots(s, { enemyHit, propHit, playerHit }, fx, record);
+  const sweep = weightSweep(s, { enemyHit, propHit, shieldBlock }, shots, fx);
+  return { enemyHit, propHit, playerHit, sweep, collisions, stepShots: shots.step };
 }

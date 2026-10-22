@@ -4,6 +4,7 @@ import { ram } from './paint-ram.js';
 import { archer } from './paint-archer.js';
 import { guardian } from './paint-guardian.js';
 import { artillery } from './paint-artillery.js';
+import { rainKiln } from './paint-rain-combat.js';
 
 export function telegraph(c, e) {
   if (e.hp <= 0 || !['windup', 'lunge'].includes(e.phase)) return;
@@ -16,7 +17,7 @@ export function telegraph(c, e) {
   const g = c.createLinearGradient(20, 0, len, 0);
   g.addColorStop(0, ram ? '#b9553c23' : '#b9553c12');
   g.addColorStop(1, '#b9553c00');
-  const spread = ram ? (e.kind === 'guardian' ? 48 : 32) : Math.tan(e.kind === 'artillery' ? 0.34 : 0.17) * len;
+  const spread = ram ? (e.kind === 'guardian' ? 48 : 32) : e.projectileKind === 'rainbolt' ? 18 : Math.tan(e.kind === 'artillery' ? 0.34 : 0.17) * len;
   polygon(c, [
     [16, -(ram ? 17 : 4)],
     [len, -spread],
@@ -63,13 +64,14 @@ export function enemy(c, e, t) {
     c.translate(e.x, e.y);
     c.scale(1.15, 0.55);
     c.translate(-e.x, -e.y);
-  } else if (e.flash > 0) {
+  } else if (e.flash > 0 && e.projectileKind !== 'rainbolt') {
     c.translate(e.x, e.y);
     c.scale(1.13, 0.82);
     c.translate(-e.x, -e.y);
   }
   shadow(c, e.x, e.y, e.kind === 'ram' ? 25 : 18, e.kind === 'ram' ? 36 : 46, 0.22);
-  if (e.kind === 'artillery') artillery(c, e, t);
+  if (e.projectileKind === 'rainbolt') rainKiln(c, e, t);
+  else if (e.kind === 'artillery') artillery(c, e, t);
   else if (e.kind === 'guardian') guardian(c, e, t);
   else if (e.kind === 'ram') ram(c, e, t);
   else archer(c, e, t);

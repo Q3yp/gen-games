@@ -72,3 +72,39 @@ them immediately with the jar. No substantial plan revision was needed: the
 opening idea worked immediately and the firing lanes were straightforward. This
 is evidence of a voluntary replay, not sustained challenge or overall engine
 success. The retry uses exactly the same pinned source, in a separate campaign.
+
+## Glassworks: unchanged voluntary replay
+
+The separate retry `087204d2-9bb8-4ea1-9574-e375b5844ad1` used the exact same
+`4c8f8277a1010f9a5a006cff` release. The player initially avoided the jars, missed a
+long return through the charging beetles, then revised to a close-range throw after
+they crossed the room and caught them clustered. They continued experimenting with
+the kiln's incoming shots and finished with four health. They could not tell whether
+a fireball was intercepted or missed, so no successful interception is claimed.
+Both jars later broke incidentally; this was not a jar-free final save.
+
+The player's verdict: the short loop held interest through one voluntary replay
+and an actual revision of an unsuccessful idea. They would play a different
+encounter with the weapon, not grind a third copy. This is a credible small playable
+loop, not sustained campaign depth or overall engine success. The stopped retry's
+portable save and exact played source archive are in `docs/demo/sunspindle/`.
+
+## Rain Balcony: candidate trial, not a verdict
+
+A new complete short situation responds to the player's interest in incoming shots:
+fixed countershot sources, finite cover, and plainly colored reflected projectiles.
+Ordinary hits do not cancel these sources' attack cycle; reflected hits can stagger.
+The source is arbitrary campaign code, not an engine-wide component catalog.
+Independent play and evaluation are still pending. Existing player sessions are
+unchanged. Do not infer enjoyment from syntax checks or a host's feasibility clear.
+
+Host preview `74a9012a-4c58-4e0f-b86d-11ddbc831821` used normal visible controls
+and finished at the garden with four health. A thrown weight visibly reversed an
+incoming warm bolt into a cyan-white comet, which traveled back to the remaining
+kiln; recall finished it. The finite screen visibly cracked under fire. These are
+readability/feasibility observations, not independent enjoyment evidence.
+
+The fresh independent trial `d7239057-bef9-4a79-968f-22421866d5da` was invited at
+10:32 UTC on release `815128558806a332c7ce5a09`. It has the same controls and no
+unfinished exit. The host preview was paused and its own tab closed; the player
+retains sole control of their separate campaign. Verdict pending.

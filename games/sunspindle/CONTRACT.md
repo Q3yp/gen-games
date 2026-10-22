@@ -24,12 +24,12 @@ IDs, and `versions.world`/`versions.route`. No nonserializable objects live in s
 
 The sunweight has held, outbound, resting, and returning states. Recall follows
 the player's current position. Swept collision prevents tunneling; each target is
-hit once per flight. Hits shove and interrupt enemies. Committed lunges can hurt
+hit once per flight. Most hits shove and interrupt enemies. Ordinary hits on rain kilns deal damage without canceling their attack; reflected bolts can stagger them. Committed lunges can hurt
 the player once per attack, even when hostile time slows.
 
 Player movement and weight flight run locally. Hostile movement, projectiles,
-and timers all use 0.06× time while the player is stationary with a held/resting
-weight, and 1× while moving or throwing/recalling. Recovery keeps broken objects
+and timers use 0.06× time while the player is stationary with a held/resting
+weight, and 1× while moving or throwing/recalling. Reflected friendly rainbolts use real time so their payoff stays prompt. Recovery keeps broken objects
 and defeated enemies instead of resetting the room.
 
 ## Authored rooms
@@ -43,11 +43,19 @@ hold separate gate bars; destroying both opens escape without requiring a kill.
 The renderer reflects actual shield direction, block/damage feedback, cords and
 individual bars. No text tells the player the combat solution.
 
-The current fresh-save path starts directly in room 3, the Glassworks short trial,
+The earlier Glassworks short trial starts in room 3,
 with a rescued bird, fixed artillery, moving guards and finite blast jars. Clearing
 the threats opens its garden exit. Existing saves retain their own room/progress;
 the old Sun Court-to-Threadmill migration remains guarded by `threadmillEntered`.
-Do not publish into the stopped Threadmill campaign to start this trial.
+Do not publish into stopped player campaigns to start a new trial.
+
+The current fresh-save path starts in room 5, the Rain Balcony: fixed rain kilns,
+one breakable stone screen, and a complete garden exit. Moving weight can reflect
+large rainbolts back to their original kiln. Held/resting weight does not shield.
+Screens block projectiles and weight in nearest-contact order and break after two
+impacts. A stopped weight can be recalled away without re-hitting the same contact.
+`exitOnClear`, `finishAtExit`, `clearNotice`, and `endNotice` are campaign-owned room
+fields. A finished exit reports `complete`, not a promise of unfinished content.
 
 `rooms.js` snapshots each departure in `rooms[String(from)]` and records health,
 companion status, living/defeated guards and broken props in `departures`. Entry
@@ -64,7 +72,7 @@ the current room, explicit `null` for an empty pending slot (or its observed ID)
 and an unvisited destination `config.room`. `threadmill` accepts room ≥2, name,
 entry/exit points, guardian position/angle, exactly two seals, and notice;
 `glassworks` accepts room ≥3, name, entry/exit points, 1–6 enemies of kind
-ram/archer/artillery, and 0–4 jars. Room numbers cap at 9999. Other settings default;
+ram/archer/artillery, and 0–4 jars. `rain-balcony` accepts room ≥3, name, entry/exit, 1–4 kiln positions, and a screen position or null. Room numbers cap at 9999. Other settings default;
 the factories validate bounds, spacing and unsupported fields before mutation.
 
 The command persists one inactive, materialized room and increments `route`;

@@ -2,6 +2,8 @@ import { palace, exitArch, foreground } from './paint-palace.js';
 import { threadmill } from './paint-threadmill.js';
 import { blastCourt } from './paint-blast-court.js';
 import { blastJar, sunbolt } from './paint-artillery.js';
+import { rainBalcony, stoneScreen } from './paint-rain-balcony.js';
+import { rainbolt } from './paint-rain-combat.js';
 import { courier, enemy, telegraph, crystal, weight } from './paint-figures.js';
 import { arrow, effects, ambience, pointer } from './paint-effects.js';
 
@@ -14,7 +16,7 @@ export function paint(c, s, view) {
     t = Number(s.clock ?? view.time ?? 0);
   c.save();
   c.clearRect(0, 0, w, h);
-  c.fillStyle = '#dfbf91';
+  c.fillStyle = s.presentation === 'rain-balcony' ? '#162f54' : '#dfbf91';
   c.fillRect(0, 0, w, h);
   c.translate(ox, oy);
   c.scale(scale, scale);
@@ -26,7 +28,8 @@ export function paint(c, s, view) {
     c.translate(Math.sin(t * 137) * k, Math.cos(t * 117) * k * 0.6);
   }
   const presentation = s.presentation || (s.room === 2 ? 'threadmill' : 'courtyard');
-  if (presentation === 'glassworks') blastCourt(c, s, t);
+  if (presentation === 'rain-balcony') rainBalcony(c, s, t);
+  else if (presentation === 'glassworks') blastCourt(c, s, t);
   else palace(c, s, t);
   exitArch(c, s, t);
   if (presentation === 'threadmill') threadmill(c, s, t);
@@ -43,16 +46,18 @@ export function paint(c, s, view) {
     else if (e.type === 'enemy') enemy(c, e.value, t);
     else if (e.value.kind === 'crystal') crystal(c, e.value, s, t);
     else if (e.value.kind === 'blastjar') blastJar(c, e.value, t);
+    else if (e.value.kind === 'stone-screen') stoneScreen(c, e.value, t);
   }
   for (const a of s.shots || []) {
-    if (a.kind === 'shell') sunbolt(c, a);
+    if (a.kind === 'rainbolt') rainbolt(c, a, t);
+    else if (a.kind === 'shell') sunbolt(c, a);
     else arrow(c, a);
   }
   weight(c, s, t);
   effects(c, s);
   ambience(c, s, t);
   pointer(c, s, view.pointer, t);
-  foreground(c, t);
+  if (presentation !== 'rain-balcony') foreground(c, t);
   // A thin inner ink edge unifies the scene without a panel, HUD, or vignette.
   c.strokeStyle = '#6a584f30';
   c.lineWidth = 1;

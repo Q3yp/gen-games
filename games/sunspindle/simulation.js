@@ -91,19 +91,19 @@ export function simulation(s, emit = () => {}) {
   function objectives() {
     if (!s.cleared && s.enemies.length && s.enemies.every(e => e.hp <= 0)) {
       s.cleared = true;
-      if (s.roomKey === 'glassworks') {
+      if (s.exitOnClear || s.roomKey === 'glassworks') {
         s.exitReady = true;
-        notice('Quiet at last. The garden is open.', 5);
+        notice(s.clearNotice || 'Quiet at last. The garden is open.', 5);
         fx.ring(s.exit.x, s.exit.y, '#fff2a7', 160, 1);
       }
-      record('room.cleared', 'The guards are gone. The courtyard belongs to the keeper.', { rescue: s.rescue });
+      record('room.cleared', `The guards are gone from ${s.roomName || 'the courtyard'}.`, { rescue: s.rescue });
     }
     if (s.player.hp <= 0 || s.respawn > 0 || !s.exitReady || s.exitAsked || distance(s.player, s.exit) > 76) return;
     s.exitAsked = true; s.awaitingHost = true; s.shots = [];
     s.versions.route = (s.versions.route || 0) + 1;
     fx.ring(s.exit.x, s.exit.y, '#fff2a7', 160, 1);
-    notice(s.roomKey === 'glassworks' ? 'The sunbird rests at the garden gate.' : 'The sunbird keeps you safe while it finds the way onward.', 7);
-    record('game.decision_due', 'The keeper and rescued sunbird reached the open arch.',
+    notice(s.endNotice || (s.roomKey === 'glassworks' ? 'The sunbird rests at the garden gate.' : 'The sunbird keeps you safe while it finds the way onward.'), 7);
+    record(s.finishAtExit && !s.pendingRoom ? 'game.completed' : 'game.decision_due', 'The keeper and rescued sunbird reached the open arch.',
       { reason: 'open-exit', rescued: true, guardsRemaining: s.enemies.filter(e => e.hp > 0).length });
   }
   function tick(dt) {

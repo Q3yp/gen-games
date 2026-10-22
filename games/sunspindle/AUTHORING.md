@@ -21,11 +21,16 @@ voluntary request for another encounter; the Threadmill did not. Its moving rear
 target was fiddly, while bypassing it with two seal shots offered little decision.
 Do not treat greater execution difficulty as a deeper spatial choice.
 
-Fresh saves now open the Glassworks as a separate, short trial, not a continuation
-of the stopped Threadmill save. Fixed artillery and finite blast jars change the
-local spatial problem; the garden exit is a complete stopping point. A host's
-normal-controls clear established feasibility, not enjoyment. Await an independent
-player verdict before claiming this iteration works or adding another encounter.
+The Glassworks earned one voluntary unchanged replay. The player tried a different
+opening, missed a long return, revised to a close-range attack, and finished with
+four health. They would try a different situation with this weapon, but not grind
+a third copy. Projectile interception was not readable enough to judge. This is a
+credible brief loop, not sustained campaign depth or overall engine success.
+
+Fresh saves now open the Rain Balcony as a new, complete short trial. It explores
+a readable countershot and finite cover rather than adding more moving targets.
+This trial has not received an independent player verdict. Preserve both previous
+Glassworks runs and the stopped Threadmill; do not publish into them to reset play.
 
 The host owns implementation and audits. Give an independent player only the URL,
 ordinary controls and visible premise. No tactics, hidden conditions or future room

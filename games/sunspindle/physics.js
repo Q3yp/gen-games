@@ -25,3 +25,18 @@ export function segmentHits(from, to, target, radius) {
   const t = divisor ? clamp(((target.x - from.x) * dx + (target.y - from.y) * dy) / divisor, 0, 1) : 0;
   return Math.hypot(target.x - from.x - dx * t, target.y - from.y - dy * t) < radius;
 }
+
+// First circle contact along a segment, rather than its closest point. Sorting
+// these fractions lets a screen block everything farther along the same sweep.
+export function segmentContact(from, to, target, radius) {
+  const dx = to.x - from.x, dy = to.y - from.y;
+  const ox = from.x - target.x, oy = from.y - target.y;
+  const c = ox * ox + oy * oy - radius * radius;
+  if (c <= 0) return 0;
+  const a = dx * dx + dy * dy;
+  if (a <= 1e-12) return null;
+  const b = ox * dx + oy * dy, discriminant = b * b - a * c;
+  if (discriminant < 0) return null;
+  const t = (-b - Math.sqrt(discriminant)) / a;
+  return t >= 0 && t <= 1 ? t : null;
+}

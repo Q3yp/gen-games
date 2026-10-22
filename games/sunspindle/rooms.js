@@ -4,7 +4,7 @@ import { distance } from './physics.js';
 
 const localFields = ['room', 'roomName', 'roomKey', 'presentation', 'objective', 'entry', 'exit',
   'player', 'orb', 'enemies', 'props', 'shots', 'particles', 'rings', 'clock',
-  'cleared', 'exitReady', 'exitAsked', 'awaitingHost'];
+  'cleared', 'exitReady', 'exitAsked', 'awaitingHost', 'exitOnClear', 'finishAtExit', 'clearNotice', 'endNotice'];
 
 function enter(s, room, stageId = null) {
   const from = s.room;
@@ -16,7 +16,7 @@ function enter(s, room, stageId = null) {
     brokenProps: s.props.filter(p => p.hp <= 0).map(p => p.id) };
   s.rooms ||= {}; s.departures ||= {};
   s.rooms[String(from)] = snapshot; s.departures[String(from)] = departure;
-  Object.assign(s, destination);
+  Object.assign(s, { exitOnClear: false, finishAtExit: false, clearNotice: null, endNotice: null }, destination);
   // Carry the actual player's latest condition, never a health value frozen at staging.
   Object.assign(s.player, { ...s.entry, angle: 0, grace: 1.8, flash: 0, trail: [] });
   Object.assign(s.orb, { x: s.entry.x + 29, y: s.entry.y, vx: 0, vy: 0, mode: 'held', distanceLeft: 0, hits: [], trail: [] });
