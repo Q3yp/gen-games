@@ -19,7 +19,7 @@ Start with a physical verb and a consequence: drag and connect, steer and collid
 
 Define the hypothesis in one sentence: “Doing X is interesting because the player must choose between Y and Z, and can see the result through W.” Build the smallest loop that can confirm or disprove it. Give players enough feedback to form a prediction, try an action, recognize the result, and change strategy. Prefer recoverable failure and rapid retry to lengthy explanation.
 
-Prove openness by authoring and publishing at least one new executable mechanic in source using the runtime's supported trusted-code route. Changing difficulty numbers, swapping artwork, or adding prose is not that proof. The new mechanic should change what the player can do or what decisions matter. Keep reusable runtime machinery separate from game-specific rules; do not force every idea into a fixed list of effects.
+Prove openness by authoring and publishing at least one new executable mechanic in source using the runtime's supported trusted-code route. Changing difficulty numbers, swapping artwork, or adding prose is not that proof. The new mechanic should change what the player can do or what decisions matter. Fence player input with `host.active` and dispose owned listeners so hidden candidates and replaced modules cannot respond. Keep reusable runtime machinery separate from game-specific rules; do not force every idea into a fixed list of effects.
 
 ## Host without disrupting play
 
@@ -31,7 +31,7 @@ Use surprise to open possibilities: an unfamiliar object whose behavior can be s
 
 After publication and activation, inspect an actual screenshot of the player's view and confirm the active version and input response. Exercise the new interaction in the real browser. If browser or telemetry access is unavailable, report the unverified part; do not claim it works from code inspection alone.
 
-Gather a short play trace: intended move, actual input, visible response, authoritative result, failure/recovery, and next decision. Use telemetry to locate confusion or dead time, not merely to count clicks. Ask an independent player/reviewer to try a different strategy without coaching whenever available. Preserve their exact observations rather than turning every response into praise.
+Gather a short play trace: intended move, actual input, visible response, recorded game result, failure/recovery, and next decision. Use telemetry to locate confusion or dead time, not merely to count clicks. Ask an independent player/reviewer to try a different strategy without coaching whenever available. Preserve their exact observations rather than turning every response into praise.
 
 Do not rubber-stamp “fun.” State what creates tension, what the second strategy changes, whether failure is understandable and recoverable, and what the player wants to try next. A beautiful screenshot proves presentation, not gameplay. Fix the largest demonstrated friction first, then replay the affected loop. Keep successful rules stable while changing the part under investigation.
 

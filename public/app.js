@@ -83,9 +83,11 @@ async function init() {
     const [games, sessions] = await Promise.all([request('/api/games'), request('/api/sessions')]);
     state.games = games.games || []; state.sessions = sessions.sessions || []; renderSelectors();
     if (!state.games.length) { connection('No worlds installed'); $('#standard-renderer').innerHTML = '<div class="stage-empty"><h3>No game packs found</h3><p>Add a game pack to the games directory and restart the runtime.</p></div>'; return; }
-    const saved = state.sessions.find(session => session.id === savedSession.get());
-    const latest = [...state.sessions].sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];
-    if (saved || latest) await loadSession((saved || latest).id); else await createSession(state.games[0].id);
+    const saved = state.sessions.find(session => session.id === savedSession.get() && state.games.some(pack => pack.id === session.gameId));
+    const firstWorld = state.games.find(pack => pack.id === 'lumen-weave') || state.games.find(pack => pack.runtime === 'code') || state.games[0];
+    const latest = state.sessions.filter(session => session.gameId === firstWorld.id).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];
+    // Remembered play wins; a fresh browser enters the primary game, not a legacy pack.
+    if (saved || latest) await loadSession((saved || latest).id); else await createSession(firstWorld.id);
   } catch (error) {
     connection('Runtime unavailable'); notify(`Could not open the world. ${error.message} Check that the local server is running, then reload.`, false, true);
     $('#standard-renderer').innerHTML = '<div class="stage-empty"><h3>The world is offline</h3><p>Your saved runs are safe on the server. Reconnect the runtime and reload this page.</p><button class="button" id="retry-start">Try again</button></div>';

@@ -65,12 +65,17 @@ The code-pack manifest declares `runtime: "code"`, an `entry` such as
 `"./main.js"`, `saveVersion: 1`, and an arbitrary JSON `initial` save. The entry
 exports `create(host, {save, release, previousRelease})` as its default factory.
 Its return value requires `serialize()` and `dispose()`; optional hooks are
-`step(dtSeconds)`, `render(alpha)`, `inspect(query?)`, and `command(name, args)`.
+`step(dtSeconds)`, `render()`, `inspect()`, and `command(name, args)`.
 The game owns canvas/WebGL/DOM and input listeners. Dispose listeners, animation
 resources, and other owned state when the runtime replaces the module.
 
-The host provides `root`, `emit(type, text, data)`, `asset(path)`, and
-`checkpoint(reason)`. Keep summary/event payloads under the discovered limits
+The host provides `root`, read-only `active`, `emit(type, text, data)`,
+`asset(path)`, `checkpoint()`, `requestSave()`, and `notify(text)`. Guard every
+player input handler with `host.active`: hidden candidates, replaced instances,
+paused/faulted runtimes, and open shell dialogs must not accept gameplay input.
+A game-owned tinker mode can still permit edits because it is not a host fault.
+Do not use the active check to skip candidate construction, serialization, or its
+initial render. Dispose owned listeners even though input is fenced. Keep summary/event payloads under the discovered limits
 (current summary budget: 12 KB). Use game-specific event types rather than the
 reserved `runtime.*` and `state.changed` names. Keep `inspect()` concise and useful for decisions, rather
 than dumping frame state. Emit meaningful events such as a failed attempt,
@@ -128,7 +133,7 @@ module published, browser loaded, and gameplay exercised are different milestone
 
 A successful publication response is not sufficient. Confirm the requested
 version is active, inspect a fresh screenshot, and use the new mechanic through
-real player controls. Observe the authoritative result. If publication fails,
+real player controls. Correlate the visible result with the latest game summary/events. If publication fails,
 retain the last working view and report the exact failed step. Do not claim the
 last-good view is the new build.
 

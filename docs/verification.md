@@ -2,11 +2,76 @@
 
 Verification date: 2026-10-22. No test suite or test files were created, per the project request. The checks below were performed against real running code; syntax checks are listed separately from gameplay.
 
-## Runtime and tool execution
+## Code canvas runtime and actual browser play
+
+A later iteration replaced the primary game path with browser-owned code modules.
+Evidence below was reported by the primary browser player and the implementation
+lead who played separately. The documentation reviewer inspected actual victory
+screenshots, but did not independently operate these runs. This attribution
+matters: visual review, player reports, and execution records are distinct evidence.
+
+- The primary player completed six real browser wins: baseline drifts 1 and 2;
+  Prism drift 3; Prism drift 4 using an 11-adjustment, three-mirror/two-fork route;
+  a same-constellation replay using five adjustments and no forks; and the optional
+  Lantern Trial in seven adjustments.
+- The baseline runs took 13 rotations/46 seconds and 12 rotations/62 seconds
+  respectively. Neither required moving a mirror. They established immediate,
+  legible cause/effect but failed the desired strategy-depth bar. Tinker pauses
+  were used while planning and during tool waits, so times are not a speed benchmark.
+- A separate host authored a new Prism ESM mechanic in source and published it
+  through the guarded release route. The new goal required all three flowers
+  illuminated simultaneously for two seconds, instead of sequentially charging
+  each once. Source publication and browser activation were checked during play.
+- The implementation lead separately reported Prism wins in seven adjustments
+  with two forks and four adjustments with a focused, zero-fork chain. Together
+  with the primary player's 11-to-five replay, this is concrete evidence of
+  alternative strategies and an optimization loop, not proof of long-term retention.
+- The optional Lantern Trial introduced distinct absorbing receivers requiring
+  at least 20% light simultaneously. The lead completed it in eight adjustments,
+  deliberately over-split a ray to observe 12% and `TOO FAINT`, then used Undo to
+  recover 24%. The primary player separately completed it in seven adjustments.
+- In the lead's session a deliberately invalid published candidate produced
+  `ui.failed` at event 249. The prior animated game and its Show result control
+  remained usable. Restored healthy source produced `runtime.activated` at 251
+  and `ui.recovered` at 252. Temporary broken source was removed.
+- The visual reviewer inspected first-win, alternate-circuit, focused-chain,
+  and Lantern victory screenshots. Revisions kept the earned garden sharp after
+  victory, reduced the result overlay, distinguished decorative constellation
+  links, and showed receiver power/thresholds directly in the scene.
+
+A 35-second silent recording assembled from actual browser captures shows the
+mechanics; thinking gaps were removed. It is an edited demonstration, not an
+uninterrupted timed trial. Captures and local play databases are not bundled as
+source assets. The narrative record is in [playthrough](playthrough.md).
+
+The final source-formatting checkpoint at `9d612af` was reported by the primary
+agent as passing syntax checks for 52 JavaScript modules and all three packs.
+This is a reported static check, not a claim that the documentation reviewer
+independently executed it.
+
+The primary player subsequently stopped and restarted the Node host at 04:09:29
+UTC, then reloaded the browser. Lantern drift 5 restored the correct circuit
+geometry, four of four receivers lit, the completed two-second chord, seven
+adjustments, and personal best seven, without a reload lease error. The readable
+module release `a2ad4fef2ef127eb27f1f2cc` had already been activated in the recorded
+254/255 activation/recovery sequence. Separately, the lead replayed Lantern after
+formatting in ten adjustments; the previous personal best of eight remained
+unchanged. Two extra adjustments deliberately exercised that record behavior.
+
+### What this establishes, and what it does not
+
+Observed: direct canvas interaction, executable mechanic extension, activation
+feedback, different successful topologies, a deliberate failure/recovery loop,
+and a visible new receiver rule that changes planning. The repeated same-puzzle
+improvement supplies a credible reason to try again. It does not establish a
+mature campaign, broad audience enjoyment, addiction, exhaustive puzzle solvability,
+long-term replay value, mobile usability, or a full accessibility/security audit.
+
+## Earlier legacy runtime and tool execution
 
 Manual HTTP sessions, CLI processes, and MCP stdio calls exercised:
 
-- Discover both installed packs and action-specific argument schemas.
+- Discover the two legacy packs and action-specific argument schemas.
 - Create/open saved sessions with deterministic uint32 seeds.
 - Player/agent actions, revision advancement, targeted entity/path inspection, and atomic authoring.
 - Identical action retry returning the original result without executing again, including after closing/reopening the server database.
@@ -54,7 +119,7 @@ A narrative account of the actual improvised story and which content remains tra
 
 ## Static checks
 
-The final `npm run check` passed for all 36 JavaScript modules and both source packs (10 and 9 registered actions). It parses every JavaScript module with `node --check`, then loads all packs to validate required world shape, plugin dependencies, and action registration. This unbundled JavaScript project has no transpilation/build step and no TypeScript typecheck. Passing syntax and pack loading is not a claim of exhaustive gameplay correctness.
+The earlier legacy-build `npm run check` passed for all 36 JavaScript modules and both source packs (10 and 9 registered actions). It parses every JavaScript module with `node --check`, then loads all packs to validate required world shape, plugin dependencies, and action registration. This unbundled JavaScript project has no transpilation/build step and no TypeScript typecheck. Passing syntax and pack loading is not a claim of exhaustive gameplay correctness.
 
 ## Known coverage limits
 

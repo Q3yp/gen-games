@@ -1,8 +1,27 @@
 # Agent tools: CLI and MCP
 
-The browser, CLI, and MCP bridge use one authoritative running HTTP server. Neither
-adapter owns a second world, evaluates agent-supplied code, or retries mutations.
-Node 24 or newer is required; no third-party packages are needed.
+The browser, CLI, and MCP bridge share one running HTTP coordination server.
+For code packs the browser owns frame simulation and the server records releases,
+activation, coarse saves, command results, and semantic events. For legacy packs
+the server remains the authoritative structured-world simulation. Node 24 or newer
+is required; no third-party packages are needed.
+
+## Primary code-game workflow
+
+There are ten tools: `discover`, `session`, `observe`, `inspect`, `publish`,
+`command`, `checkpoint`, plus legacy `act`, `author`, and `jobs`. Use
+[the host playbook](host-playbook.md) for the source/publish/activate loop and
+[the architecture](architecture.md) for ownership and persistence boundaries.
+`publish` is guarded by the observed `runtime.release`; `command` targets the
+observed `runtime.activeRelease`. Both return pending delivery, not completed
+execution. Confirm `runtime.activated` or `runtime.command.result` and inspect
+the browser before reporting success. `inspect` scopes `runtime`, `summary`,
+and `commands` expose coordination metadata and bounded snapshots, not live
+simulation frame access.
+
+The structured actions, authoring, and jobs examples below apply to legacy packs.
+Session, observation, checkpoint, and transport conventions remain shared where
+the discovered tool schema supports the selected runtime.
 
 ## Start and discover
 
@@ -217,7 +236,7 @@ absolute path to the bridge. Typical client configuration:
 
 The exact enclosing configuration location is MCP-client-specific. The bridge
 supports `initialize`, `notifications/initialized`, `ping`, `tools/list`,
-`tools/call`, and `notifications/cancelled`. Its eight tools map directly to the HTTP
+`tools/call`, and `notifications/cancelled`. Its ten tools map directly to the HTTP
 `POST /api/tools` endpoint with `{ "tool": "NAME", "args": {} }`. Tool schemas are
 available without a live HTTP server; tool execution requires it.
 

@@ -1,6 +1,18 @@
 # Authoring worlds, systems, and coded UI
 
-The engine exposes two deliberately separate layers:
+## Primary path: code games
+
+For new open-ended games, use the code-runtime factory and publish workflow in
+[the host playbook](host-playbook.md). A game owns its arbitrary JSON save,
+canvas/DOM, input, and mechanics; its source tree is published as an immutable
+release. This path is not constrained by the entity/scene/effect schema below.
+Use `host.active` to fence input, preserve saves during replacement, and confirm
+browser activation after publishing. These modules are trusted local code.
+
+## Optional legacy structured-world path
+
+The remaining guide documents the legacy pack/plugin/UI contract used by Ember
+Vault and Signal House. In this compatibility path the engine exposes two layers:
 
 - **Pack source:** editable JSON, JavaScript, and media under `games/<id>`. Restart the server after changing pack/server-plugin source. New sessions start from the edited pack.
 - **Running world:** a session's independent state in SQLite. Agent `author` operations change it live, atomically, without rewriting the source pack. Existing sessions do not silently reset when source changes.

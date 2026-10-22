@@ -9,7 +9,8 @@ choices, stats, or predefined effects. The server is the durable coordination
 boundary, not the authority for every simulated frame.
 
 The browser host calls optional simulation/render hooks and required serialization
-and disposal hooks. It submits coarse saves, bounded game-defined inspection
+and disposal hooks. Game input handlers must check `host.active` to reject input
+to inactive candidates, replaced modules, paused/faulted hosts, or open dialogs. It submits coarse saves, bounded game-defined inspection
 summaries, and meaningful events. `session.state` is the latest durable save;
 `runtime.summary` is a saved inspection snapshot. Neither is necessarily current
 to the displayed frame. Use events and actual browser inspection to establish

@@ -1,4 +1,74 @@
-# A player and a live director played together
+# Actual play: from narrative director to code canvas
+
+## Lumen Weave: a different game, not a prettier chat
+
+On 2026-10-22 the primary browser player and an implementation lead separately
+played the new canvas prototype. The account here attributes their direct reports;
+the documentation reviewer inspected actual screenshots, not the inputs firsthand.
+
+The first version was a pleasing optical toy: rotate a shard and see the beam
+change immediately; hold it on a seed and watch it bloom. The primary player won
+the first two drifts with 13 and 12 rotations, without moving a mirror. A new stone
+changed the view but did not force a different plan. The honest conclusion was
+“responsive and attractive, but not enough strategy,” so iteration continued.
+
+An independent host then wrote and published a new executable Prism mechanic.
+A selected shard could split light into a straight and reflected branch, while
+the goal changed to illuminating all three transparent flowers together for two
+seconds. This made the circuit, not the order of three clicks, the object of play.
+The player completed a first Prism drift and then built an 11-adjustment network
+with three mirrors and two forks on another constellation.
+
+The same constellation invited a cleaner route. On retry the player instead
+threaded a focused beam through the transparent flowers, winning in five
+adjustments with no forks. The lead independently reported a seven-adjustment
+forked solution and a four-adjustment focused chain. These were different
+successful topologies, not merely different captions or reduced waiting. The
+focused solution was preserved as valid mastery rather than patched away.
+
+Next, the player opted into a distinct Lantern Trial. Lanterns absorb rather than
+pass light onward, and each needs at least 20% power. The familiar focused-chain
+strategy therefore remains valid for flowers but does not solve this new material.
+The primary player built a balanced circuit and won in seven adjustments. The
+lead separately won in eight, deliberately made a branch too faint at 12%, saw
+the explicit warning, and used Undo to restore 24%. That supplied a concrete
+prediction, failure, explanation, and recovery loop.
+
+### Presentation changes driven by these runs
+
+The first victory modal blurred and obscured the garden the player had just made.
+It became a small result plaque; the earned circuit stays sharp and can still be
+inspected and manipulated. Decorative constellation links were distinguished from
+powered beams. Lanterns received different silhouettes, power labels, threshold
+rings, and explicit faint/bright states. Menus and Studio remain secondary to the
+full-viewport world and direct controls.
+
+A deliberately bad code release also exercised the actual fallback: the lead's
+old animated world and Show result control kept working, while failure and later
+healthy activation/recovery appeared in the observation feed. This was a real
+browser exercise, not merely a mocked tool result.
+
+### Current verdict
+
+There is now evidence for a playable optical sandbox and a small replay loop:
+learn a rule, build a circuit, discover a different topology, and improve the
+same puzzle. The host demonstrated changing executable mechanics rather than
+only supplying narration. The Lantern Trial adds a meaningful new constraint.
+This is still a short prototype, not evidence of a mature progression system or
+lasting enjoyment across many players. The 35-second silent demo uses actual
+browser capture with thinking gaps removed; it is not a continuous speedrun.
+
+After the final readable module release, the primary player restarted the Node
+host and reloaded the browser. The completed Lantern circuit, four lit receivers,
+seven-adjustment result, and personal best all returned without a lease error.
+The lead separately replayed after formatting and confirmed a slower completion
+did not overwrite the better record.
+
+Source mechanics and reusable fixes belong in the repository. Individual saves,
+telemetry, and capture media remain local artifacts unless separately delivered.
+See [verification](verification.md) for exact reported run counts and limitations.
+
+## Earlier legacy experiment: Signal House
 
 On 2026-10-22, a browser player and a separate coding-agent GM shared one real Signal House session. The GM used the documented CLI/tool surface, not implementation source. This was improvised play against the running server, not a prerecorded dialogue or a mocked tool response.
 

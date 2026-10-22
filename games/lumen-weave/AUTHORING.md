@@ -78,3 +78,20 @@ per-flower feedback, fork markings and earned aurora. The small example hook
 inspectable as `prism: { enabled, chord, lit, complete }`, and the existing
 manipulation events include each shard's fork state. These hooks are pack code,
 not additions to the runtime's host command vocabulary.
+
+## Next material: Lantern Trial
+
+The player can explicitly choose Lantern Trial after learning transparent flowers.
+`mechanics/lantern.js` constructs four distinctly drawn absorbing receivers. Each
+requires 20% source intensity, so the third half-power split in a serial chain is
+too dim, while a balanced two-level tree delivers approximately 24% to each leaf.
+The existing three manipulable mirrors suffice. Two shadowstones constrain routes.
+The new requirement is shown before the player starts; ordinary Prism flowers
+retain their transparent behavior and 9% threshold.
+
+Seeded layouts vary within authored clear branch corridors, rather than placing
+unvalidated random blockers across required paths. Shards begin unassembled. There
+is no host solve command, auto-arrangement, inferred success or generated score;
+the browser must trace an actual valid four-way circuit for two seconds. Receiver
+`kind: 'lantern'` controls absorption and `requiredPower: .20` controls the visible
+brightness requirement. Retry and next drift retain the chosen material mode.
