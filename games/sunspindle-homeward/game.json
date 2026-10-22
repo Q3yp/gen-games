@@ -1,0 +1,10 @@
+{
+  "id": "sunspindle-homeward",
+  "title": "Sunspindle: Homeward",
+  "description": "A complete journey with a sun on a thread. Bring the stolen bird home.",
+  "version": "0.1.0",
+  "runtime": "code",
+  "entry": "./main.js",
+  "saveVersion": 1,
+  "initial": {}
+}

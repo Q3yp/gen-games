@@ -1,6 +1,7 @@
 import { requireValue as check } from './errors.js';
+import { isRecord } from './schema-validation.js';
+export { isRecord, validateSchema } from './schema-validation.js';
 const forbidden = new Set(['__proto__', 'prototype', 'constructor']);
-export const isRecord = value => !!value && typeof value === 'object' && !Array.isArray(value);
 export function safePath(path) {
   check(Array.isArray(path) && path.length > 0 && path.length <= 20 && path.every(key =>
     typeof key === 'string' && key.length > 0 && key.length < 160 && !forbidden.has(key)),
@@ -50,22 +51,6 @@ export function validateEnvelope(input) {
   check(isRecord(input), 'INVALID_REQUEST', 'Arguments must be an object.');
   check(typeof input.requestId === 'string' && /^[\w.:-]{1,120}$/.test(input.requestId), 'REQUEST_ID_REQUIRED', 'A unique requestId is required for every mutation.', 'Reuse the same requestId only when retrying the exact same operation.');
 }
-export function validateSchema(args, schema) {
-  if (!schema) return;
-  if (schema.additionalProperties === false) for (const key of Object.keys(args)) check(Object.hasOwn(schema.properties || {}, key), 'UNKNOWN_ARGUMENT', `Unknown argument: ${key}.`, 'Use discover to inspect the action schema.');
-  for (const key of schema.required || []) check(args[key] !== undefined, 'MISSING_ARGUMENT', `Required argument: ${key}.`);
-  for (const [key, rule] of Object.entries(schema.properties || {})) {
-    if (args[key] === undefined) continue;
-    const value = args[key], valid = rule.type === 'integer' ? Number.isInteger(value) : rule.type === 'array' ? Array.isArray(value) : rule.type === 'object' ? isRecord(value) : !rule.type || typeof value === rule.type;
-    check(valid, 'INVALID_ARGUMENT', `${key} must be ${rule.type}.`);
-    if (rule.enum) check(rule.enum.includes(value), 'INVALID_ARGUMENT', `${key} must be one of ${rule.enum.join(', ')}.`);
-    if (rule.minimum !== undefined) check(value >= rule.minimum, 'INVALID_ARGUMENT', `${key} must be at least ${rule.minimum}.`);
-    if (rule.maximum !== undefined) check(value <= rule.maximum, 'INVALID_ARGUMENT', `${key} must be at most ${rule.maximum}.`);
-    if (rule.minLength) check(value.length >= rule.minLength, 'INVALID_ARGUMENT', `${key} is too short.`);
-    if (rule.maxLength) check(value.length <= rule.maxLength, 'INVALID_ARGUMENT', `${key} is too long.`);
-  }
-}
-
 /** Code games own their save schema. The engine only bounds JSON persistence. */
 export function validateJSONState(state) {
   check(isRecord(state), 'INVALID_STATE', 'A code-game save must be a JSON object.');

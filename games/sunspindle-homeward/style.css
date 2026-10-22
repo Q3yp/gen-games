@@ -1,0 +1,11 @@
+.ss { position:relative;width:100%;height:100%;min-height:560px;overflow:hidden;background:#292541;color:#fff0c4;font-family:Georgia,serif; }
+.ss canvas {position:absolute;inset:0;width:100%;height:100%;outline:none;touch-action:none;cursor:crosshair;}
+.ss-title {position:absolute;left:28px;top:22px;font:12px Georgia,serif;letter-spacing:.35em;color:#574354bb;pointer-events:none;}
+.ss-health {position:absolute;left:28px;top:48px;color:#a33f32;font:14px system-ui;letter-spacing:.25em;pointer-events:none;}
+.ss-controls {position:absolute;bottom:18px;width:100%;text-align:center;color:#574354;font:11px system-ui;letter-spacing:.04em;pointer-events:none;}
+.ss-notice {position:absolute;bottom:48px;left:20%;width:60%;text-align:center;font:16px Georgia,serif;color:#513746;text-shadow:0 1px 4px #fff0c9;pointer-events:none;}
+.code-game #play-surface {height:100vh !important;min-height:560px;}
+.code-game .play-heading {display:none !important;}
+
+.ss[data-palette='moon'] .ss-title {color:#dcebf3bb;}
+.ss[data-palette='moon'] .ss-health {color:#ffe2ae;}

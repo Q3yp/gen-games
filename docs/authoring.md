@@ -134,7 +134,7 @@ export default {
 };
 ```
 
-The context provides mutable transaction draft `state`, draft `session`, selected `actor`, `emit(type,text,data?)`, deterministic `random()`, and `require(condition,code,message,hint?)`. Handler descriptions and argument schemas appear through `discover`. The built-in validator supports top-level required/properties, primitive/array/object types, enums, numeric bounds, string-length bounds, and additionalProperties:false. It is not a complete JSON Schema implementation; validate nested game-specific values in the handler using `require`. Invalid named arguments fail with specific errors.
+The context provides mutable transaction draft `state`, draft `session`, selected `actor`, `emit(type,text,data?)`, deterministic `random()`, and `require(condition,code,message,hint?)`. Handler descriptions and argument schemas appear through `discover`. The built-in validator supports the same [recursive schema subset as code capabilities](live-runtime.md#optional-game-hooks), including nullable type unions, `anyOf`, nested object properties and array items. It is not a complete JSON Schema implementation; enforce game-specific invariants in the handler using `require`. Invalid arguments fail with path-specific errors.
 
 Handlers must be synchronous and free of external side effects. Throw to reject the whole transaction. Do not perform network calls, write files, start subprocesses, or launch model turns inside `run`/`tick`: rollback cannot undo them. Use the jobs boundary for slow work.
 

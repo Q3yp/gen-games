@@ -1,0 +1,76 @@
+import { palace, exitArch, foreground } from './paint-palace.js';
+import { threadmill } from './paint-threadmill.js';
+import { blastCourt } from './paint-blast-court.js';
+import { blastJar, sunbolt } from './paint-artillery.js';
+import { rainBalcony, stoneScreen } from './paint-rain-balcony.js';
+import { crownGarden, gardenArrival } from './paint-crown-garden.js';
+import { crownWarden, crownTelegraph } from './paint-crown-warden.js';
+import { rainbolt } from './paint-rain-combat.js';
+import { courier, enemy, telegraph, crystal, weight } from './paint-figures.js';
+import { arrow, effects, ambience, pointer } from './paint-effects.js';
+
+export function paint(c, s, view) {
+  const w = view.width,
+    h = view.height,
+    scale = Math.min(w / 1200, h / 800),
+    ox = (w - 1200 * scale) / 2,
+    oy = (h - 800 * scale) / 2,
+    t = Number(s.clock ?? view.time ?? 0);
+  c.save();
+  c.clearRect(0, 0, w, h);
+  c.fillStyle = ['rain-balcony', 'crown-garden'].includes(s.presentation) ? '#162f54' : '#dfbf91';
+  c.fillRect(0, 0, w, h);
+  c.translate(ox, oy);
+  c.scale(scale, scale);
+  c.beginPath();
+  c.rect(0, 0, 1200, 800);
+  c.clip();
+  if (s.shake > 0) {
+    const k = Math.min(7, s.shake * 30);
+    c.translate(Math.sin(t * 137) * k, Math.cos(t * 117) * k * 0.6);
+  }
+  const presentation = s.presentation || (s.room === 2 ? 'threadmill' : 'courtyard');
+  if (presentation === 'crown-garden') crownGarden(c, s, t);
+  else if (presentation === 'rain-balcony') rainBalcony(c, s, t);
+  else if (presentation === 'glassworks') blastCourt(c, s, t);
+  else palace(c, s, t);
+  if (presentation !== 'crown-garden') exitArch(c, s, t);
+  if (presentation === 'threadmill') threadmill(c, s, t);
+  for (const e of s.enemies || []) {
+    if (e.kind === 'crown-warden') crownTelegraph(c, e, t);
+    else telegraph(c, e);
+  }
+  // Ground-position sorting keeps characters and the hanging prism overlapping naturally.
+  const entities = [
+    ...(s.enemies || []).map(value => ({ type: 'enemy', value })),
+    ...(s.props || []).map(value => ({ type: 'prop', value }))
+  ];
+  if (s.player) entities.push({ type: 'player', value: s.player });
+  entities.sort((a, b) => a.value.y - b.value.y);
+  for (const e of entities) {
+    if (e.type === 'player') courier(c, e.value, t);
+    else if (e.type === 'enemy') {
+      if (e.value.kind === 'crown-warden') crownWarden(c, e.value, t);
+      else enemy(c, e.value, t);
+    }
+    else if (e.value.kind === 'crystal') crystal(c, e.value, s, t);
+    else if (e.value.kind === 'blastjar') blastJar(c, e.value, t);
+    else if (e.value.kind === 'stone-screen') stoneScreen(c, e.value, t);
+  }
+  for (const a of s.shots || []) {
+    if (a.kind === 'rainbolt') rainbolt(c, a, t);
+    else if (a.kind === 'shell') sunbolt(c, a);
+    else arrow(c, a);
+  }
+  weight(c, s, t);
+  effects(c, s);
+  ambience(c, s, t);
+  pointer(c, s, view.pointer, t);
+  if (!['rain-balcony', 'crown-garden'].includes(presentation)) foreground(c, t);
+  if (presentation === 'crown-garden') gardenArrival(c, s, t);
+  // A thin inner ink edge unifies the scene without a panel, HUD, or vignette.
+  c.strokeStyle = '#6a584f30';
+  c.lineWidth = 1;
+  c.strokeRect(10.5, 10.5, 1179, 779);
+  c.restore();
+}

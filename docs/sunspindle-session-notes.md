@@ -159,3 +159,28 @@ A disposable direct initialization/step check exercised the exact exported balco
 save, entered the garden while paused, preserved two health, then repeated
 initialization without replacing progress. The archive was extracted and rehashed
 to its exact release ID. These are lifecycle and preservation checks, not fun claims.
+
+## Crown ending and voluntary complete replay
+
+The player defeated the warden at 4/5 health and saw the bird settle in its nest.
+They judged that ending readable. A planted-weight experiment ended with a blue
+reflected shot on recall, but they explicitly could not determine whether a
+stationary weight would have reflected it. Do not claim an unobserved interaction.
+They still wanted to experiment with the weapon and voluntarily requested a fresh,
+complete, uninterrupted rescue-to-home journey, with no live changes or host help.
+They also reported inert circling during the boss and found repeated ordinary
+hits less interesting than reflections. This was not a whole-run success verdict.
+
+The exact paused garden ending and actual player screenshot are preserved.
+A separate `sunspindle-homeward` source workspace begins before the rescue and
+contains the full route and actual ending before its player starts. It omits the
+rejected Threadmill and reduces only crown post-attack recovery from 2.6 to 1.6
+seconds; telegraphs, health and controls are unchanged. Source is frozen at
+`2ec34aa92b754f49f16d6a17` throughout independent play. Native-window passive capture
+was verified against the exact fresh session URL and 5/5 opening court.
+
+The earlier nullable command-schema failure also exposed an engine validator gap.
+A shared supported-subset validator now handles nullable type arrays, anyOf and
+nested field/item paths; documentation explicitly does not claim full JSON Schema.
+Direct function checks and pack/syntax validation passed. Like the scaffold and
+compact-text changes, this is not yet loaded into the active player server.

@@ -30,9 +30,16 @@ return {
 
 Versions are arbitrary game-defined string or finite-number tokens. Increment them
 when the relevant meaning changes, not necessarily on every rendered frame.
-Capability schemas currently support the runtime's simple object-property validator
-(types, required, enum, bounds, lengths, additionalProperties); this is not a full
-JSON Schema implementation. Games must enforce nested invariants themselves.
+Capability and action schemas support a small recursive subset: `type` (including
+`null`, finite `number`/`integer`, and unions such as `['string', 'null']`), `anyOf`,
+primitive `enum`, `minimum`/`maximum`, string `minLength`/`maxLength`, object
+`properties`/`required`/`additionalProperties: false`, and array `items` (one schema)
+plus `minItems`/`maxItems`. `anyOf` requires at least one matching option and does
+not replace sibling constraints. Bounds apply only to numbers, lengths only to
+strings/arrays; nullable values skip incompatible constraints. Errors identify
+nested paths such as `enemies[0].kind`. This is not full JSON Schema: other keywords
+(including `$ref`, `oneOf`, and `pattern`) are ignored. Games must still enforce
+game-specific invariants in their handlers.
 
 `host.emit(type, text, data)` returns a correlation ID and queues a bounded,
 immediate semantic event, independently of the coarse save timer. Data and projection

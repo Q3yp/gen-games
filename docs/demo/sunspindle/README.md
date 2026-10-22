@@ -89,3 +89,9 @@ handoff iteration, SHA-256:
 `a247308b5e980bb7482117335cdf18f7b87ace688ecc4717133b9b8a4c640853`.
 The player confirmed normal rejoin into the garden with the same two health.
 This source is not a finished-playthrough demo; the concluding verdict is pending.
+
+`crown-garden-home-save.json` preserves the actual paused garden ending at 4/5
+health, on source `107c2207429abd06136db8d0`. `crown-garden-home.png` is the
+independent player's own ending screenshot, not a host recreation. The player
+found the ending readable and voluntarily requested an uninterrupted full journey;
+the preceding gate delay and inert portions of the fight remain recorded failures.
