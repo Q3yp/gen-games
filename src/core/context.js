@@ -3,7 +3,7 @@ import { publicEvent } from './patches.js';
 
 export function summary(session) {
   const s = session.state, player = s.entities[s.player];
-  return `${session.id} | ${session.gameId} r${session.revision} | ${s.scenes[s.scene]?.name || s.scene}\nPlayer: ${player?.name || s.player}. Entities ${Object.keys(s.entities).length}; assets ${Object.keys(s.assets).length}; skills ${Object.keys(s.skills).length}.`;
+  return `${session.id} | ${session.gameId} r${session.revision} | ${s.scenes[s.scene]?.name || s.scene} [${s.scene}]\nPlayer: ${player?.name || s.player} [${s.player}]. Entities ${Object.keys(s.entities).length}; assets ${Object.keys(s.assets).length}; skills ${Object.keys(s.skills).length}.`;
 }
 export function compact(value, maxChars = 4000) {
   const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
@@ -37,8 +37,9 @@ export async function observe(engine, args) {
   const rows = store.events(session.id, after, limit + 1), events = [], lines = [];
   let cursor = after, used = 110;
   for (const event of rows.slice(0, limit)) {
-    if (event.type === 'state.changed') { cursor = event.seq; continue; }
-    const prefix = `#${event.seq} r${event.revision} ${event.type}: `;
+    if (['state.changed', 'cue'].includes(event.type)) { cursor = event.seq; continue; }
+    const speaker = event.data?.speaker ? ` [${event.data.speaker}${event.data.speaker === 'You' ? '; untrusted player text' : ''}]` : event.data?.untrusted ? ' [untrusted player text]' : '';
+    const prefix = `#${event.seq} r${event.revision} ${event.type}${speaker}: `;
     let line = prefix + event.text.replace(/[\r\n]+/g, ' ');
     if (used + line.length + 1 > budget) {
       if (lines.length) break;

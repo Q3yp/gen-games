@@ -40,6 +40,10 @@ export function validateState(state) {
     const stats = entity.components.stats;
     if (stats) for (const [name, value] of Object.entries(stats)) check(typeof value !== 'number' || Number.isFinite(value), 'INVALID_STAT', `${id}.${name} must be finite.`);
   }
+  for (const [id, asset] of Object.entries(state.assets)) {
+    const source = typeof asset === 'string' ? asset : asset?.src;
+    check(typeof source === 'string' && (/^\/games\/[^\\]*$/.test(source) || /^https:\/\//i.test(source) || /^data:image\/(png|jpeg|gif|webp|avif|svg\+xml)[;,]/i.test(source)), 'UNSUPPORTED_ASSET_URL', `Asset ${id} needs a supported src URL.`, 'Use /games/<pack>/assets/<file>, an HTTPS URL, or an image data URI (including SVG).');
+  }
   check(Buffer.byteLength(JSON.stringify(state)) <= 2_000_000, 'STATE_TOO_LARGE', 'State exceeds the 2 MB local-runtime limit.', 'Keep media in asset files, not inline game state.');
 }
 export function validateEnvelope(input) {
@@ -48,6 +52,7 @@ export function validateEnvelope(input) {
 }
 export function validateSchema(args, schema) {
   if (!schema) return;
+  if (schema.additionalProperties === false) for (const key of Object.keys(args)) check(Object.hasOwn(schema.properties || {}, key), 'UNKNOWN_ARGUMENT', `Unknown argument: ${key}.`, 'Use discover to inspect the action schema.');
   for (const key of schema.required || []) check(args[key] !== undefined, 'MISSING_ARGUMENT', `Required argument: ${key}.`);
   for (const [key, rule] of Object.entries(schema.properties || {})) {
     if (args[key] === undefined) continue;
@@ -56,6 +61,7 @@ export function validateSchema(args, schema) {
     if (rule.enum) check(rule.enum.includes(value), 'INVALID_ARGUMENT', `${key} must be one of ${rule.enum.join(', ')}.`);
     if (rule.minimum !== undefined) check(value >= rule.minimum, 'INVALID_ARGUMENT', `${key} must be at least ${rule.minimum}.`);
     if (rule.maximum !== undefined) check(value <= rule.maximum, 'INVALID_ARGUMENT', `${key} must be at most ${rule.maximum}.`);
+    if (rule.minLength) check(value.length >= rule.minLength, 'INVALID_ARGUMENT', `${key} is too short.`);
     if (rule.maxLength) check(value.length <= rule.maxLength, 'INVALID_ARGUMENT', `${key} is too long.`);
   }
 }

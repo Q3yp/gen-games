@@ -75,6 +75,7 @@ export class Engine extends EventEmitter {
     }, { requireRevision: actor !== 'player', actor });
   }
   tick(deltaMs) {
+    if (![...this.games.values()].some(game => game.plugins.some(plugin => typeof plugin.tick === 'function'))) return;
     for (const original of this.store.sessions()) {
       const game = this.games.get(original.gameId); if (!game) continue;
       const hooks = game.plugins.filter(plugin => typeof plugin.tick === 'function'); if (!hooks.length) continue;

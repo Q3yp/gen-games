@@ -19,10 +19,11 @@
       <label class="select-field session-field"><span>SESSION</span><select id="session-select" aria-label="Select saved session"><option>No session</option></select></label>
       <button class="button new-session" id="new-session"><span aria-hidden="true">＋</span> New run</button>
     </div>
+    <button id="studio-toggle" class="button studio-toggle" aria-expanded="false" aria-controls="world-inspector"><span aria-hidden="true">{ }</span> Studio</button>
     <div class="connection" id="connection" role="status"><span class="status-dot"></span><span>Connecting</span></div>
   </header>
 
-  <main class="workspace">
+  <main class="workspace inspector-hidden">
     <aside class="player-rail" aria-label="Player tools">
       <div class="world-summary"><p class="eyebrow">YOUR EXPEDITION <span id="world-number">01</span></p><h1 id="world-title">A world awaits.</h1><p id="world-description">Connecting to your local game runtime.</p><span class="tag" id="world-version">LOCAL-FIRST · PERSISTENT</span></div>
       <section class="panel player-panel" aria-labelledby="player-heading"><div class="section-heading"><h2 id="player-heading">Character</h2><span class="tiny-label" id="player-role">PLAYER</span></div><div id="player-card" class="loading-block">Loading character…</div></section>
@@ -32,7 +33,7 @@
     </aside>
 
     <section class="play-column" aria-label="Game and actions">
-      <div class="scene-heading"><div><p class="eyebrow"><span class="live-spark" aria-hidden="true"></span> LIVE WORLD <span class="divider">/</span> <span id="scene-kind">EXPLORING</span></p><h2 id="scene-title">Preparing the scene</h2></div><button id="help-button" class="icon-button" title="Keyboard controls" aria-label="Show keyboard controls">?</button></div>
+      <div class="scene-heading"><div><p class="eyebrow"><span class="live-spark" aria-hidden="true"></span> LIVE WORLD <span class="divider">/</span> <span id="scene-kind">EXPLORING</span></p><h2 id="scene-title">Preparing the scene</h2></div><div class="scene-tools"><button id="reload-view" class="icon-button" title="Reload the custom game view from disk" aria-label="Reload custom game view" hidden>↻</button><button id="help-button" class="icon-button" title="Keyboard controls" aria-label="Show keyboard controls">?</button></div></div>
       <div id="notice" class="notice" role="status" hidden></div>
       <section id="play-surface" class="scene-stage" tabindex="0" aria-label="Interactive game world">
         <div class="stage-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -48,7 +49,7 @@
       <section class="event-panel" aria-labelledby="event-heading"><div class="section-heading"><h2 id="event-heading"><span class="event-symbol" aria-hidden="true">↳</span> World journal</h2><span id="event-count" class="tiny-label">LIVE EVENTS</span></div><ol id="event-list" class="event-list" aria-live="polite" aria-relevant="additions"><li class="empty-note">Your first move starts the journal.</li></ol></section>
     </section>
 
-    <aside class="inspector-rail" aria-label="World inspector">
+    <aside id="world-inspector" class="inspector-rail" aria-label="World inspector">
       <section class="director-card"><div class="director-top"><div class="director-icon" aria-hidden="true">✳</div><span class="tag mint">LIVE CONTEXT</span></div><p class="eyebrow">THE DIRECTOR'S DESK</p><h2>A world you can<br>build on.</h2><p>Play in the browser. Let an agent observe, act, and extend the very same world.</p><div class="agent-status"><span class="status-dot"></span><div><strong id="agent-status">Waiting for world</strong><small id="agent-detail">State and events stream here.</small></div></div><div class="runtime-metrics"><div><strong id="metric-revision">0</strong><span>REVISION</span></div><div><strong id="metric-entities">0</strong><span>ENTITIES</span></div><div><strong id="metric-uptime">00:00</strong><span>CONNECTED</span></div></div></section>
       <section class="panel focus-panel" aria-labelledby="focus-heading"><div class="section-heading"><h2 id="focus-heading">In focus</h2><span class="tiny-label">INSPECT</span></div><div id="focus-content"><p class="empty-note">Select an entity in the scene to inspect it.</p></div></section>
       <section class="panel context-panel" aria-labelledby="context-heading"><div class="section-heading"><h2 id="context-heading">World context</h2><button id="copy-context" class="text-button" title="Copy the current authoritative session snapshot">Copy</button></div><dl id="context-summary" class="context-summary"></dl><div id="world-variables" class="variables"></div><details id="snapshot-details"><summary>Inspect state <span aria-hidden="true">{ }</span></summary><pre id="context-json" tabindex="0" aria-label="Session state as JSON"></pre></details><details class="agent-details"><summary>Connect a coding agent <span aria-hidden="true">↗</span></summary><p>Use the repository's agent CLI or MCP server to read events, inspect context, and make revision-checked changes. The browser stays live while your agent works.</p><code>npm run agent -- --help</code><p class="empty-note">No agent process is started by this page.</p></details></section>

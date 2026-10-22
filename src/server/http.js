@@ -4,7 +4,7 @@ import { resolve, extname, sep } from 'node:path';
 import { errorInfo, requireValue as check } from '../core/errors.js';
 import { publicEvent } from '../core/patches.js';
 
-const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.wav': 'audio/wav', '.mp3': 'audio/mpeg', '.woff2': 'font/woff2' };
+const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.avif': 'image/avif', '.webp': 'image/webp', '.wav': 'audio/wav', '.mp3': 'audio/mpeg', '.woff2': 'font/woff2' };
 function send(response, status, body) { response.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); response.end(JSON.stringify(body)); }
 async function body(request) {
   check(request.headers['content-type']?.startsWith('application/json'), 'CONTENT_TYPE', 'Use Content-Type: application/json.');
@@ -50,6 +50,8 @@ export function createHttpServer(engine, tools, root, options = {}) {
     response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; media-src 'self' https:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'");
     try {
       const url = new URL(request.url, 'http://localhost'), path = url.pathname;
+      const hostname = new URL(`http://${request.headers.host || 'invalid'}`).hostname;
+      if (!options.token) check(['localhost', '127.0.0.1', '[::1]'].includes(hostname), 'HOST_REJECTED', 'Use the localhost address for this local runtime.');
       if (!['GET', 'POST'].includes(request.method)) { send(response, 405, { ok: false, error: { code: 'METHOD_NOT_ALLOWED', message: 'Use GET or POST.' } }); return; }
       if (request.method === 'POST') {
         const origin = request.headers.origin;

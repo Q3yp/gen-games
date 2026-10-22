@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { applyOperations, atPath } from './validate.js';
 import { requireValue as check, errorInfo } from './errors.js';
 import { manageJob } from './jobs.js';
@@ -35,12 +34,17 @@ export class ToolService {
       if (scope === 'session') value = { id: session.id, gameId: session.gameId, revision: session.revision, sceneEpoch: session.sceneEpoch, scene: session.state.scene, player: session.state.player, variables: session.state.variables, entityIds: Object.keys(session.state.entities), assets: Object.keys(session.state.assets), skills: Object.keys(session.state.skills) };
       else if (scope === 'event') { check(Number.isInteger(Number(args.id)), 'INVALID_EVENT', 'Event id must be a cursor number.'); const event = store.events(session.id, Number(args.id) - 1, 1)[0]; check(event?.seq === Number(args.id), 'NOT_FOUND', 'Event not found.'); value = event.type === 'state.changed' ? { ...event, data: { fields: event.data.patches.length } } : event; }
       else if (scope === 'path') value = atPath(session.state, args.path);
-      else { const plural = { entity: 'entities', scene: 'scenes', asset: 'assets', skill: 'skills' }[scope] || scope; check(['entities', 'scenes', 'assets', 'skills', 'dialogue', 'variables'].includes(plural), 'INVALID_SCOPE', 'Use session, entity, scene, asset, skill, event, dialogue, variables, or path.'); value = session.state[plural]; if (args.id) { check(Object.hasOwn(value || {}, args.id), 'NOT_FOUND', `${scope} ${args.id} does not exist.`); value = value[args.id]; } }
+      else { if (!args.id && scope === 'scene') args = { ...args, id: session.state.scene }; if (!args.id && scope === 'entity') args = { ...args, id: session.state.player }; const plural = { entity: 'entities', scene: 'scenes', asset: 'assets', skill: 'skills' }[scope] || scope; check(['entities', 'scenes', 'assets', 'skills', 'dialogue', 'variables'].includes(plural), 'INVALID_SCOPE', 'Use session, entity, scene, asset, skill, event, dialogue, variables, or path.'); value = session.state[plural]; if (args.id) { check(Object.hasOwn(value || {}, args.id), 'NOT_FOUND', `${scope} ${args.id} does not exist.`); value = value[args.id]; } }
       return { text: `INSPECT r${session.revision} ${scope}${args.id ? ` ${args.id}` : ''}\n${compact(value ?? null, 6000)}`, data: { revision: session.revision, cursor: store.head(session.id) } };
     }
     if (tool === 'act') return this.mutation(engine.act(args));
-    if (tool === 'author') return this.mutation(engine.transact(args, ctx => { applyOperations(ctx.state, args.operations); ctx.emit('author.updated', `${args.operations.length} authoring operations applied.`, { paths: args.operations.map(op => op.path) }); return { operations: args.operations.length }; }));
-    if (tool === 'jobs') { const result = manageJob(engine, args); return result.session ? this.mutation(result) : { text: compact(result), data: result }; }
+    if (tool === 'author') return this.mutation(engine.transact(args, ctx => { applyOperations(ctx.state, args.operations); ctx.emit('author.updated', `${args.operations.length} edits: ${args.operations.slice(0, 5).map(op => op.path.join('.')).join(', ')}${args.operations.length > 5 ? '…' : ''}.`, { paths: args.operations.map(op => op.path) }); return { operations: args.operations.length }; }));
+    if (tool === 'jobs') {
+      const result = manageJob(engine, args);
+      if (result.session) return this.mutation(result);
+      const text = result.jobs ? result.jobs.map(job => `${job.id} ${job.status} [${job.mode || 'context'}] ${job.label}`).join('\n') || 'No jobs.' : `JOB ${result.id} ${result.status}${result.mode ? ` [${result.mode}] r${result.revision}` : ''}${result.label ? ` · ${result.label}` : ''}${result.token ? `\nGeneration token: ${result.token}` : ''}`;
+      return { text: compact(text), data: result };
+    }
     if (tool === 'checkpoint') {
       if (args.op === 'list') return { text: compact(store.checkpoints(session.id)), data: { revision: session.revision } };
       check(typeof args.name === 'string' && /^[\w .-]{1,80}$/.test(args.name), 'INVALID_NAME', 'Checkpoint name must be 1–80 simple characters.');
@@ -57,7 +61,7 @@ export class ToolService {
     check(false, 'TOOL_NOT_FOUND', `Unknown tool ${tool}.`, 'Use discover.');
   }
   mutation(result) {
-    const events = result.events.filter(event => event.type !== 'state.changed').map(event => event.text);
+    const events = result.events.filter(event => event.type !== 'state.changed' && event.text).map(event => event.text);
     return { text: compact(`OK r${result.session.revision}${result.replayed ? ' [replayed, not executed again]' : ''} · ${events.join(' | ') || 'Applied.'}\nCursor ${result.cursor}.`, 4000), data: { sessionId: result.session.id, revision: result.session.revision, cursor: result.cursor, replayed: !!result.replayed, result: result.result } };
   }
 }
