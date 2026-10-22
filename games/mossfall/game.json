@@ -1,0 +1,10 @@
+{
+  "id": "mossfall",
+  "title": "Mossfall",
+  "description": "A continuing woodland RPG. Read enemy intentions, shape your lantern-bearer's build, and carry the light through a wounded forest.",
+  "version": "0.1.0",
+  "runtime": "code",
+  "entry": "./main.js",
+  "saveVersion": 1,
+  "initial": { "seed": 1209 }
+}

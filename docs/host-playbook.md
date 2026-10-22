@@ -5,6 +5,53 @@ This playbook connects that role to operational evidence. Exact runtime contract
 live in [agent-tools.md](agent-tools.md) and [authoring.md](authoring.md); discover
 the running server rather than assuming a saved example matches its version.
 
+## Select the host profile before authoring
+
+Read the [shared host core](../.agents/skills/game-host/SKILL.md), then only the
+profile that matches the requested experience:
+
+- [RPG](../.agents/skills/game-host/references/rpg.md): continuing identity,
+  build, quests and world consequences.
+- [Roguelike](../.agents/skills/game-host/references/roguelike.md): bounded runs,
+  adaptation, risk and a clearly defined reset boundary.
+- [Puzzle / sandbox](../.agents/skills/game-host/references/puzzle-sandbox.md):
+  understanding rules or expressive construction.
+- [Adventure](../.agents/skills/game-host/references/adventure.md): places,
+  clues, discovery and environmental problem solving.
+- [Conversation / visual novel](../.agents/skills/game-host/references/conversation-visual-novel.md):
+  interpretation, expression, relationships and narrative consequence.
+- [Action](../.agents/skills/game-host/references/action.md): responsive control,
+  timing and readable real-time pressure.
+
+Choose one primary promise. Add a secondary profile only for a substantial
+subsystem, such as RPG + action; do not load all profiles on every turn. State
+what persists, what failure costs and what can be retried if the profiles pull in
+different directions. Genre guidance selects design priorities, not runtime APIs
+or a mandatory ruleset. Lumen Weave's puzzle interactions are not the template
+for every game; Ember Vault and Signal House's structured-world format does not
+constrain code packs.
+
+### Example starting prompt for a continuing RPG host
+
+> Host the intended RPG session using the shared game-host skill and its RPG
+> profile. Read AGENTS.md and this playbook. Run `node src/agent/cli.js discover`
+> and `node src/agent/cli.js session --op list`; identify the intended session
+> rather than selecting an unrelated one. Open it and discover its session
+> schemas using the commands below. Observe current state before changing it.
+> Preserve this character, build, inventory, quest outcomes and world changes.
+> Make the next connected encounter give two credible approaches whose costs
+> and later consequences are visible. Inspect the existing pack before deciding
+> whether the encounter needs source changes. If publishing code, use the
+> observed release guard and wait for activation as documented below. Do not
+> invent a quest, combat or dialogue tool: use only the discovered contract and
+> game-implemented commands. Validate through actual player controls, then
+> record the consequence and a reachable next objective in a compact summary.
+
+This is a prompt template, not a claim that a session exists or that the runtime
+already implements RPG features. The intended game/session must be resolved from
+actual context. For action combat, load the action profile too; for a dialogue-led
+RPG, load conversation only if that subsystem needs its guidance.
+
 ## First contact with a running world
 
 From the repository root:
@@ -42,6 +89,8 @@ original request ID for an identical retry.
 
 Before a substantial change, write a small working note with:
 
+- **Profile and continuity:** Which primary/secondary genre applies, what persists,
+  and what is the next decision beyond this scene?
 - **Verb:** What can the player directly do?
 - **Tradeoff:** What makes two plausible moves differ?
 - **Readable consequence:** What changes on screen, and what state confirms it?
@@ -53,7 +102,9 @@ Before a substantial change, write a small working note with:
 
 For example, a resonator that converts rhythmic flashes into steering is a new
 mechanic only if pulse timing actually affects movement. A glowing resonator that
-merely triggers a predefined narrative choice is not the same experiment.
+merely triggers a predefined narrative choice is not the same experiment. This
+does not disqualify narrative games: a conversation experiment should instead
+state the actual stance, relationship or future opportunity that a choice changes.
 
 Do not require every game to use beams, puzzles, combat, or even a win condition.
 A toy can succeed through expressive combinations and satisfying surprises. Its
@@ -144,7 +195,9 @@ mechanic before explaining its intended cleverness. Have them replay with a
 meaningfully different strategy: alter timing, topology, resource allocation,
 movement route, or combination of tools, not merely choose a different caption.
 
-Capture a short evidence record:
+Apply the selected profile's evaluation questions as well as the shared checks
+below. For a continuing RPG, evaluate consequences across connected encounters
+and a revisit, not only an opening-scene victory. Capture a short evidence record:
 
 | Question | Evidence to capture |
 | --- | --- |

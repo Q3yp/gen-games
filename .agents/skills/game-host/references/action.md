@@ -1,0 +1,20 @@
+# Action: readable pressure and expressive control
+
+## Promise and verbs
+
+The player improves at move, aim, dodge, strike, block or time. Prioritize control response, spatial readability and recoverable learning. Load this as a secondary profile when real-time execution is a significant RPG or roguelike subsystem.
+
+## Author the loop
+
+- Establish input, movement and camera behavior before adding effects. Show hitboxes or reliable visual equivalents, attack windups, impact and recovery distinctly.
+- Make threats readable early enough to respond. Distinguish taking damage, spending a resource and being unable to act; avoid effects that obscure the information needed to survive.
+- Give tools different timing, range, positional or resource tradeoffs. Include a useful defensive response rather than reducing every encounter to racing damage numbers.
+- Keep failed attempts short enough to learn from and restarts clear. Offer appropriate input alternatives and readable contrast; difficulty should not depend on ambiguous controls.
+
+## State, context and live hosting
+
+Serialize durable encounter/progression state; do not require the host to process individual frames. Summarize current threat, player condition, recent damage/failure cause and available tactical alternatives. Keep timing rules stable mid-encounter, guard inactive input and release held controls on focus loss where applicable. Publish disruptive changes at a safe boundary rather than during a committed attack.
+
+## Play evaluation
+
+Exercise controls under actual browser timing, including rapid inputs and a defensive maneuver. Can the player identify why they were hit before seeing a log? Compare two tools or movement strategies; distinguish tactical choice from execution difficulty. Verify that effects and UI do not conceal threats. A scripted command that wins an encounter does not validate action controls.
