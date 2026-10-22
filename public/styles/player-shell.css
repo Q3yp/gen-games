@@ -1,0 +1,85 @@
+/* The world is the default surface. Studio is an explicit alternate workspace. */
+body:not(.studio-open) { background: #080e12; overflow: hidden; }
+.player-toolbar { position: fixed; z-index: 40; right: max(18px, env(safe-area-inset-right)); top: max(16px, env(safe-area-inset-top)); display: flex; gap: 6px; }
+.player-toolbar .button { min-height: 34px; padding: 7px 12px; font-size: 10px; color: #d8e2df; background: #111a20c9; border: 1px solid #a9bcc32b; backdrop-filter: blur(14px); border-radius: 6px; margin: 0; }
+.player-toolbar .button:hover { background: #2c3b43; }
+.player-hud { position: fixed; top: max(20px, env(safe-area-inset-top)); left: max(24px, env(safe-area-inset-left)); z-index: 10; display: flex; flex-wrap: wrap; gap: 8px 18px; max-width: calc(100vw - 300px); align-items: center; font-size: 11px; color: #b7cac5; pointer-events: none; text-shadow: 0 2px 5px #000; }
+.player-hud strong { color: #eef1e4; }
+.player-hud .hud-health { color: #d4f7a7; }
+body:not(.studio-open) .workspace { display: block; margin: 0; padding: 0; max-width: none; }
+body:not(.studio-open) .play-column { position: relative; width: 100%; height: 100dvh; }
+body:not(.studio-open) .scene-stage { position: absolute; inset: 0; height: 100%; min-height: 0; max-height: none; border: 0; border-radius: 0; }
+body:not(.studio-open) .scene-heading { position: absolute; z-index: 8; top: 66px; left: 24px; right: 24px; pointer-events: none; }
+body:not(.studio-open) .scene-heading h2 { font-size: 17px; letter-spacing: -.02em; color: #d5e2d9; }
+body:not(.studio-open) .scene-heading .eyebrow { display: none; }
+body:not(.studio-open) .scene-tools { pointer-events: auto; }
+body:not(.studio-open) .stage-topline, body:not(.studio-open) .stage-bottomline { display: none; }
+body:not(.studio-open) .renderer { padding: 112px 28px 154px; }
+body:not(.studio-open) .grid-board { max-width: calc((var(--stage-height, 650px) - 266px) * var(--cols) / var(--rows)); }
+body:not(.studio-open) .scene-description { display: none; }
+body:not(.studio-open) .command-panel { position: absolute; z-index: 9; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: min(660px, calc(100% - 40px)); margin: 0; padding: 12px; border-color: #adc5b32b; background: #101d20d9; backdrop-filter: blur(16px); box-shadow: 0 10px 40px #0005; }
+body:not(.studio-open) .command-title, body:not(.studio-open) .control-note { display: none; }
+body:not(.studio-open) .choice-list { max-height: 22dvh; overflow: auto; }
+body:not(.studio-open) .choice-list:empty { display: none; }
+body:not(.studio-open) .choice-button { padding: 9px 12px; }
+body:not(.studio-open) .action-row { margin-top: 0; }
+body:not(.studio-open) .choice-list:not(:empty) + .action-row { margin-top: 10px; }
+body:not(.studio-open) .notice { position: fixed; z-index: 45; left: 50%; top: 110px; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); box-shadow: 0 10px 30px #0006; }
+body:not(.studio-open) .custom-warning { position: fixed; z-index: 45; top: 112px; left: 20px; right: 20px; background: #262319f5; padding: 12px; }
+/* A pack that owns its interaction may scroll, unless it requests a viewport. */
+body:not(.studio-open) .scene-stage.has-custom { height: 100dvh; overflow: auto; }
+body:not(.studio-open) .scene-stage.has-custom .custom-renderer { min-height: 100%; padding-top: 100px; }
+.custom-owned:not(.studio-open) .player-hud { display: none; }
+.custom-immersive:not(.studio-open) .scene-heading,
+.custom-immersive .stage-topline, .custom-immersive .stage-bottomline,
+.custom-immersive .game-over-banner { display: none; }
+body.custom-immersive:not(.studio-open) .scene-stage.immersive { height: 100dvh; overflow: hidden; }
+body.custom-immersive:not(.studio-open) .scene-stage.immersive .custom-renderer,
+body.custom-immersive:not(.studio-open) .scene-stage.immersive .pack-view { display: block; width: 100%; height: 100%; min-height: 0; padding: 0; overflow: hidden; }
+/* Tools live in one accessible modal, not competing sidebars. */
+#player-menu { width: min(860px, calc(100vw - 32px)); max-width: 860px; max-height: calc(100dvh - 40px); padding: 28px; overflow: auto; background: #121e24f5; backdrop-filter: blur(20px); }
+#player-menu::backdrop { background: #02080dbb; backdrop-filter: blur(5px); }
+#player-menu .dialog-heading h2 { margin: 0; font-size: 24px; }
+.menu-note { font-size: 11px; color: var(--muted); margin: 12px 0 20px; }
+#player-menu .topbar { display: flex; flex-wrap: wrap; padding: 0 0 20px; min-height: 0; margin: 0 0 18px; gap: 12px; }
+#player-menu .brand { display: none; }
+#player-menu .session-controls { width: 100%; flex-basis: 100%; order: 0; flex-wrap: wrap; gap: 8px; }
+#player-menu .select-field { flex: 1; max-width: none; min-width: 130px; }
+#player-menu .select-field select { width: 100%; max-width: none; min-width: 0; }
+#player-menu .connection { margin: 0; }
+.menu-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 24px; }
+#player-menu .player-rail { display: block; }
+#player-menu .world-summary, #player-menu .rail-footer { display: none; }
+#player-menu .panel { padding: 18px 0; }
+#player-menu .item-list, #player-menu .skill-list { grid-template-columns: 1fr; }
+#player-menu .player-panel #player-card { display: block; }
+#player-menu .minor-stats { justify-content: flex-start; }
+#player-menu .event-panel { margin-top: 15px; }
+#player-menu .event-list { max-height: 240px; }
+.studio-open .player-hud, .studio-open #menu-toggle { display: none; }
+.studio-open .topbar { padding-right: 230px; }
+.studio-open .scene-stage.immersive { height: 650px; }
+.studio-open .scene-stage.immersive .custom-renderer,
+.studio-open .scene-stage.immersive .pack-view { height: 100%; padding: 0; overflow: auto; }
+@media (max-width: 700px) {
+  .player-toolbar { top: max(12px, env(safe-area-inset-top)); right: 12px; gap: 4px; }
+  .player-toolbar .button { padding: 6px 9px; font-size: 9px; }
+  .player-hud { left: 14px; top: 17px; max-width: calc(100vw - 220px); font-size: 9px; gap: 3px 8px; }
+  .player-hud strong { width: 100%; }
+  body:not(.studio-open) .scene-heading { left: 15px; right: 15px; top: 70px; }
+  body:not(.studio-open) .scene-heading h2 { font-size: 15px; }
+  body:not(.studio-open) .renderer { padding: 110px 12px 150px; }
+  body:not(.studio-open) .command-panel { width: calc(100% - 24px); bottom: max(12px, env(safe-area-inset-bottom)); padding: 10px; }
+  #player-menu { padding: 20px; }
+  .menu-columns { grid-template-columns: 1fr; gap: 10px; }
+  .studio-open .topbar { padding-top: 65px; padding-right: 16px; }
+}
+@media (max-height: 500px) and (min-width: 600px) {
+  body:not(.studio-open) .renderer { padding-top: 65px; padding-bottom: 100px; }
+  body:not(.studio-open) .grid-board { max-width: calc((var(--stage-height, 450px) - 165px) * var(--cols) / var(--rows)); }
+  body:not(.studio-open) .scene-heading { top: 60px; }
+  body:not(.studio-open) .command-panel { width: min(460px, calc(100% - 40px)); bottom: 10px; }
+}
+.menu-utilities { display: flex; gap: 8px; flex-wrap: wrap; }
+body:not(.studio-open):not(.map-world):not(.custom-owned) .renderer { display: block; padding: 110px 24px 240px; overflow: auto; }
+body:not(.studio-open):not(.map-world) .dialogue-scene { margin: auto; }

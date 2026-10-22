@@ -4,7 +4,11 @@ import { $, state, world, game, freeze, clone, asset, escapeHTML, dispatch, setT
 
 function syncInteraction() {
   const owned = Boolean(state.custom?.instance?.ownsInteraction && !state.custom.paused && !$('#custom-renderer').hidden);
+  const immersive = owned && state.custom?.instance?.presentation === 'immersive';
+  document.body.classList.toggle('custom-immersive', immersive);
+  document.body.classList.toggle('custom-owned', owned);
   $('#play-surface').classList.toggle('has-custom', owned);
+  $('#play-surface').classList.toggle('immersive', immersive);
   $('.command-panel').hidden = owned;
   $('#scene-description').hidden = owned;
 }

@@ -10,8 +10,10 @@
   <link rel="stylesheet" href="/styles.css">
   <script type="module" src="/app.js"></script>
 </head>
-<body>
+<body class="player-mode">
   <a class="skip-link" href="#play-surface">Skip to game</a>
+  <nav class="player-toolbar" aria-label="Game menu"><button id="menu-toggle" class="button" aria-haspopup="dialog">Menu</button><button id="fullscreen-toggle" class="button" aria-pressed="false">Fullscreen</button><button id="studio-toggle" class="button studio-toggle" aria-expanded="false" aria-controls="world-inspector">Studio</button></nav>
+  <div id="player-hud" class="player-hud" aria-label="Player status"></div>
   <header class="topbar">
     <a class="brand" href="/" aria-label="gen games home"><img src="/mark.svg" alt="" width="38" height="38"><span>gen<span class="brand-slash">/</span>games<small>THE LIVING WORLD STUDIO</small></span></a>
     <div class="session-controls">
@@ -19,7 +21,6 @@
       <label class="select-field session-field"><span>SESSION</span><select id="session-select" aria-label="Select saved session"><option>No session</option></select></label>
       <button class="button new-session" id="new-session"><span aria-hidden="true">＋</span> New run</button>
     </div>
-    <button id="studio-toggle" class="button studio-toggle" aria-expanded="false" aria-controls="world-inspector"><span aria-hidden="true">{ }</span> Studio</button>
     <div class="connection" id="connection" role="status"><span class="status-dot"></span><span>Connecting</span></div>
   </header>
 
@@ -57,6 +58,7 @@
     </aside>
   </main>
 
+  <dialog id="player-menu" aria-labelledby="menu-title"><div class="dialog-heading"><h2 id="menu-title">Game menu</h2><button class="icon-button" data-close-dialog aria-label="Return to game">×</button></div><p class="menu-note">Your world stays live. Progress is saved automatically.</p><div id="menu-session"></div><div class="menu-utilities"><button id="menu-help" class="button">Controls & help</button><button id="menu-reload" class="button" hidden>Reload game view</button></div><div class="menu-columns"><div id="menu-player"></div><div><div id="menu-focus"></div><div id="menu-journal"></div></div></div></dialog>
   <dialog id="new-dialog"><form id="new-form"><div class="dialog-heading"><span class="eyebrow">A NEW BEGINNING</span><button type="button" class="icon-button" data-close-dialog aria-label="Close new session dialog">×</button></div><h2>Where to next?</h2><p>Start a fresh run. Your other sessions remain saved.</p><label class="form-label" for="new-game">World</label><select id="new-game" required></select><label class="form-label" for="new-seed">Seed <span>optional</span></label><input id="new-seed" type="number" step="1" placeholder="Let the world surprise you"><p class="form-hint">The same seed gives you the same starting randomness.</p><button id="create-session" type="submit" class="button primary">Enter world <span aria-hidden="true">↗</span></button></form></dialog>
   <dialog id="help-dialog"><div class="dialog-heading"><span class="eyebrow">QUICK GUIDE</span><button class="icon-button" data-close-dialog aria-label="Close controls dialog">×</button></div><h2>The world is yours.</h2><ul class="help-list"><li><kbd>W A S D</kbd><span>Move around the grid</span></li><li><kbd>↑ ← ↓ →</kbd><span>Also move around the grid</span></li><li><kbd>Click</kbd><span>Attack a hostile, interact with a friendly entity, or step onto an adjacent tile</span></li><li><kbd>1–9</kbd><span>Choose a numbered story option</span></li><li><kbd>Enter</kbd><span>Send text when the dialogue field is focused</span></li></ul><p>Inventory and ability buttons work with keyboard and pointer. Text fields keep their normal typing controls. Every accepted move is saved by the server.</p></dialog>
   <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>

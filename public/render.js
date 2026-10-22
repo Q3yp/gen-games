@@ -2,12 +2,14 @@ import { $, state, world, scene, game, terminal, setText, number } from './share
 import { renderSelectors, renderCharacter, renderFocus, renderChoices, renderContext } from './panels.js';
 import { renderGrid, renderStory } from './scenes.js';
 import { renderCustom } from './custom-view.js';
+import { renderPlayerHUD } from './player-shell.js';
 let renderFrame;
 function render() {
   if (!state.session) return;
   const current = scene();
   const pack = game();
   $('#reload-view').hidden = !(world().ui || pack?.ui);
+  $('#menu-reload').hidden = $('#reload-view').hidden;
   renderSelectors();
   setText('#world-title', pack?.title || state.session.gameId);
   setText('#world-description', pack?.description || 'A persistent world, ready to play and extend.');
@@ -23,7 +25,8 @@ function render() {
   const combatEnabled = (pack?.plugins || []).includes('combat');
   $('.player-panel').hidden = !combatEnabled;
   $('#skills-heading').closest('section').hidden = !combatEnabled;
-  renderCharacter();
+  renderCharacter(); renderPlayerHUD();
+  document.body.classList.toggle('map-world', Array.isArray(current.map));
   if (Array.isArray(current.map) && current.map.length) renderGrid(); else renderStory();
   renderFocus(); renderChoices(); renderContext();
   const oldEnding = $('.game-over-banner', $('#play-surface'));

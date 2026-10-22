@@ -7,13 +7,11 @@ import { renderCustom, disposeCustom } from './custom-view.js';
 import { refreshStatus } from './journal.js';
 import { reconnect, loadSession, createSession } from './transport.js';
 import { attack, actOnEntity } from './actions.js';
+import { bindPlayerShell, renderPlayerHUD } from './player-shell.js';
 function showNewDialog() { $('#new-form .dialog-error')?.remove(); fillSelect($('#new-game'), state.games.map(item => ({ value: item.id, label: item.title || item.id })), $('#game-select').value || state.session?.gameId); $('#new-dialog').showModal(); }
 function bindEvents() {
   $('#new-session').addEventListener('click', showNewDialog);
-  $('#studio-toggle').addEventListener('click', () => {
-    const hidden = $('.workspace').classList.toggle('inspector-hidden');
-    $('#studio-toggle').setAttribute('aria-expanded', String(!hidden));
-  });
+  bindPlayerShell();
   $('#help-button').addEventListener('click', () => $('#help-dialog').showModal());
   $$('[data-close-dialog]').forEach(button => button.addEventListener('click', () => button.closest('dialog').close()));
   $$('dialog').forEach(dialog => dialog.addEventListener('click', event => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } }));
@@ -47,7 +45,7 @@ function bindEvents() {
     else if (button.dataset.interact) void dispatch('world.interact', { target: button.dataset.interact });
     else if (button.dataset.use) void dispatch('inventory.use', { item: button.dataset.use });
     else if (button.dataset.equip) void dispatch('inventory.equip', { item: button.dataset.equip });
-    else if (Object.hasOwn(button.dataset, 'skill')) { state.skill = button.dataset.skill || null; renderCharacter(); renderFocus(); $('#announcer').textContent = state.skill ? `${world().skills[state.skill]?.name || state.skill} selected. Choose a target.` : 'Basic attack selected.'; }
+    else if (Object.hasOwn(button.dataset, 'skill')) { state.skill = button.dataset.skill || null; renderCharacter(); renderFocus(); renderPlayerHUD(); $('#announcer').textContent = state.skill ? `${world().skills[state.skill]?.name || state.skill} selected. Choose a target.` : 'Basic attack selected.'; }
     else if (button.dataset.choice) void dispatch('narrative.choose', { choice: button.dataset.choice });
     else if (Object.hasOwn(button.dataset, 'x')) {
       const pos = position(hero()); if (!pos) return;
@@ -57,7 +55,7 @@ function bindEvents() {
     }
   });
   document.addEventListener('keydown', event => {
-    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || $('dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable || event.target.closest('#custom-renderer')) return;
+    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || $('dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable || event.target.closest('#custom-renderer') || (state.custom?.instance?.ownsInteraction && !state.custom.paused)) return;
     const directions = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0], w: [0, -1], s: [0, 1], a: [-1, 0], d: [1, 0] };
     const direction = directions[event.key] || directions[event.key.toLowerCase()];
     if (direction && Array.isArray(scene().map)) { event.preventDefault(); if (!terminal()) void dispatch('world.move', { dx: direction[0], dy: direction[1] }); }

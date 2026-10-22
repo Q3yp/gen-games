@@ -74,10 +74,12 @@ A trusted local `/games/<id>/ui.js` exports one canonical factory:
 
 ```text
 createUI({root,dispatch,asset,escapeHTML,snapshot})
-  → {update(session),dispose?(),ownsInteraction?:boolean}
+  → {update(session),dispose?(),ownsInteraction?:boolean,presentation?:'immersive'}
 ```
 
 `dispatch(action,args)` resolves to the player action response, cloned/frozen by the host. `asset(id)` returns a safe URL or an empty string. `snapshot` and each `update` receive a read-only frozen session. `ownsInteraction:true` hides duplicate standard command inputs while the custom view is healthy; fallback controls remain available on error.
+
+The browser opens in full-window player mode. Menu exposes saved runs, inventory, abilities, target actions, and the journal; Studio restores the authoring workspace. Fullscreen is optional and user-initiated. A healthy view returning both `ownsInteraction:true` and `presentation:'immersive'` receives the entire viewport with zero host padding and no duplicate scene labels or ending banner. The root fills the viewport; the pack is responsible for responsive layout, readable overflow, its own ending presentation, and leaving space for compact host controls in the upper-right corner. The host marks the body `custom-immersive` and the stage `immersive`. Removing, pausing, or disabling the view clears these flags and restores standard controls. Studio can constrain the view to a preview-sized stage.
 
 Factories mount once per session/module/version; regular world revisions call `update`. UI version changes or the reload-view button validate a replacement candidate before swapping it in. The custom component owns its root's DOM/events and should clean up loops/listeners in `dispose`.
 
