@@ -76,9 +76,9 @@ const mutation = {
 export const TOOL_DEFINITIONS = [
   {
     name: 'library', title: 'Discover saved campaigns',
-    description: 'List durable campaigns and game definitions; register a newly authored code pack without restart (never reloads existing IDs); create a new save or open an existing workspace without resetting it. List is paginated and never returns game saves.',
-    inputSchema: object({ op: { type: 'string', enum: ['list', 'register', 'create', 'open'] }, sessionId,
-      workspaceId: { type: 'string' }, gameId: { type: 'string' }, title: { type: 'string', maxLength: 120 },
+    description: 'List durable campaigns; scaffold an isolated, unrestricted code source pack under a new gameId and register it live; register an already-authored new pack; create a campaign save or open its workspace. scaffold never overwrites source or creates a save; register never reloads existing IDs. List is paginated and omits saves.',
+    inputSchema: object({ op: { type: 'string', enum: ['list', 'scaffold', 'register', 'create', 'open'] }, sessionId,
+      workspaceId: { type: 'string' }, gameId: { type: 'string', description: 'New unique source ID for scaffold: 1–80 lowercase letters/numbers with single separating hyphens. Existing pack ID for create/register.' }, title: { type: 'string', maxLength: 120, description: 'Game title for scaffold; campaign title for create.' },
       seed: { type: 'integer', minimum: 0, maximum: 4294967295 }, limit: { type: 'integer', minimum: 1, maximum: 100 }, offset: { type: 'integer', minimum: 0 } }),
     annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
   },

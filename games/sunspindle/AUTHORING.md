@@ -29,7 +29,10 @@ credible brief loop, not sustained campaign depth or overall engine success.
 
 Fresh saves now open the Rain Balcony as a new, complete short trial. It explores
 a readable countershot and finite cover rather than adding more moving targets.
-This trial has not received an independent player verdict. Preserve both previous
+The player found the reflection-plus-outbound/return combination engaging and
+chose to continue this same run toward a destination and concluding fight. They
+used ordinary pause for screenshot-based tactical planning; human-speed reflex
+feel was not assessed. Its caption-only garden ending failed visibly. Preserve both previous
 Glassworks runs and the stopped Threadmill; do not publish into them to reset play.
 
 The host owns implementation and audits. Give an independent player only the URL,
@@ -46,3 +49,9 @@ authoring gap lost momentum despite fast publication. Ordinary changes should
 use focused game-owned commands where useful;
 there is no universal enemy, item or room schema imposed by the engine. Do not
 replace Tidelight's preserved failed-iteration ending.
+
+Crown Garden continues the saved balcony run, rather than replacing it with a fresh
+health total. Its full-body warden tests committed paths and countershots. An optional
+two-petal spring is a visible, consumed world resource, not an exit heal. The final
+nest must actually hold the bird and transform the garden. Do not claim this
+continuation has succeeded before the independent player has played it.

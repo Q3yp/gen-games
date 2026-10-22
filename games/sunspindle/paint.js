@@ -3,6 +3,8 @@ import { threadmill } from './paint-threadmill.js';
 import { blastCourt } from './paint-blast-court.js';
 import { blastJar, sunbolt } from './paint-artillery.js';
 import { rainBalcony, stoneScreen } from './paint-rain-balcony.js';
+import { crownGarden, gardenArrival } from './paint-crown-garden.js';
+import { crownWarden, crownTelegraph } from './paint-crown-warden.js';
 import { rainbolt } from './paint-rain-combat.js';
 import { courier, enemy, telegraph, crystal, weight } from './paint-figures.js';
 import { arrow, effects, ambience, pointer } from './paint-effects.js';
@@ -16,7 +18,7 @@ export function paint(c, s, view) {
     t = Number(s.clock ?? view.time ?? 0);
   c.save();
   c.clearRect(0, 0, w, h);
-  c.fillStyle = s.presentation === 'rain-balcony' ? '#162f54' : '#dfbf91';
+  c.fillStyle = ['rain-balcony', 'crown-garden'].includes(s.presentation) ? '#162f54' : '#dfbf91';
   c.fillRect(0, 0, w, h);
   c.translate(ox, oy);
   c.scale(scale, scale);
@@ -28,12 +30,16 @@ export function paint(c, s, view) {
     c.translate(Math.sin(t * 137) * k, Math.cos(t * 117) * k * 0.6);
   }
   const presentation = s.presentation || (s.room === 2 ? 'threadmill' : 'courtyard');
-  if (presentation === 'rain-balcony') rainBalcony(c, s, t);
+  if (presentation === 'crown-garden') crownGarden(c, s, t);
+  else if (presentation === 'rain-balcony') rainBalcony(c, s, t);
   else if (presentation === 'glassworks') blastCourt(c, s, t);
   else palace(c, s, t);
-  exitArch(c, s, t);
+  if (presentation !== 'crown-garden') exitArch(c, s, t);
   if (presentation === 'threadmill') threadmill(c, s, t);
-  for (const e of s.enemies || []) telegraph(c, e);
+  for (const e of s.enemies || []) {
+    if (e.kind === 'crown-warden') crownTelegraph(c, e, t);
+    else telegraph(c, e);
+  }
   // Ground-position sorting keeps characters and the hanging prism overlapping naturally.
   const entities = [
     ...(s.enemies || []).map(value => ({ type: 'enemy', value })),
@@ -43,7 +49,10 @@ export function paint(c, s, view) {
   entities.sort((a, b) => a.value.y - b.value.y);
   for (const e of entities) {
     if (e.type === 'player') courier(c, e.value, t);
-    else if (e.type === 'enemy') enemy(c, e.value, t);
+    else if (e.type === 'enemy') {
+      if (e.value.kind === 'crown-warden') crownWarden(c, e.value, t);
+      else enemy(c, e.value, t);
+    }
     else if (e.value.kind === 'crystal') crystal(c, e.value, s, t);
     else if (e.value.kind === 'blastjar') blastJar(c, e.value, t);
     else if (e.value.kind === 'stone-screen') stoneScreen(c, e.value, t);
@@ -57,7 +66,8 @@ export function paint(c, s, view) {
   effects(c, s);
   ambience(c, s, t);
   pointer(c, s, view.pointer, t);
-  if (presentation !== 'rain-balcony') foreground(c, t);
+  if (!['rain-balcony', 'crown-garden'].includes(presentation)) foreground(c, t);
+  if (presentation === 'crown-garden') gardenArrival(c, s, t);
   // A thin inner ink edge unifies the scene without a panel, HUD, or vignette.
   c.strokeStyle = '#6a584f30';
   c.lineWidth = 1;

@@ -1,5 +1,6 @@
 import { enterThreadmill, atSafeExit, pendingBlocker } from './rooms.js';
 import { rainBalcony } from './rain-room.js';
+import { prepareVoyage } from './continuation.js';
 
 const enemy = (id, kind, x, y, timer) => ({
   id, kind, x, y, hp: kind === 'archer' ? 2 : 3, maxHp: kind === 'archer' ? 2 : 3,
@@ -34,6 +35,7 @@ export function initial(save) {
     Object.assign(base.player, base.entry);
     Object.assign(base.orb, { x: base.entry.x + 29, y: base.entry.y });
     base.rescue = true;
+    prepareVoyage(base);
     return base;
   }
   const old = structuredClone(save);
@@ -56,11 +58,13 @@ export function initial(save) {
   if (s.rescue && s.room === 1) s.exitReady = true;
   if (s.player.hp <= 0 && !(s.respawn > 0)) s.respawn = 0.9;
   enterThreadmill(s);
+  prepareVoyage(s);
   return s;
 }
 
 export function projection(s) {
-  const complete = (s.finishAtExit || s.roomKey === 'glassworks') && s.awaitingHost && !s.pendingRoom;
+  const complete = (s.finishAtExit || s.roomKey === 'glassworks') && s.awaitingHost && !s.pendingRoom
+    && (s.roomKey !== 'crown-garden' || s.gardenArrived);
   return {
     progress: { label: 'Sunspindle', location: `${s.roomName || 'Sun Court'} · ${s.room}`,
       objective: complete ? s.endNotice || 'The glassworks are quiet. The sunbird rests at the garden gate.'

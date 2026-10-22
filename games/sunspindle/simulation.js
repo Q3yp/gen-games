@@ -1,5 +1,6 @@
 import { clamp, confine, direction, distance, separate } from './physics.js';
 import { effects } from './effects.js';
+import { gardenLife } from './garden-life.js';
 import { combat } from './combat.js';
 import { enemies } from './enemies.js';
 import { enterThreadmill, enterStagedRoom } from './rooms.js';
@@ -122,6 +123,7 @@ export function simulation(s, emit = () => {}) {
     }
     s.timeFlow = move.moving || ['outbound', 'returning'].includes(s.orb.mode) ? 1 : 0.06;
     weight(dt); guards.step(dt, dt * s.timeFlow); confine(p, 18); objectives();
+    gardenLife(s, dt, fx, record, notice);
   }
   function step(dt) {
     if (enterStagedRoom(s) || (s.room === 1 && s.awaitingHost && enterThreadmill(s))) keys.clear();

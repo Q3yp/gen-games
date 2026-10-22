@@ -9,9 +9,9 @@ Usage: node src/agent/cli.js <tool> [options]
 
   --workspace ID     Stable host workspace ID from library list
   --workspace-version N  Observed version for workspace update; use --json for patch
-  --title TEXT       Campaign title for library create; --offset N pages library
+  --title TEXT       Game title for scaffold; campaign title for create; --offset N pages library
   --session ID       Session ID (or GEN_GAMES_SESSION)
-  --game ID          Game ID for library register/create or session create; --seed N deterministic seed
+  --game ID          Game ID for library scaffold/register/create or session create; --seed N deterministic seed
   --json OBJECT      Full tool arguments as JSON; --file PATH reads them from a file
   --args OBJECT      Nested action arguments; --operations ARRAY for author/job edits
   --after N          Observe strictly after cursor N
@@ -21,7 +21,7 @@ Usage: node src/agent/cli.js <tool> [options]
   --action NAME      Action from discover; --revision N is expectedRevision
   --request ID       Stable mutation requestId; reuse it only for identical retries
   --scope NAME       Targeted inspect; --id ID or --path '["entities","hero"]'
-  --op NAME          library: list/register/create/open; session: list/create/open
+  --op NAME          library: list/scaffold/register/create/open; session: list/create/open
                      jobs: start/list/cancel/commit
                      checkpoint: save/list/restore
   --release ID       Observed active release for command; desired release for publish

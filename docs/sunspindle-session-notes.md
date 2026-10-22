@@ -99,12 +99,63 @@ Independent play and evaluation are still pending. Existing player sessions are
 unchanged. Do not infer enjoyment from syntax checks or a host's feasibility clear.
 
 Host preview `74a9012a-4c58-4e0f-b86d-11ddbc831821` used normal visible controls
-and finished at the garden with four health. A thrown weight visibly reversed an
+and finished at the balcony exit with four health. The caption claimed a garden,
+but no new place actually appeared; the later player correctly rejected that ending. A thrown weight visibly reversed an
 incoming warm bolt into a cyan-white comet, which traveled back to the remaining
 kiln; recall finished it. The finite screen visibly cracked under fire. These are
 readability/feasibility observations, not independent enjoyment evidence.
 
 The fresh independent trial `d7239057-bef9-4a79-968f-22421866d5da` was invited at
-10:32 UTC on release `815128558806a332c7ce5a09`. It has the same controls and no
-unfinished exit. The host preview was paused and its own tab closed; the player
+10:32 UTC on release `815128558806a332c7ce5a09`. It has the same controls. The host incorrectly treated its caption-only
+exit as a complete ending; the later independent verdict below corrects that claim. The host preview was paused and its own tab closed; the player
 retains sole control of their separate campaign. Verdict pending.
+
+
+## Rain Balcony verdict and engine audit
+
+The independent player enjoyed a deliberate countershot/outbound/return combination
+and asked to continue the same run, not restart another isolated room at full health.
+They finished at two health. Ordinary pause made screenshot-based tactical planning
+worthwhile; this does not validate human-speed reflex feel. A later mistimed recall
+intercept was explicitly their decision rather than an observation-gap hit. The
+caption-only garden ending was not visually convincing and is recorded as a failure.
+
+A read-only fresh-host audit resumed the exact campaign from workspace, projection
+and focused fields without a save dump or source inspection. Nine reads totaled
+29,852 raw stdout bytes and 1,213 ms client time. Narrow path reads were 91–163 bytes,
+but workspace sections repeated static metadata and discover repeated/truncated
+projection/schema text. The subsequent formatter keeps HTTP data identical while
+reducing captured v2 brief text from 2,356 to 746 bytes, decisions from 2,498 to 866, unresolved from 2,445 to 814,
+metadata from 1,945 to 1,205, and discover from 3,283 to 1,508. It uses readable text and narrower-scope
+pointers, not JSON as the required host surface. These backend edits require a
+server restart and were isolated-validated, not loaded into the active player server.
+
+Independent source allocation now has a minimal `library scaffold` operation.
+Live registration already existed; the added operation creates a unique source
+pack with optional lifecycle/save ownership and no renderer or gameplay schema.
+Disposable validation covered concurrency, duplicate/traversal/symlink rejection,
+retained-source recovery, unchanged existing pins, arbitrary JS publication and
+fresh-process host resume. Browser activation was simulated for that validation.
+The current player's browser was never used for engine checks.
+
+## Connected garden and rejoin failure
+
+The same player requested a concluding destination at 10:43 UTC. A complete garden
+and warden were published, but queued route commands were canceled as the cloud
+browser repeatedly discarded and reopened its tabs. Matching run guards behaved
+as designed; the host chose the wrong delivery mechanism for a durable passage.
+Repeated attempts exhausted momentum. This was another substantial authoring and
+delivery wait, not responsive hosting.
+
+Release `107c2207429abd06136db8d0` carries the authored continuation with its source.
+Its initialization stages the destination only when the current balcony has no
+pending or previously visited garden. It preserves health and existing progress.
+Normal rejoin now works without a simultaneous host command: the independent
+player confirmed the distinct green garden and unchanged 2/5 health at 11:01 UTC.
+The roughly eighteen-minute gap remains a failure even though rejoining is fixed.
+The concluding encounter and actual garden arrival remain under independent play.
+
+A disposable direct initialization/step check exercised the exact exported balcony
+save, entered the garden while paused, preserved two health, then repeated
+initialization without replacing progress. The archive was extracted and rehashed
+to its exact release ID. These are lifecycle and preservation checks, not fun claims.

@@ -1,7 +1,8 @@
 import { registerCodeGame } from './registry.js';
+import { scaffoldCodeGame } from './source-workspace.js';
 import { requireValue as check } from './errors.js';
 import { isRecord, validateJSONState } from './validate.js';
-import { compact } from './context.js';
+import { workspaceText } from './host-text.js';
 import { directorFor } from './director.js';
 
 const sections = ['brief', 'decisions', 'unresolved', 'references'];
@@ -65,7 +66,7 @@ export function openWorkspace(engine, args) {
       save: { tool: 'inspect', args: { sessionId: session.id, scope: 'save' } },
       delta: { tool: 'observe', args: { sessionId: session.id, after: engine.store.head(session.id) } } }
   };
-  return { text: `WORKSPACE ${workspace.id} v${workspace.version} · ${workspace.title}\nSession ${session.id} · game ${session.gameId}\n${compact({ progress: workspace.progress, freshness: data.freshness, source: data.source, director: data.director, api: data.api, context }, 6500)}`, data };
+  return { text: workspaceText(data, args), data };
 }
 export async function manageWorkspace(engine, args) {
   if (!args.op || args.op === 'read') return openWorkspace(engine, args);
@@ -75,7 +76,7 @@ export async function manageWorkspace(engine, args) {
     const opened = openWorkspace(engine, args);
     const connection = await directorFor(engine).call({ sessionId: session.id, op: 'attach', consumer: args.consumer, leaseMs: args.leaseMs });
     opened.data.director = directorFor(engine).status(session.id);
-    return { text: `${opened.text}\n${connection.text}\nConnection ${JSON.stringify(connection.data)}`, data: { ...opened.data, connection: connection.data } };
+    return { text: `${workspaceText(opened.data, args)}\n${connection.text}\nConnection token ${connection.data.token}; next cursor ${connection.data.nextCursor}.`, data: { ...opened.data, connection: connection.data } };
   }
   check(args.op === 'update', 'INVALID_WORKSPACE_OPERATION', 'Use read, update, or attach.');
   openWorkspace(engine, args); // Validate read/delta options before any durable update.
@@ -100,6 +101,15 @@ export async function manageWorkspace(engine, args) {
   return openWorkspace(engine, args);
 }
 export async function manageLibrary(engine, args) {
+  if (args.op === 'scaffold') {
+    const { game, registered, editablePath, files } = await scaffoldCodeGame(engine, args);
+    return {
+      text: `SCAFFOLDED ${game.pack.id}: ${editablePath}\nRegistered live; no campaign created. Author your game in this independent source root, then create a preview campaign and publish changes.`,
+      data: { gameId: game.pack.id, title: game.pack.title, registered, runtime: 'code',
+        release: game.release.release, editablePath, files,
+        next: { tool: 'library', args: { op: 'create', gameId: game.pack.id } } }
+    };
+  }
   if (args.op === 'register') {
     const { game, registered } = await registerCodeGame(engine, args.gameId);
     return {
@@ -118,7 +128,7 @@ export async function manageLibrary(engine, args) {
     engine.store.saveWorkspace(workspace);
     return openWorkspace(engine, { sessionId: result.session.id });
   }
-  check(!args.op || args.op === 'list', 'INVALID_LIBRARY_OPERATION', 'Use list, register, create, or open.');
+  check(!args.op || args.op === 'list', 'INVALID_LIBRARY_OPERATION', 'Use list, scaffold, register, create, or open.');
   const limit = args.limit ?? 30, offset = args.offset ?? 0;
   check(Number.isInteger(limit) && limit >= 1 && limit <= 100 && Number.isInteger(offset) && offset >= 0, 'INVALID_PAGE', 'Use limit 1–100 and nonnegative offset.');
   const all = engine.store.sessions().filter(s => !args.gameId || s.gameId === args.gameId).map(s => entry(engine, s)).sort((a,b) => String(b.lastPlayedAt).localeCompare(String(a.lastPlayedAt)) || a.sessionId.localeCompare(b.sessionId));

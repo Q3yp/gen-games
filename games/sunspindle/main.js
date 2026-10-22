@@ -106,7 +106,7 @@ export default function create(host, { save }) {
       const w = Math.floor(b.width * dpr), h = Math.floor(b.height * dpr);
       if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      root.dataset.palette = s.presentation === 'rain-balcony' ? 'moon' : 'sun';
+      root.dataset.palette = ['rain-balcony', 'crown-garden'].includes(s.presentation) ? 'moon' : 'sun';
       paint(ctx, s, { width: b.width, height: b.height, time, pointer });
       health.textContent = '◆'.repeat(Math.max(0, Math.ceil(s.player.hp))) + '◇'.repeat(Math.max(0, s.player.maxHp - Math.ceil(s.player.hp)));
       health.setAttribute('aria-label', `Health ${s.player.hp} of ${s.player.maxHp}`);

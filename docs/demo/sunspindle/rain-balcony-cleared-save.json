@@ -1,0 +1,269 @@
+{
+  "gameId": "sunspindle",
+  "saveVersion": 1,
+  "sourceRelease": "815128558806a332c7ce5a09",
+  "capturedAt": "2026-10-22T10:48:33.620809+00:00",
+  "save": {
+    "sunspindle": 1,
+    "player": {
+      "x": 1092,
+      "y": 627.8055752324581,
+      "angle": 0,
+      "hp": 2,
+      "maxHp": 5,
+      "dash": 0,
+      "grace": 0,
+      "flash": 0,
+      "trail": [
+        {
+          "x": 1092,
+          "y": 627.8055752324581,
+          "life": 0.13339999999990687,
+          "maxLife": 0.15
+        }
+      ]
+    },
+    "orb": {
+      "x": 1121,
+      "y": 627.8055752324581,
+      "vx": 0,
+      "vy": 0,
+      "radius": 19,
+      "mode": "held",
+      "spin": 349.63416000000973,
+      "flight": 10,
+      "hits": [],
+      "trail": [],
+      "distanceLeft": 465.97500000009995
+    },
+    "enemies": [
+      {
+        "x": 300,
+        "y": 270,
+        "kind": "artillery",
+        "id": "rain-5-0",
+        "radius": 55,
+        "hp": 0,
+        "maxHp": 4,
+        "angle": 0.6119013592735021,
+        "phase": "recover",
+        "timer": 1.25,
+        "phaseDuration": 1.25,
+        "flash": 0,
+        "vx": 0,
+        "vy": 0,
+        "aimX": 0.8185573100621972,
+        "aimY": 0.5744248690157314,
+        "aimDistance": 470,
+        "crashCooldown": 0,
+        "down": 0,
+        "hitPlayer": false,
+        "blastShake": 0,
+        "projectileKind": "rainbolt",
+        "blockFlash": 0
+      },
+      {
+        "x": 950,
+        "y": 430,
+        "kind": "artillery",
+        "id": "rain-5-1",
+        "radius": 55,
+        "hp": 0,
+        "maxHp": 4,
+        "angle": 2.1464993843159585,
+        "phase": "recover",
+        "timer": 1.25,
+        "phaseDuration": 1.25,
+        "flash": 0,
+        "vx": 0,
+        "vy": 0,
+        "aimX": -0.5444246566888609,
+        "aimY": 0.8388097479102256,
+        "aimDistance": 304.65344551547383,
+        "crashCooldown": 0,
+        "down": 0,
+        "hitPlayer": false,
+        "blastShake": 0,
+        "projectileKind": "rainbolt",
+        "blockFlash": 0
+      }
+    ],
+    "props": [
+      {
+        "x": 660,
+        "y": 570,
+        "id": "screen-5",
+        "kind": "stone-screen",
+        "r": 42,
+        "hp": 0,
+        "maxHp": 2,
+        "flash": 0
+      }
+    ],
+    "shots": [],
+    "particles": [],
+    "rings": [
+      {
+        "x": 1040,
+        "y": 650,
+        "r": 90.65599999999631,
+        "maxR": 160,
+        "life": 0.4334000000000231,
+        "maxLife": 1,
+        "color": "#fff2a7"
+      }
+    ],
+    "clock": 152.9230999999824,
+    "paused": true,
+    "room": 5,
+    "rooms": {},
+    "roomName": "The Rain Balcony",
+    "roomKey": "rain-balcony",
+    "presentation": "rain-balcony",
+    "entry": {
+      "x": 400,
+      "y": 650
+    },
+    "pendingRoom": null,
+    "enteredStages": [],
+    "departures": {},
+    "defeated": 2,
+    "rescue": true,
+    "exitReady": true,
+    "exitAsked": true,
+    "awaitingHost": true,
+    "exit": {
+      "x": 1040,
+      "y": 650
+    },
+    "story": [
+      {
+        "type": "sunweight.first_throw",
+        "text": "A bright weight flies freely across the courtyard.",
+        "at": 24.3
+      },
+      {
+        "type": "stone-screen.hit",
+        "text": "The stone screen cracked under the impact.",
+        "id": "screen-5",
+        "attackSource": "sunweight",
+        "cause": "impact",
+        "hp": 1,
+        "at": 24.5
+      },
+      {
+        "type": "player.first_hurt",
+        "text": "A committed attack landed. Move across its path, not along it.",
+        "source": "rainbolt",
+        "at": 42.4
+      },
+      {
+        "type": "stone-screen.broken",
+        "text": "The stone screen broke apart; its path is permanently clear.",
+        "id": "screen-5",
+        "attackSource": "rainbolt",
+        "cause": "impact",
+        "hp": 0,
+        "at": 55
+      },
+      {
+        "type": "sunweight.first_recall",
+        "text": "The sunweight returns to its keeper\u2019s new position.",
+        "from": {
+          "x": 602,
+          "y": 587
+        },
+        "to": {
+          "x": 418,
+          "y": 577
+        },
+        "at": 59.7
+      },
+      {
+        "type": "combat.first_hit",
+        "text": "The kiln took the hit, but its rainbolt rhythm did not break.",
+        "target": "rain-5-0",
+        "source": "sunweight",
+        "at": 89.3
+      },
+      {
+        "type": "projectile.reflected",
+        "text": "The moving sunweight turned a rainbolt back toward its kiln.",
+        "id": "rainbolt-6",
+        "ownerId": "rain-5-1",
+        "target": "rain-5-1",
+        "attackSource": "sunweight",
+        "cause": "sunweight-contact",
+        "at": 147.1
+      },
+      {
+        "type": "projectile.hit",
+        "text": "A turned rainbolt struck a guard with its kiln\u2019s own fire.",
+        "id": "rainbolt-6",
+        "ownerId": "rain-5-1",
+        "target": "rain-5-1",
+        "damage": 2,
+        "attackSource": "reflected-rainbolt",
+        "cause": "countershot",
+        "at": 147.6
+      },
+      {
+        "type": "enemy.defeated",
+        "text": "A guard fell; its place in the courtyard is clear.",
+        "id": "rain-5-0",
+        "kind": "artillery",
+        "source": "sunweight",
+        "at": 147.9
+      },
+      {
+        "type": "enemy.defeated",
+        "text": "A guard fell; its place in the courtyard is clear.",
+        "id": "rain-5-1",
+        "kind": "artillery",
+        "source": "sunweight",
+        "at": 151.6
+      },
+      {
+        "type": "room.cleared",
+        "text": "The guards are gone from The Rain Balcony.",
+        "rescue": true,
+        "at": 151.6
+      },
+      {
+        "type": "game.completed",
+        "text": "The keeper and rescued sunbird reached the open arch.",
+        "reason": "open-exit",
+        "rescued": true,
+        "guardsRemaining": 0,
+        "at": 152.4
+      }
+    ],
+    "versions": {
+      "world": 12,
+      "route": 1
+    },
+    "seen": {
+      "sunweight.first_throw": true,
+      "player.first_hurt": true,
+      "sunweight.first_recall": true,
+      "combat.first_hit": true
+    },
+    "shake": 0,
+    "hitstop": 0,
+    "respawn": 0,
+    "timeFlow": 0.06,
+    "notice": "The sunbird settles in the moon garden.",
+    "noticeLife": 6.433400000000034,
+    "choices": [],
+    "shotSerial": 7,
+    "cleared": true,
+    "objective": {
+      "locked": "Cross the balcony with the sunbird.",
+      "open": "The rain has passed. The garden is open."
+    },
+    "exitOnClear": true,
+    "finishAtExit": true,
+    "clearNotice": "The rain has passed. The garden is open.",
+    "endNotice": "The sunbird settles in the moon garden."
+  }
+}

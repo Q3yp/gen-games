@@ -75,9 +75,12 @@ persistent playable consequence while the existing world remains usable. If ever
 choice requires a host response, or surprises only change captions/numbers, revise
 the local loop. Separate reliability evidence from player-experience evidence.
 
-For a new generated game, author an independent `games/<unique-id>/` source pack
-and register it with `library --op register --game <unique-id>`, then create its
-campaign. Do not inherit an example's scene schema, HUD or combat skeleton merely
+For a new generated game, use `library scaffold --game <unique-id>` to allocate
+an independent source pack with optional lifecycle/save wiring and register it live.
+Create a disposable host campaign, author its renderer/mechanics, publish and
+verify there, then create a player campaign from the published default. Creating a
+campaign does not reread edited files, and re-registering an existing ID does not refresh it.
+Manual `games/<unique-id>/` authoring plus `library register` remains supported. Do not inherit an example's scene schema, HUD or combat skeleton merely
 because it exists. The default Live Canvas is an optional composition example,
 not the engine's creative boundary. Reuse lifecycle/transport/save wiring and
 preserve immutable releases; generate the world's concrete verbs and presentation.
@@ -88,3 +91,24 @@ Weigh the ordinary minutes, not just the best reveal or ending. If the answer is
 no, label the iteration unsuccessful and repair its core activity before expanding
 it. Keep iteration reports internal until that judgment is earned; do not transfer
 the burden of rejecting an obviously unrewarding loop to the user.
+
+A completion event or caption is not a visible arrival. Verify the actual doorway,
+location change, and persistent ending through the player view. For screenshot-based
+play, distinguish observation/input gaps from deliberate tactical mistakes; ordinary
+pause controls can support honest tactical judgment, not a claim about human-speed reflex feel.
+
+When ongoing play has earned voluntary interest, prepare the next optional situation
+while the player still has meaningful activity. Do not spend that window on unrelated
+engine cleanup and only begin authoring after the player reaches an exit. Keep it
+inactive until a safe boundary; discard unused speculative content if the player stops.
+
+### Durable authored continuations
+A queued command is not an acknowledged world change. Run ownership changes can
+cancel it before the browser applies it. Do not make a doorway depend on catching
+a narrow live window with the player. Carry a lasting generated route in the
+game's serialized state or its published source initialization, with explicit
+conditions that preserve existing pending/visited content and player resources.
+Exercise a normal rejoin at the boundary before inviting the player onward.
+Read terminal receipts before retrying commands; never blindly replay combat or
+resource mutations across runs. Source publication and command delivery are
+different operations, and neither a queued receipt nor a caption proves arrival.

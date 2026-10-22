@@ -54,3 +54,38 @@ copy. This earned a bounded small-loop verdict, not campaign or engine success.
 
 `815128558806a332c7ce5a09.tar.gz` preserves the newly invited Rain Balcony source.
 Its independent trial is still being evaluated; it is not a success recording.
+
+
+A later exact-source recovery check restored all three historical saves without
+any compatibility override. The engine and importer were copied into disposable
+offline workspaces, each archive was extracted into a fresh `games/sunspindle/`,
+and each save was imported into its own new data directory. The importer verified
+identical save data and the original source release, generating a distinct session
+for each. No original session, live database, or editable game pack was touched.
+This establishes portable exact-source import, not a browser replay.
+
+Rain Balcony archive SHA-256:
+`01278215fa8f89444927e205dd5abc794c9443d121634a0a652fcd2264a9d3d4`.
+
+
+`rain-balcony-cleared-save.json` captures the independent player's unchanged trial
+at 2/5 health, paused at its lit exit, with source `815128558806a332c7ce5a09`.
+They deliberately reflected a projectile into its owner while the same throw and
+return damaged the other cannon. A later mistimed recall interception cost health;
+they distinguished that tactical mistake from screenshot/input-delay hits. They
+chose to continue the same run toward a destination and concluding fight.
+
+The exit failed visually: the engine reported completion and a caption claimed a
+garden, but the player still stood on the empty balcony. This is not a successful
+ending. The next source adds an actual connected garden without resetting this save.
+Its result remains pending independent play.
+
+`107c2207429abd06136db8d0.tar.gz` is the connected garden source whose continuation
+survives a normal rejoin. SHA-256:
+`125701b872005dc4a950399aec1d3cdc3931d25f84aab268ab5ae8ee31ec2276`.
+Extraction and the engine's release hashing reproduced the exact release ID.
+The earlier `2999dcf81859ed8fe9ba2c3e.tar.gz` is retained as the failed live-command
+handoff iteration, SHA-256:
+`a247308b5e980bb7482117335cdf18f7b87ace688ecc4717133b9b8a4c640853`.
+The player confirmed normal rejoin into the garden with the same two health.
+This source is not a finished-playthrough demo; the concluding verdict is pending.

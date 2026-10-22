@@ -5,15 +5,23 @@ import { weightSweep } from './weight-combat.js';
 export function combat(s, record, once, fx, notice) {
   function enemyHit(e, damage, push, source = 'sunweight') {
     if (e.hp <= 0) return;
-    const uninterrupted = e.kind === 'artillery' && e.projectileKind === 'rainbolt' && source === 'sunweight';
+    const warden = e.kind === 'crown-warden';
+    const counterStagger = warden && source === 'reflected-rainbolt' && !(e.staggerCooldown > 0);
+    const uninterrupted = warden ? !counterStagger
+      : e.kind === 'artillery' && e.projectileKind === 'rainbolt' && source === 'sunweight';
     e.hp = Math.max(0, e.hp - damage); e.flash = 0.18;
-    if (!uninterrupted || e.hp <= 0) { e.phase = 'recover'; e.timer = e.phaseDuration = 1.25; }
-    const shove = e.kind === 'artillery' ? 0 : e.kind === 'guardian' ? 155 : e.kind === 'ram' ? 330 : 430;
+    if (!uninterrupted || e.hp <= 0) { e.phase = 'recover'; e.timer = e.phaseDuration = warden ? 2.6 : 1.25; }
+    if (counterStagger) {
+      e.staggerCooldown = 4;
+      once('warden.counter_staggered', 'Its own rain broke the crown warden’s advance.', { target: e.id });
+    }
+    const shove = warden || e.kind === 'artillery' ? 0 : e.kind === 'guardian' ? 155 : e.kind === 'ram' ? 330 : 430;
     e.vx = push.x * shove; e.vy = push.y * shove;
     if (e.kind === 'artillery') e.blastShake = source === 'blastjar' ? 0.45 : 0.2;
     s.shake = Math.max(s.shake, 4); s.hitstop = Math.max(s.hitstop, 0.035);
     fx.burst(e.x, e.y, '#fff2ac', 12); fx.ring(e.x, e.y, '#ffdf86', 44, 0.22);
-    once('combat.first_hit', uninterrupted ? 'The kiln took the hit, but its rainbolt rhythm did not break.'
+    once('combat.first_hit', warden ? 'The sunweight struck the warden’s broad crown.'
+      : uninterrupted ? 'The kiln took the hit, but its rainbolt rhythm did not break.'
       : 'The sunweight knocked a guard out of its attack.', { target: e.id, source });
     if (e.kind === 'guardian') once('guardian.exposed_hit', 'The sunweight found the unshielded bronze.', { target: e.id });
     if (e.hp === 0) {
@@ -21,6 +29,10 @@ export function combat(s, record, once, fx, notice) {
       fx.burst(e.x, e.y, e.kind === 'ram' ? '#e88965' : '#68bcb5', 20, 220);
       record('enemy.defeated', 'A guard fell; its place in the courtyard is clear.', { id: e.id, kind: e.kind, source,
         ...(source === 'reflected-rainbolt' ? { attackSource: source, cause: 'countershot' } : {}) });
+      if (warden) {
+        for (const shot of s.shots) if (shot.ownerId === e.id) shot.life = 0;
+        record('warden.defeated', 'The crown warden fell. The sunbird’s garden is quiet at last.', { id: e.id, source });
+      }
     }
   }
   function burstJar(p) {
@@ -114,11 +126,13 @@ export function combat(s, record, once, fx, notice) {
       if (p.hp <= 0 || distance(e, p) >= e.radius + p.r) continue;
       const n = direction(previous, e, e.angle);
       propHit(p, charging ? 2 : 1, e.id);
-      e.phase = 'recover'; e.timer = e.phaseDuration = 1.6;
-      e.vx = -n.x * 80; e.vy = -n.y * 80;
+      e.phase = 'recover'; e.timer = e.phaseDuration = e.kind === 'crown-warden' ? 2.6 : 1.6;
+      e.vx = e.kind === 'crown-warden' ? 0 : -n.x * 80;
+      e.vy = e.kind === 'crown-warden' ? 0 : -n.y * 80;
       if (e.crashCooldown <= 0) {
         e.crashCooldown = 0.8;
-        record('combat.collision', 'A guard crashed into a hanging seal.', { guard: e.id, target: p.id });
+        record('combat.collision', p.kind === 'stone-screen' ? 'A guard crashed through the stone screen.'
+          : 'A guard crashed into a hanging seal.', { guard: e.id, target: p.id });
       }
     }
     for (const other of s.enemies) {
@@ -133,5 +147,5 @@ export function combat(s, record, once, fx, notice) {
   }
   const shots = countershots(s, { enemyHit, propHit, playerHit }, fx, record);
   const sweep = weightSweep(s, { enemyHit, propHit, shieldBlock }, shots, fx);
-  return { enemyHit, propHit, playerHit, sweep, collisions, stepShots: shots.step };
+  return { enemyHit, propHit, playerHit, sweep, collisions, stepShots: shots.step, recordOnce: once };
 }

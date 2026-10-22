@@ -8,6 +8,7 @@ import { directorFor } from './director.js';
 import { manageJob } from './jobs.js';
 import { observe, summary, compact } from './context.js';
 import { validateToolArguments } from './tool-arguments.js';
+import { codeDiscoveryText } from './host-text.js';
 
 export class ToolService {
   constructor(engine) {
@@ -41,32 +42,27 @@ export class ToolService {
       let capabilities;
       const lines = [
         'gen-games · local game tools',
-        'session → observe → inspect → act/author → observe. Acknowledge only after processing.',
+        'Choose a campaign with library list/open (or create); discover with its sessionId for the runtime-specific loop.',
         'Tools: library, workspace, session, discover, observe, inspect, director, work, asset, publish, command, act, author, jobs, checkpoint.'
       ];
-      if (!args.sessionId)
+      if (!args.sessionId) {
+        lines.push('For independent code source: library scaffold allocates a new gameId/directory live; library create then starts its campaign.');
         for (const { pack } of engine.games.values())
           lines.push(`${pack.id}: ${pack.title} — ${pack.description}`);
-      else {
+      } else {
         const session = engine.session(args.sessionId);
-        lines.push(summary(session));
+        const game = engine.game(session.gameId);
         if (session.runtime) {
           capabilities = session.runtime.capabilities || [];
-          lines.push('Live capabilities: ' + JSON.stringify(capabilities));
+          lines.splice(0, lines.length, codeDiscoveryText(session, capabilities, directorFor(engine).status(session.id)));
+        } else {
+          lines.push('Structured runtime: session → observe → inspect → act/author → observe. Use the observed revision and a stable requestId; acknowledge only after processing.', summary(session));
+          for (const [name, action] of game.actions)
+            lines.push(`${name}: ${action.description}\n  ${JSON.stringify(action.input || {})}`);
         }
-        if (session.runtime)
-          lines.push(
-            'Code game: edit source files in games/' +
-              session.gameId +
-              ', then publish with expectedRelease + requestId. Browser owns live simulation; inspect summary/runtime/commands for concise telemetry. command queues a game-defined command and reports pending until acknowledged.'
-          );
-        for (const [name, action] of engine.game(session.gameId).actions)
-          lines.push(
-            `${name}: ${action.description}\n  ${JSON.stringify(action.input || {})}`
-          );
       }
       return {
-        text: compact(lines.join('\n'), 10000),
+        text: capabilities ? lines.join('\n') : compact(lines.join('\n'), 10000),
         data: {
           tools: [
             'library',

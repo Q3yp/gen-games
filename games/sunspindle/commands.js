@@ -9,9 +9,9 @@ export function capabilities() {
       properties: {
         stageId: { type: 'string', minLength: 1, maxLength: 80 },
         fromRoom: { type: 'integer', minimum: 1, maximum: 9999 },
-        expectedStageId: { description: 'Explicit null for an empty slot, otherwise the exact pending stage ID being replaced.' },
+        expectedStageId: { anyOf: [{ type: 'string' }, { type: 'null' }], description: 'Explicit null for an empty slot, otherwise the exact pending stage ID being replaced.' },
         roomKey: { type: 'string', enum: Object.keys(roomFactories) },
-        config: { type: 'object', description: 'Required room (unvisited integer). Threadmill: name, entry, exit, guardian, seals, notice. Glassworks: name, entry, exit, enemies [{kind,x,y}] (ram/archer/artillery), jars [{x,y}]. Rain balcony: name, entry, exit, kilns [{x,y}], screen {x,y} or null. Factory validation rejects unsupported fields.' }
+        config: { type: 'object', description: 'Required room (unvisited integer). Threadmill: name, entry, exit, guardian, seals, notice. Glassworks: name, entry, exit, enemies [{kind,x,y}] (ram/archer/artillery), jars [{x,y}]. Rain balcony: name, entry, exit, kilns [{x,y}], screen {x,y} or null. Crown garden: name, entry, exit, boss {x,y}, screens [{x,y}]. Factory validation rejects unsupported fields.' }
       } } }];
 }
 

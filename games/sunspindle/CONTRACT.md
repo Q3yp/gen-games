@@ -111,3 +111,14 @@ records that this is a stop, not permission or a promise to append content.
 Host previews and player saves are separate. A source publication receipt is not
 proof of activation or enjoyable play. Preserve player choices during migration;
 never manipulate a player's controls, health, or future state to stage evidence.
+
+Crown garden factory accepts room, name, entry, exit, boss {x,y}, and screens [{x,y}]
+(up to two). It supplies no player health. The final garden arrival is a persistent
+world change (`gardenArrived`, animated `gardenBloom`), not only a completion caption.
+
+The connected voyage's authored route is now carried in continuation.js with its
+source release. Initializing from a balcony save materializes the inactive garden
+without replacing an existing pending/visited destination. Normal safe-exit entry
+then works even after browser loss; it needs no live host command window. This is
+game-authored source evolution, not a generic engine room rule. Ordinary queued
+commands remain run-guarded and can be canceled when browser ownership changes.

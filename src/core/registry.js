@@ -62,6 +62,12 @@ export async function registerCodeGame(engine, gameId) {
   }
   check(folder.isDirectory() && !folder.isSymbolicLink(), 'INVALID_PACK',
     'New code packs must be real directories within games/, not symbolic links.');
+  try { await lstat(resolve(host.directory, gameId, 'game.json')); }
+  catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    check(false, 'GAME_SOURCE_NOT_READY', `games/${gameId}/ has no completed game.json.`,
+      'Wait for source scaffolding to finish, or finish the retained pack and matching manifest before registering.');
+  }
   const release = await snapshotRelease(host.directory, host.output, gameId);
   const pack = release.pack;
   check(typeof pack.title === 'string' && typeof pack.version === 'string',

@@ -1,6 +1,8 @@
 import { confine, direction, distance, separate } from './physics.js';
+import { crownWarden, confineWarden } from './crown-warden.js';
 
 export function enemies(s, fight, fx) {
+  const warden = crownWarden(s, fight, fx);
   function phase(e, name, time) { e.phase = name; e.timer = e.phaseDuration = time; }
   function aim(e) {
     if (e.kind === 'guardian') {
@@ -27,6 +29,7 @@ export function enemies(s, fight, fx) {
     fx.burst(e.x + e.aimX * 30, e.y + e.aimY * 30, '#edaa6c', 5, 65);
   }
   function think(e, dt) {
+    if (e.kind === 'crown-warden') { warden(e, dt); return; }
     e.timer -= dt;
     if (e.phase === 'windup') {
       if (e.timer > 0) return;
@@ -94,8 +97,12 @@ export function enemies(s, fight, fx) {
       confine(e, e.radius);
       for (const p of s.props) if (p.hp > 0) separate(e, p, e.radius + p.r);
       // Bodies occupy space, but only the clearly telegraphed ram lunge hurts.
-      if (e.phase !== 'lunge') separate(e, s.player, e.radius + 18);
-      confine(e, e.radius);
+      if (e.phase !== 'lunge') {
+        if (e.kind === 'crown-warden') separate(s.player, e, e.radius + 18);
+        else separate(e, s.player, e.radius + 18);
+      }
+      if (e.kind === 'crown-warden') confineWarden(e);
+      else confine(e, e.radius);
     }
     fight.stepShots(dt, hostileDt);
   }

@@ -75,7 +75,7 @@ export function ambience(c, s, t) {
     ], '#fff8dc', 1.3);
     c.restore();
   }
-  if (s.awaitingHost && s.player) {
+  if (s.awaitingHost && !s.gardenArrived && s.player) {
     const p = s.player;
     glow(c, p.x, p.y - 16, 53, '#fff2aa45');
     ellipse(c, p.x, p.y - 11, 31, 43, null, '#c99a4655', 1);
@@ -84,7 +84,7 @@ export function ambience(c, s, t) {
       star(c, p.x + Math.cos(a) * 33, p.y - 11 + Math.sin(a) * 43, 3, '#fff9d1', a, 4);
     }
   }
-  if (s.rescue && s.player) {
+  if (s.rescue && !s.gardenArrived && s.player) {
     const p = s.player,
       x = p.x - 35 + Math.sin(t * 2.1) * 11,
       y = p.y - 48 + Math.cos(t * 1.7) * 5;

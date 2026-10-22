@@ -32,9 +32,11 @@ Campaigns of the **same gameId share editable source files**. Publishing targets
 one session, while other sessions keep their existing immutable releases. Current
 editable files may differ from either the pinned active release or save release;
 check the returned release identities before changing source. For
-independent authored games, copy code into a distinct game directory and change
-its manifest ID, then register it with `library --op register --game <unique-id>`
-without restarting the server. Creating another campaign
+independent authored games, use `library --op scaffold --game <unique-id>` to
+allocate a new source pack and register it live. Alternatively, author a distinct
+game directory with a matching manifest ID and use the existing
+`library --op register --game <unique-id>` flow. Neither requires a server restart
+or inheriting an example's renderer/mechanics. Creating another campaign
 alone isolates save state, not source. This intentionally avoids a new branching,
 cloud-sync or multi-user source management framework.
 
@@ -112,7 +114,56 @@ displays this as game-owned progress, separate from the agent's optional handoff
 progress note. Shape and meaning belong to the game. Character, items, skills,
 HP/MP, level and arbitrary stats remain in the game's existing serializable save.
 
-### Register independently generated source without restarting
+### Allocate independent source without copying a game
+
+```sh
+node src/agent/cli.js library --op scaffold --game moon-garden --title 'Moon Garden' --raw
+node src/agent/cli.js library --op create --game moon-garden --title 'Moon Garden preview' --raw
+```
+
+`scaffold` allocates `games/moon-garden/` and registers its initial release live.
+It returns the editable path, release and file names, not a new campaign or save.
+The files are a minimal code manifest, an executable `main.js` placeholder, and
+an optional local `lifecycle.js`. The placeholder deliberately is not a game:
+replace its visual mark with your own controls, renderer and executable rules
+before sharing play. Its initial save is `{}`; the engine imposes no scene,
+character, item, action or component catalog. Canvas, WebGL, DOM and any other
+trusted game code remain available.
+
+The optional helper owns cleanup callbacks and listeners, fences `input()` with
+`host.active`, exposes unfenced `listen()` for release/cancel edges, and forwards
+`save()` to the existing runtime. It supplies no simulation or transport. Register
+each owned resource with `own(cleanup)` and dispose it with the game instance.
+Its local copy is included in that game's immutable releases; edit or remove it
+freely. Saves, semantic events, command acknowledgments and director guards still
+use the existing runtime, not a second persistence system.
+
+Source IDs for scaffold are 1–80 lowercase letters/numbers separated by single
+hyphens, such as `moon-garden`. An existing registry ID, file, directory or symlink
+is rejected as `GAME_SOURCE_EXISTS`, even if empty. The operation reserves its
+directory atomically and exposes the manifest only after all source files exist.
+Concurrent allocations cannot overwrite each other. No existing sessions,
+workspaces, active releases or save-release pins are changed.
+
+This is a create-only operation, not an idempotent overwrite. If a response is
+lost, inspect the exact ID with `library list` and the returned/expected source
+directory before retrying. Retrying an existing ID fails safely. If allocation
+was interrupted or file creation failed, partial source is retained for inspection
+and repair, never recursively removed; finish its manifest and files, then call
+`register`. If snapshot/registration failed after creation, the error says
+`SOURCE_REGISTRATION_FAILED` and retains the complete source for the same recovery.
+Read the nested cause for the specific error. Registering incomplete source returns
+`GAME_SOURCE_NOT_READY`. Do not delete a directory another author may be using.
+
+`create` still starts a campaign from the registry's cached release. After editing
+the scaffold, create a disposable preview and publish using its observed
+`runtime.release`, or use a preview you already created. Observe activation and
+exercise actual controls before creating a player campaign from the verified
+release. An independent fresh host can then find and attach that exact campaign
+through `library list` and `workspace attach`; its editable root is tied to its
+new gameId. A second campaign under that same gameId intentionally shares source.
+
+### Register already-authored source without restarting
 
 Author an arbitrary code game under a new `games/<unique-id>/` directory with its
 matching manifest, then call `library --op register --game <unique-id>`. Registration

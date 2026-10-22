@@ -29,7 +29,7 @@ export const rainBalcony = {
       exitOnClear: true, finishAtExit: true,
       objective: { locked: 'Cross the balcony with the sunbird.', open: 'The rain has passed. The garden is open.' },
       notice: 'Rain taps the porcelain.', clearNotice: 'The rain has passed. The garden is open.',
-      endNotice: 'The sunbird settles in the moon garden.',
+      endNotice: 'The balcony is quiet. The sunbird waits at the arch.',
       enemies: room.enemies.map((e, i) => ({ ...e, id: `rain-${room.room}-${i}`, projectileKind: 'rainbolt',
         hp: 4, maxHp: 4, timer: .25 + i * .85, phaseDuration: .25 + i * .85 })),
       props: c.screen ? [{ ...c.screen, id: `screen-${room.room}`, kind: 'stone-screen', r: 42,
