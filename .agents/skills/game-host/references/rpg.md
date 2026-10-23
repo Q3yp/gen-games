@@ -1,28 +1,40 @@
-# RPG: a character and world that continue
+# RPG: identity and consequence
 
-## Promise and verbs
+An optional lens for inhabiting or developing a character, party or role. Continuity
+can live in relationships, knowledge, capabilities, fiction or numerical progression.
+Stats, levels, equipment, quests and combat are possible systems, not requirements.
 
-The player is becoming someone in a world that remembers. Prioritize explore, talk, choose an approach, fight or evade, equip and develop. Character ownership and consequences across encounters matter more than a single spectacular scene. Combat may be central or optional; do not impose a tabletop ruleset the game does not implement.
+## Design questions
 
-## Author a continuing loop
+- What gives the player ownership of their role? Expression, decisions and remembered
+  consequences may matter more than a large character sheet.
+- Where choices affect capabilities or relationships, can the player understand
+  enough to commit? Do not promise approaches that the current interaction cannot
+  support; unexpected requests can become new authored possibilities.
+- If items, abilities or builds exist, do their descriptions match their actual
+  effects? Their value may be tactical, expressive, narrative or otherwise contextual.
+- If quests or recurring characters exist, how do they acknowledge relevant earlier
+  choices? Let the intended experience determine objectives and pacing.
+- If conflict, defeat or recovery exists, which consequences and continuity have
+  been promised? Avoid accidental resets or retroactive cancellation of earned outcomes.
 
-- Connect a safe or understandable starting place, a consequential encounter, and a reachable next destination. Finishing the opening should open another decision in the same world, not ask the host to generate an unrelated game.
-- Make identity/build choices alter available tactics, costs or relationships. Present current equipment and ability effects before commitment. Loot should enable a different approach or a meaningful tradeoff; avoid an unreadable pile of slightly larger numbers.
-- If combat exists, make turn/timing rules, enemy intent, range, damage, resource costs and recovery visible. Establish why using an ability now competes with saving it for later. Prevent accidental double inputs and unexplained resource spending.
-- Give important encounters multiple credible approaches where scope permits: force, skill, conversation, route choice or preparation. Different captions that lead to identical state are not different approaches. Do not promise universal freedom that the controls cannot support.
-- Keep quests anchored to people, places and changes: what happened, who wants what, what is known, what remains unresolved. NPCs should acknowledge relevant prior outcomes. Offer a clear immediate objective without forcing one route.
-- Make defeat and recovery explicit. Preserve identity and appropriate world continuity unless the player knowingly chose a harsher mode. Do not reset the campaign because a room was cleared or the character fell.
+## Live hosting and continuity
 
-## State, context and live hosting
+Persist the identity and world consequences relevant to this game, using its own
+state shape. Stable references help when entities or rewards recur; avoid duplicate
+rewards and lost choices across updates. On return, reconcile current saved state
+with the workspace brief instead of restoring stale values from prose.
 
-Persist stable character identity, chosen build, resources, inventory/equipment, current location, discovered connections, quest stages, NPC/world flags, claimed rewards and defeated or changed encounters as appropriate. Use stable IDs; revisiting or reloading must not silently duplicate loot or undo choices. These are design needs, not a prescribed save schema.
+Extend the player's established journey when authoring new possibilities. If changing
+existing rules, explain meaningful changes and migrate retained state deliberately.
+Summarize only context needed for the current interaction, keeping undiscovered
+information separate where discovery matters.
 
-Summarize only the relevant party/build, immediate quest, known routes, resource pressure, relationship commitments, and last irreversible outcome. Keep undiscovered secrets separate from player-facing summaries. Host additions should extend unresolved hooks and respect past choices, not replace the campaign or introduce arbitrary counters to the player's build. Changes to existing abilities need clear notice and safe migration.
+## Observe play
 
-For a returning host, reconcile the workspace brief with the latest saved build, reward flags and active source; do not re-award an encounter or restore yesterday's HP/MP from prose. Keep item/skill descriptions aligned with executable effects. Author arbitrary character and equipment rules in the game's code rather than forcing a universal stats/component schema.
-
-Pace combat as an arc: readable threat, a useful defense, a bounded opening, then a recovery or resource decision. Alternate intensity with preparation and consequences. A special timed clash should express the encounter or build, not replace every ordinary attack. Check whether repeated basic strikes dominate skill use; narrow the opening or clarify costs based on observed play, without retroactively cancelling earned outcomes. Distinguish an authored setup command from player-earned progression in evidence.
-
-## Play evaluation
-
-Play through at least two connected encounters and revisit a changed place. Can the player explain who they are, what they want next, and why an ability/item matters? Does an earlier choice change a later approach or outcome? Compare two strategies, check readable combat costs if present, and verify reload continuity. Report which of identity, progression and world consequence is demonstrated versus merely planned. A map, XP bar and dialogue box alone do not prove RPG depth.
+Evaluate the form of ownership, development or consequence the game intends to
+support. Look at whether relevant choices are understood and remembered, and check
+save/resume of those promises. No encounter count, combat strategy comparison or
+mandatory revisit establishes RPG quality. A text-led roleplay, tactical board,
+stat-dense party interface or visual world may each suit the player; assess the
+chosen form rather than enforcing a world-first layout.

@@ -1,6 +1,11 @@
 /** Shared live run, client lease, and durable runtime transport. */
 import { request, notify, clone } from './shared.js';
 import { reportUI } from './diagnostics.js';
+import {
+  jsonSnapshot,
+  validateCapabilities,
+  validateTelemetry
+} from './code-contract.js';
 let run = null;
 function setRun(current) {
   run = current;
@@ -51,22 +56,29 @@ function fault(current, error) {
     error,
     'Fix the game module and publish or reload. The last saved run remains available.'
   );
-  notify(
+  current.faultNotice = notify(
     `Game paused: ${error.message}. Open Menu to reload the game view.`,
     false,
     true
   );
 }
 function projection(current, instance) {
-  return {
-    summary: clone(instance.inspect?.() ?? {}),
+  const observed = {
+    summary: jsonSnapshot(instance.inspect?.() ?? {}, 'inspect()'),
     ...(typeof instance.capabilities === 'function'
-      ? { capabilities: clone(instance.capabilities()) }
+      ? {
+          capabilities: jsonSnapshot(instance.capabilities(), 'capabilities()')
+        }
       : {}),
-    telemetrySeq: ++current.telemetrySeq,
-    timings: clone(current.timings || []),
-    versions: clone(instance.versions?.() ?? {})
+    telemetrySeq: current.telemetrySeq + 1,
+    timings: jsonSnapshot(current.timings || [], 'Timing spans'),
+    versions: jsonSnapshot(instance.versions?.() ?? {}, 'versions()')
   };
+  validateTelemetry(observed);
+  if (observed.capabilities !== undefined)
+    validateCapabilities(observed.capabilities);
+  current.telemetrySeq = observed.telemetrySeq;
+  return observed;
 }
 function runtimeError(code, message) {
   return Object.assign(new Error(message), { code });

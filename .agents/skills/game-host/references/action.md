@@ -1,41 +1,32 @@
-# Action: readable pressure and expressive control
+# Action: execution and response
 
-## Promise and verbs
+An optional lens for experiences where real-time execution matters: movement,
+rhythm, aiming, timing, coordination or other expressive controls. Use only the
+parts relevant to the intended experience; combat and spatial movement are not
+required.
 
-The player improves at move, aim, dodge, strike, block or time. Prioritize control response, spatial readability and recoverable learning. Load this as a secondary profile when real-time execution is a significant RPG or roguelike subsystem.
+## Design questions
 
-## Author the loop
+- What should the player be able to anticipate, attempt and learn? Match feedback
+  to that skill, whether through motion, sound, symbols, text or another medium.
+- Can they distinguish an accepted input, a costly action and an unavailable one?
+  If there are hazards, make their consequences and response opportunities legible.
+- Where challenge is intended, is difficulty coming from the chosen skill rather
+  than input ambiguity, unreadable effects or unexplained rules?
+- What recovery, retry or alternative input support fits this game and its players?
 
-- Establish input, movement and camera behavior before adding effects. Show hitboxes or reliable visual equivalents, attack windups, impact and recovery distinctly.
-- Make threats readable early enough to respond. Distinguish taking damage, spending a resource and being unable to act; avoid effects that obscure the information needed to survive.
-- Give tools different timing, range, positional or resource tradeoffs. Include a useful defensive response rather than reducing every encounter to racing damage numbers.
-- Keep failed attempts short enough to learn from and restarts clear. Offer appropriate input alternatives and readable contrast; difficulty should not depend on ambiguous controls.
+## Live hosting and continuity
 
-## State, context and live hosting
+Run time-sensitive judgments locally rather than requiring a model turn per input.
+Keep committed timing/cost rules consistent while preparing changes. If held
+controls, pause or timed cues exist, handle focus loss and resumption without stuck
+inputs or fabricated outcomes. Persist the encounter/progression data the game
+promises to retain, not an assumption that a physical key is still held.
 
-Serialize durable encounter/progression state; do not require the host to process individual frames. Summarize current threat, player condition, recent damage/failure cause and available tactical alternatives. Keep timing rules stable mid-encounter, guard inactive input and release held controls on focus loss where applicable. Publish disruptive changes at a safe boundary rather than during a committed attack.
+## Observe play
 
-Judge windups, parries, holds and release windows locally; the director authors circumstances and follows up on outcomes, not individual timed inputs. Use optional timed cues sparingly for a distinct clash or flourish. Leave enough ordinary control between them for mastery. Bound attack openings so repeated tapping is a deliberate tradeoff rather than the dominant answer to every threat.
-
-Verify pause/blur/reload during a held cue: inactive input cannot progress the game, releasing while paused must not leave a stuck key, and resume must neither award a free hit nor synthesize a miss. Save gameplay progress, not an assumption that a physical key remains held. On a fresh-host return, inspect current encounter phase and capabilities before applying an older plan. Prepare new code/art separately and activate at a safe boundary; visual flourish must not obscure the next actionable cue.
-
-## Play evaluation
-
-Exercise controls under actual browser timing, including rapid inputs and a defensive maneuver. Can the player identify why they were hit before seeing a log? Compare two tools or movement strategies; distinguish tactical choice from execution difficulty. Verify that effects and UI do not conceal threats. A scripted command that wins an encounter does not validate action controls.
-
-Check the easiest bypass as well as the intended technique. A fiddly optional
-target plus a trivial exit may offer neither a worthwhile fight nor an interesting
-choice. Earn continuation through the ordinary local activity, not a promised next
-reveal. Prepare supported situations while the player acts; if new authoring is
-not ready, offer a complete short stopping point rather than a long empty wait.
-
-## When the player reports guesswork
-
-Fix the visible cause and consequence before adding another encounter. A bright
-windup alone is insufficient if closed armor, exposed vulnerability, impact and
-recovery look interchangeable. Make resource loss readable without consulting a
-log. Observe whether the player forms a prediction or merely repeats the same key.
-Do not count an eventual win as resolution of this problem. Support a spatial or
-preparatory idea when appropriate, and avoid repeating an identical solved loop
-just because the first version is now reliable. Preserve an already announced
-attack; activate revised behavior between attacks or while voluntarily paused.
+Use actual player controls and timing to evaluate the intended skill. Look for
+understandable feedback, learning and unwanted friction; a scripted winning
+command cannot establish those. Check interrupted input flows where relevant.
+The right amount and placement of UI depends on what the player must perceive;
+minimal HUDs, dense instruments or text-led feedback can each be appropriate.

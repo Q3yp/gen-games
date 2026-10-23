@@ -1,3 +1,5 @@
+import { inspectWorld } from './world-inspection.js';
+import { managePlayerRequest } from './player-requests.js';
 import { manageLibrary, manageWorkspace } from './library.js';
 import { commandSummary, commandList } from './code-command.js';
 import { authorEdits } from './authoring.js';
@@ -43,7 +45,7 @@ export class ToolService {
       const lines = [
         'gen-games · local game tools',
         'Choose a campaign with library list/open (or create); discover with its sessionId for the runtime-specific loop.',
-        'Tools: library, workspace, session, discover, observe, inspect, director, work, asset, publish, command, act, author, jobs, checkpoint.'
+        'Tools: library, workspace, session, discover, observe, inspect, director, player_request, work, asset, publish, command, act, author, jobs, checkpoint.'
       ];
       if (!args.sessionId) {
         lines.push('For independent code source: library scaffold allocates a new gameId/directory live; library create then starts its campaign.');
@@ -72,6 +74,7 @@ export class ToolService {
             'observe',
             'inspect',
             'director',
+            'player_request',
             'work',
             'asset',
             'publish',
@@ -121,6 +124,7 @@ export class ToolService {
         data: { count: sessions.length }
       };
     }
+    if (tool === 'player_request') return managePlayerRequest(engine, args);
     if (tool === 'director') return directorFor(engine).call(args);
     if (tool === 'observe') return observe(engine, args);
     if (tool === 'work') return manageWork(engine, args);
@@ -131,6 +135,7 @@ export class ToolService {
     if (tool === 'inspect') {
       let value;
       const scope = args.scope || 'session';
+      if (scope === 'world') return inspectWorld(session, args);
       if (scope === 'save') value = session.state;
       else if (scope === 'director') value = directorFor(engine).status(session.id);
       else if (session.runtime && scope === 'timings')

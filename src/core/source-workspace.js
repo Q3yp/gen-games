@@ -18,7 +18,7 @@ export async function scaffoldCodeGame(engine, { gameId, title }) {
   if (engine.games.has(gameId)) throw duplicate();
 
   // Read templates before reserving the ID so a missing installation cannot leave a partial pack.
-  const names = ['main.js', 'lifecycle.js'];
+  const names = ['main.js'];
   const files = await Promise.all(names.map(async name => [name,
     await readFile(new URL(`../scaffolds/code/${name}`, import.meta.url), 'utf8')]));
   const directory = resolve(host.directory, gameId);

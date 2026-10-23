@@ -1,5 +1,9 @@
 # Player-first live-host audit
 
+Historical observations from specific generated games, not current cross-genre
+host instructions. Use the shared game-host skill for current guidance; the
+experiments and next-step recommendations below belong to their original context.
+
 The prior Iron Cadence run demonstrated timing/persistence and boss completion,
 not player enjoyment. Its fixed next-key instructions and heavy status presentation
 encouraged developer validation rather than exploration. The shared host skill
@@ -28,8 +32,10 @@ The first bell was too subtle and the tower not visually distinct. Larger pulse
 rings and a hanging bell/waterline knocking cue were added. Novel behavior took
 host authoring time; source activation itself was quick, but delivery latency is
 not a substitute for a satisfying local loop. Whole-instance source replacement
-still requires serialize/dispose continuity and cautious timing. Source directories
-are authored by the coding agent, not yet allocated by an integrated editor.
+still requires serialize/dispose continuity and cautious timing. At that stage, source directories
+were manually allocated. The later `library scaffold` implementation allocates an
+independent source directory and live registry entry, but is not an integrated
+editor; its deployment and validation status is recorded in the Sunspindle notes.
 
 Judge each next iteration through the player's voluntary choices and candid
 feedback. Do not turn the observations above into a prescribed test route.

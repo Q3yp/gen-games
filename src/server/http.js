@@ -1,3 +1,4 @@
+import { listPlayerRequests, submitPlayerRequest } from '../core/player-requests.js';
 import { reportDiagnostic } from './diagnostics.js';
 import { createServer } from 'node:http';
 import { readFile, realpath, stat } from 'node:fs/promises';
@@ -220,10 +221,14 @@ export function createHttpServer(engine, tools, root, options = {}) {
         return;
       }
       const match = path.match(
-        /^\/api\/sessions\/([\w-]+)(?:\/(actions|events|status|diagnostics|runtime))?$/
+        /^\/api\/sessions\/([\w-]+)(?:\/(actions|events|status|diagnostics|runtime|requests))?$/
       );
       if (match) {
         const [, id, action] = match;
+        if (action === 'requests') {
+          const result = request.method === 'POST' ? submitPlayerRequest(engine, id, await body(request)) : listPlayerRequests(engine, id, { after: Number(url.searchParams.get('after') || 0), limit: Number(url.searchParams.get('limit') || 20) });
+          send(response, 200, result); return;
+        }
         if (action === 'runtime' && request.method === 'POST') {
           send(
             response,

@@ -1,0 +1,19 @@
+.host-request-status { align-self: center; max-width: 13rem; font-size: .75rem; color: #c5d7d4; }
+.host-request-dialog { width: min(30rem, calc(100vw - 2rem)); max-height: 85vh; overflow: auto; padding: 1.4rem; border: 1px solid #4d6865; border-radius: 16px; color: #e6f2ee; background: #142522; }
+.host-request-dialog::backdrop { background: #07110f85; }
+.host-request-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+.host-request-heading h2 { margin: 0; font-size: 1.2rem; }
+.host-request-dialog p, .host-request-dialog small { font-size: .85rem; line-height: 1.5; color: #bccdca; }
+.host-request-dialog textarea { box-sizing: border-box; display: block; width: 100%; resize: vertical; margin-top: .6rem; padding: .7rem; color: inherit; background: #0c1917; border: 1px solid #4d6865; border-radius: 8px; font: inherit; }
+.host-request-dialog label { font-size: .85rem; }
+.host-request-dialog details { margin-top: 1.2rem; }
+.host-request-history { padding-left: 1.2rem; }
+.host-request-history li { margin: .8rem 0; overflow-wrap: anywhere; }
+.host-request-history p { margin: .3rem 0; white-space: pre-wrap; }
+.host-request-dialog .host-request-error { color: #ffb4a5; }
+@media (max-width: 600px) { .host-request-status { max-width: 7rem; font-size: .65rem; } }
+.player-toolbar { flex-wrap: wrap; justify-content: flex-end; max-width: calc(100vw - 24px); }
+.host-request-status { position: absolute; top: calc(100% + 5px); right: 0; padding: 3px 7px; border-radius: 5px; background: #111a20c9; pointer-events: none; }
+.host-request-status { top: calc(100% + 38px); max-width: 14rem; }
+.host-request-status[hidden] { display: none; }
+.host-request-dialog .button { min-height: 44px; }

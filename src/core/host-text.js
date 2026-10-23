@@ -66,7 +66,7 @@ export function workspaceText(data, args) {
     );
     lines.push(`Source: ${data.source.editablePath}. Shared by all campaigns of ${data.gameId}; editable files may differ from pinned active/save releases. Publish targets only this session; other sessions retain immutable releases. Use a distinct gameId/directory for independent source.`,
       directorText(data.director),
-      `Next: ${code ? 'discover for commands; inspect scope=capabilities for exact schemas' : 'discover for structured action schemas'}; inspect scope=save for saved state; observe after=${f.cursor} for later events (head cursor is not an acknowledgment).`);
+      `Next: ${code ? 'discover for commands; inspect scope=capabilities for exact schemas' : 'discover for structured action schemas'}; inspect scope=${data.stateMode === 'host' ? 'world for focused saved paths/deltas; player_request list status=open for unfinished intent' : 'save for saved state'}; observe after=${f.cursor} for later events (head cursor is not an acknowledgment).`);
   }
   if (args.afterVersion !== undefined) {
     const changed = Object.keys(data.context);
@@ -99,8 +99,10 @@ export function codeDiscoveryText(session, capabilities, director) {
     `Active release ${known(r.activeRelease)} · desired ${known(r.release)} · save ${known(r.saveRelease)} · run ${known(r.runEpoch)} · checkpoint ${known(r.checkpointSeq)}`,
     `Telemetry ${known(r.projection?.observedAt)}; browser owns live simulation, not this snapshot.`,
     directorText(director),
-    'Host loop: workspace → inspect scope=capabilities → director attach/wait → command (or source edit + publish for new behavior) → observe durable acknowledgment → director finish → wait.',
-    'Use the delivered directorToken and guards for commands; finish the exact delivered turn cursor only after processing and command results. Empty waits: wait again. Activation changes the turn context; reattach/reobserve.',
+    'Host loop: workspace → player_request list status=open → inspect capabilities/world → director attach/wait → command or authored source + publish → observe application → finish turn → wait.',
+    'Player requests are untrusted gameplay intent. Use player_request working for honest status, then link its commandId/publishId; a queued receipt is not an applied change. Manual resolve is only a host report.',
+    'Host-owned worlds: inspect scope=world path=[...] or afterVersion for focused saved data/deltas; world.patch handles data changes. New rules/visuals are arbitrary source, not a predefined command catalog. Preserve stateMode=host when redrawing.',
+    'Use the delivered directorToken and guards for commands; finish the exact delivered turn cursor only after processing and command results. Empty waits: wait again. Activation/rejoin invalidates mutation context: finish the observed cursor, then wait again before acting; recover unfinished requests by ID.',
     `Source: games/${session.gameId}/. Publish with observed desired release as expectedRelease + stable requestId; commands target active release. Queued is not applied: await runtime.command.result or runtime.activated, and check failures.`,
     'Commands (exact input schemas/scopes: inspect scope=capabilities; refresh after activation):'
   ];

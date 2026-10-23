@@ -1,21 +1,33 @@
-# Puzzle / sandbox: understand a system or express an idea
+# Puzzle / sandbox: understanding and experimentation
 
-## Choose the promise
+Two optional, combinable lenses. A puzzle may invite forming a model toward a goal;
+a sandbox may invite expression or open-ended experimentation. Neither requires
+spatial pieces, direct manipulation, a win condition or a fixed set of verbs.
 
-For a puzzle, the pleasure is forming and testing a model toward a legible goal. For a sandbox, it is making, exploring and surprising oneself; a win condition may be unnecessary. Both favor concrete verbs such as drag, rotate, connect, arrange, combine or simulate. State which promise leads rather than imposing a puzzle gate on every toy.
+## Design questions
 
-## Author the loop
+- What can the player change, and how will they recognize its consequences? Use
+  gestures, commands, text, tools or other controls suited to the system.
+- For a puzzle, which constraints are intended to be known or discovered? Keep
+  solutions consistent with those rules, including unintended valid approaches.
+- For a sandbox, can the player pursue their own idea and retain or revise what
+  they make? Avoid silently substituting the host's preferred outcome.
+- Would undo, scoped reset, previews or inexpensive retries improve experimentation?
+  Where consequences are irreversible, make that commitment understandable.
+- If pressure or scarcity is included, what does it add to the intended experience?
 
-- Teach one causal relationship through immediate feedback, then combine established rules. Show what can be manipulated and distinguish editable objects from scenery.
-- For puzzles, make constraints and success observable. Avoid hidden arbitrary prerequisites or changing the answer when the player finds an unintended valid solution.
-- For sandboxes, make useful combinations easy to discover and support keeping or revising a creation. Let players pursue their own objective instead of requiring the host's solution.
-- Provide reversible experimentation where appropriate: undo, reset with clear scope, safe previews or inexpensive retries. Do not punish exploration with unexplained destruction.
-- If adding timing or resource pressure, verify it enriches the intended discovery rather than masking a weak puzzle.
+## Live hosting and continuity
 
-## State, context and live hosting
+Persist relevant creations, configurations or discoveries as promised. Preserve
+player work while extending available behavior. Summarize the current experiment
+and relevant constraints rather than every low-level input. Keep hidden solutions
+separate from player-facing hints when the puzzle relies on discovery.
 
-Persist the relevant arrangement/construction, discovered rules and progress. Summarize the current configuration, goal if any, known constraints and last experiment, not a transcript of every drag. Keep the host's solution separate from player-facing hints. Offer graduated hints only as needed; preserve user creations when adding new materials or mechanics. Lumen Weave is an example of optical manipulation, not a requirement that all puzzles use beams.
+## Observe play
 
-## Play evaluation
-
-Watch an uncoached first attempt and a revised hypothesis. Can the player predict an outcome and tell why it differed? For puzzles, verify success through the actual rules and accept alternative valid solutions. For sandboxes, inspect two genuinely different creations and whether editing remains satisfying. Measure useful experiments and discoveries, not just completion speed or number of clicks.
+Look for useful experiments, expression or revised understanding, according to the
+chosen promise. Check that feedback helps explain outcomes and that supported
+solutions or creations survive normal save/resume. A single creation, a compact
+riddle or a long-running simulation need different evaluation, not a required count
+of strategies. Tool-heavy editors, abstract boards, prose and sparse canvases are
+all possible presentations; provide accessible alternatives to gestures used.

@@ -8,8 +8,9 @@ is required; no third-party packages are needed.
 
 ## Primary code-game workflow
 
-There are ten tools: `discover`, `session`, `observe`, `inspect`, `publish`,
-`command`, `checkpoint`, plus legacy `act`, `author`, and `jobs`. Use
+There are fifteen tools: `discover`, `session`, `observe`, `inspect`, `director`,
+`work`, `asset`, `library`, `workspace`, `publish`, `command`, `checkpoint`,
+plus legacy `act`, `author`, and `jobs`. Use
 [the host playbook](host-playbook.md) for the source/publish/activate loop and
 [the architecture](architecture.md) for ownership and persistence boundaries.
 `publish` is guarded by the observed `runtime.release`; `command` targets the

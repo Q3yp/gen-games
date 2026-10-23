@@ -3,3 +3,25 @@ node_modules/
 .env
 *.log
 .DS_Store
+
+# Local build and tool caches (not game source/assets).
+/.cache/
+/.tmp/
+/tmp/
+/dist/
+/coverage/
+*.tsbuildinfo
+.env.*
+!.env.example
+
+# Generated play evidence belongs in artifact storage, not source control.
+/docs/demo/**/*.png
+/docs/demo/**/*.jpg
+/docs/demo/**/*.jpeg
+/docs/demo/**/*.webp
+/docs/demo/**/*.mp4
+/docs/demo/**/*.webm
+/docs/demo/**/*.gif
+/docs/demo/**/*.tar.gz
+/docs/demo/**/*.zip
+/docs/demo/**/*.json

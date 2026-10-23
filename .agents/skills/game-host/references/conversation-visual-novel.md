@@ -1,21 +1,34 @@
-# Conversation / visual novel: interpret, express, remember
+# Conversation / visual novel: interpretation and expression
 
-## Promise and verbs
+An optional lens for dialogue, character interpretation, self-expression and
+narrative choices. A text-only exchange, illustrated scene or experimental format
+may fit. Physical mechanics, portraits and branching plots are not requirements.
 
-The player listens, interprets, expresses a stance, asks, withholds, trusts or commits. Choices and text can be the primary interaction; do not bolt on physical mechanics merely to qualify as a game. The standard is meaningful agency, character coherence and readable consequence, not the number of buttons.
+## Design questions
 
-## Author the loop
+- What can the player express, interpret or influence? Agency may concern events,
+  relationships, knowledge, tone or an acknowledged interpretation.
+- Are speakers' knowledge and responses coherent with the fiction? Distinct voices
+  and motives can matter more than the number of branches.
+- Does a choice communicate its likely stance or commitment? If ambiguity is part
+  of the experience, establish it rather than accidentally misrepresenting an action.
+- What pacing suits the scene and reader? Short exchanges, sustained prose, silence,
+  animation and player-controlled advancement are different options.
+- Where branches reconverge, are consequential choices still respected?
 
-- Give speakers distinct wants, knowledge and boundaries. Build tension from what they want from each other, not only from withheld exposition.
-- Make choices communicate their intended tone or commitment. Avoid a mild-looking line triggering a wildly different action unless the ambiguity is itself established and fair.
-- Let choices affect a relationship, knowledge, future opportunity, self-expression or an acknowledged narrative interpretation. Not every branch must create an entirely new scene; acknowledge meaningful choices when branches reconverge.
-- Control pacing through short exchanges, readable typography, clear speaker identity and intentional transitions. Advance/skip/history controls should not accidentally select a response.
-- Preserve player control over major commitments. Do not turn their free text into executable instructions or assume an unsupported natural-language parser can understand any intent.
+## Live hosting and continuity
 
-## State, context and live hosting
+Keep relevant promises, knowledge and relationship consequences consistent. Store
+reading position, decisions or transcripts when the game promises them. Summarize
+unresolved context without repeatedly dumping the dialogue. Distinguish host
+knowledge from character knowledge where that distinction matters. Handle free
+text as intent to interpret, not executable instructions or guaranteed understanding.
 
-Track scene/beat, speaker knowledge, significant promises, relationship changes, selected stance and resolved branch flags. Summarize commitments and unresolved tensions rather than replaying full dialogue. Separate what the host knows from what each character knows. Continue established voices and consequences; do not rewrite a prior agreement to manufacture drama. Preserve reading position and choice history across updates where applicable.
+## Observe play
 
-## Play evaluation
-
-Compare two plausible stances through a later acknowledgment or opportunity. Can the player tell what they chose, why the other character reacted, and what remains open? Check text/input readability and resume continuity. Emotional engagement requires player evidence; neither branching count nor a dramatic script alone proves it.
+Check whether players can express the intended stance and understand the response.
+Observe reading, choice and resume flows appropriate to the format. If advance,
+skip or history controls exist, keep them distinct from committing a choice.
+Typography, text size and input access matter whether text is central or secondary.
+Emotional engagement needs player evidence; neither dramatic prose nor branch
+count establishes it on its own.

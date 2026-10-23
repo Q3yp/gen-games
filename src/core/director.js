@@ -43,21 +43,25 @@ export class Director {
     );
     return c;
   }
-  validateToken(id, token) {
-    const c = this.current(id),
-      runtime = this.engine.session(id).runtime;
+  validateTurn(id, token) {
+    const c = this.current(id);
     check(
       c && c.turn && c.turn.token === token,
       'STALE_DIRECTOR_TURN',
       'Only the current unexpired director turn can act or finish.'
     );
-    check(
-      c.turn.runEpoch === runtime?.runEpoch &&
-        c.turn.release === runtime?.activeRelease,
-      'STALE_DIRECTOR_CONTEXT',
-      'Run or release changed during this turn. Detach, reattach, and observe again.'
-    );
     return c.turn;
+  }
+  validateToken(id, token) {
+    const turn = this.validateTurn(id, token);
+    const runtime = this.engine.session(id).runtime;
+    check(
+      turn.runEpoch === runtime?.runEpoch &&
+        turn.release === runtime?.activeRelease,
+      'STALE_DIRECTOR_CONTEXT',
+      'Run or release changed. Finish the delivered cursor, then wait for fresh context before acting. Unfinished requests remain durable.'
+    );
+    return turn;
   }
   async call(args) {
     const id = this.engine.session(args.sessionId).id;
@@ -100,7 +104,8 @@ export class Director {
       return this.result(id);
     }
     if (args.op === 'finish') {
-      const turn = this.validateToken(id, args.directorToken);
+      // Acknowledgment retires an observed cursor, not authority to mutate.
+      const turn = this.validateTurn(id, args.directorToken);
       check(
         !this.engine
           .session(id)

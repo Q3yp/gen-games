@@ -13,9 +13,9 @@ Opening the page does not start a model. The game owns arbitrary code, local
 controls, simulation and save shape; reusable transport and durability wiring do
 not require a component catalog or scene schema.
 
-Keep movement, held keys and other continuous interaction local. The director
-reacts to semantic milestones such as an intention, collision, discovery or changed
-objective, not every frame. Balance speed with creative and mechanical quality:
+Keep already-defined interaction and time-sensitive execution local. The director
+reacts to meaningful requests and outcomes rather than every frame. Generative
+conversation or improvisation may intentionally use host turns as part of play. Balance speed with creative and mechanical quality:
 reduce redundant context and tool work, not the depth or expressiveness of the
 game. An early consequence or progressive response is useful when it serves play,
 not a requirement that every response be tiny. Complex visuals and mechanics may
@@ -77,10 +77,26 @@ Never claim “hold left/right” works because that caption or a new choice app
 See [live-session-notes.md](live-session-notes.md) for the bounded evidence behind
 these priorities, not a reusable game script.
 
-## Select the host profile before authoring
+## Presentation boundaries
 
-Read the [shared host core](../.agents/skills/game-host/SKILL.md), then only the
-profile that matches the requested experience:
+The reusable shell occupies two small top-right controls: Game menu and Ask host.
+Library/session/fullscreen/studio tools are on demand. Request progress remains
+visible while queued/working or failed; successful updates briefly acknowledge
+completion, then yield the screen. The request history remains in Ask host.
+
+A host owns all game UI and can use any canvas, WebGL or DOM presentation. The
+shell does not inject stats, prescribe a component library, rewrite authored CSS,
+or hide game controls to manufacture an immersive screenshot. See the shared
+skill's “Choose presentation for this game” guidance for experience-appropriate
+interaction, information density and accessibility. Text, menus, abstract boards
+and dense controls can be the intended game, just as a spatial canvas can. Engine-only refinement must
+leave existing game source and saved progress unchanged.
+
+## Use optional design references
+
+Read the [shared host core](../.agents/skills/game-host/SKILL.md). The following
+nonexhaustive references are optional, composable design questions. Use any that
+help, or none; an unlisted genre needs no new engine category:
 
 - [RPG](../.agents/skills/game-host/references/rpg.md): continuing identity,
   build, quests and world consequences.
@@ -95,13 +111,11 @@ profile that matches the requested experience:
 - [Action](../.agents/skills/game-host/references/action.md): responsive control,
   timing and readable real-time pressure.
 
-Choose one primary promise. Add a secondary profile only for a substantial
-subsystem, such as RPG + action; do not load all profiles on every turn. State
-what persists, what failure costs and what can be retried if the profiles pull in
-different directions. Genre guidance selects design priorities, not runtime APIs
-or a mandatory ruleset. Lumen Weave's puzzle interactions are not the template
-for every game; Ember Vault and Signal House's structured-world format does not
-constrain code packs.
+Choose presentation and evaluation from the intended activity, not a required
+primary/secondary genre hierarchy. Resolve conflicting assumptions about
+continuity, pacing, information and player control explicitly. A genre reference
+provides neither runtime APIs nor required mechanics, visuals, success conditions
+or a save schema. Existing demos are examples, not default products to reproduce.
 
 ### Example starting prompt for a continuing RPG host
 
@@ -111,15 +125,15 @@ constrain code packs.
 > rather than selecting an unrelated one. Open it and discover its session
 > schemas using the commands below. Observe current state before changing it.
 > Preserve this character, build, inventory, quest outcomes and world changes.
-> Make the next connected encounter give two credible approaches whose costs
-> and later consequences are visible. Inspect the existing pack before deciding
+> Identify the next interaction that suits this RPG and the player's intentions.
+> Make its relevant choices and consequences understandable. Inspect the existing pack before deciding
 > whether the encounter needs source changes. If publishing code, use the
 > observed release guard and wait for activation as documented below. Do not
 > invent a quest, combat or dialogue tool: use only the discovered contract and
 > game-implemented commands. Validate through actual player controls, then
 > record the consequence and a reachable next objective in a compact summary.
 
-This is a prompt template, not a claim that a session exists or that the runtime
+This is an optional RPG-specific prompt example, not a shared-host requirement or a claim that a session exists or that the runtime
 already implements RPG features. The intended game/session must be resolved from
 actual context. For action combat, load the action profile too; for a dialogue-led
 RPG, load conversation only if that subsystem needs its guidance.
@@ -157,37 +171,28 @@ do not mechanically substitute a fresh revision into an old proposal. A transpor
 timeout may conceal a successful mutation: inspect before retrying, retaining the
 original request ID for an identical retry.
 
-## The experiment card
+## Frame a useful iteration
 
-Before a substantial change, write a small working note with:
+Before a substantial change, identify the intended player experience, what the
+player can do or perceive, which state must persist, and what evidence would show
+an improvement. Add only the questions relevant to this activity: a narrative may
+need interpretation and consequence; a management game may need inspectable
+systems; a timing game may need response windows. None is a universal template.
 
-- **Profile and continuity:** Which primary/secondary genre applies, what persists,
-  and what is the next decision beyond this scene?
-- **Verb:** What can the player directly do?
-- **Tradeoff:** What makes two plausible moves differ?
-- **Readable consequence:** What changes on screen, and what state confirms it?
-- **Failure and recovery:** What can go wrong, how will the player know why, and
-  what can they try immediately afterward?
-- **Novel code:** Which new rule or interaction requires executable source rather
-  than a renamed choice or number adjustment?
-- **Observation:** What would make you keep, revise, or discard this experiment?
-
-For example, a resonator that converts rhythmic flashes into steering is a new
-mechanic only if pulse timing actually affects movement. A glowing resonator that
-merely triggers a predefined narrative choice is not the same experiment. This
-does not disqualify narrative games: a conversation experiment should instead
-state the actual stance, relationship or future opportunity that a choice changes.
-
-Do not require every game to use beams, puzzles, combat, or even a win condition.
-A toy can succeed through expressive combinations and satisfying surprises. Its
-interactions still need observable cause and effect.
+Choose the medium and information density accordingly. The game may be textual,
+menu-driven, spatial, abstract, audiovisual or a hybrid. Do not add combat,
+resource costs, failure, movement or alternative strategies merely to satisfy a
+checklist. Preserve meaningful feedback and agency in the chosen form. Distinguish
+a requested content edit from a requested new executable behavior; implement and
+verify what was actually asked for.
 
 ## Source, activation, and recovery
 
 The code-pack manifest declares `runtime: "code"`, an `entry` such as
 `"./main.js"`, `saveVersion: 1`, and an arbitrary JSON `initial` save. The entry
 exports `create(host, {save, release, previousRelease})` as its default factory.
-Its return value requires `serialize()` and `dispose()`; optional hooks are
+Legacy code instances require `serialize()` and `dispose()`. With `stateMode = "host"`,
+the engine supplies world serialization and lifecycle cleanup; optional authored hooks are
 `step(dtSeconds)`, `render()`, `inspect()`, and `command(name, args)`.
 The game owns canvas/WebGL/DOM and input listeners. Dispose listeners, animation
 resources, and other owned state when the runtime replaces the module.
@@ -228,11 +233,11 @@ arrangements while the player still has useful local play. Await the durable
 command result, then separately verify the game's safe-boundary entry event; staged
 does not mean entered. Save pending content and carry the live player's condition
 at entry, not a snapshot captured during staging. Audit upstream exit/recovery
-rules too: a correct transition cannot preserve damage already erased by a gate.
+rules too: a later transition cannot recover state already lost by an earlier rule.
 Preserve or explicitly migrate staged factory versions across source publication.
 These are game-defined commands, not a required engine scene catalog. Genuinely new
-rules still need source. A short complete stopping point beats an empty exit while
-the host spends minutes authoring; do not promise continuation before it is ready.
+rules still need source. If authoring takes time, choose an honest waiting or
+stopping experience appropriate to this game; do not promise a change before it is ready.
 
 The running game's capabilities define its command vocabulary; do not invent a
 command name from a caption. Use the director turn's release, run and scope guards
@@ -275,41 +280,32 @@ separately from routine direction and engine delivery, including quality validat
 Compare like work with like work: a longer, richer generation is not automatically
 a regression, and reduced output alone is not evidence of a tooling improvement.
 
-## Independent replay, not a scripted victory lap
+## Independent experience review
 
-Give the reviewer only the player-facing controls and goal. Let them discover the
-mechanic before explaining its intended cleverness. Have them replay with a
-meaningfully different strategy: alter timing, topology, resource allocation,
-movement route, or combination of tools, not merely choose a different caption.
+Give the reviewer the visible premise and ordinary controls, not hidden state or
+an optimal route. Let them participate naturally. Use only applicable questions
+from any design references, and ask what they understood, what their actions
+changed, what held their interest and what caused friction.
 
-Apply the selected profile's evaluation questions as well as the shared checks
-below. For a continuing RPG, evaluate consequences across connected encounters
-and a revisit, not only an opening-scene victory. Capture a short evidence record:
+Gather evidence suited to the promise. A conversation may need coherent response
+and remembered context; a simulation may need understandable consequences; a
+rhythm game may need reliable timing feedback. Replay, strategy comparison,
+failure recovery and a second encounter are useful only when relevant. Do not
+turn a finite experience into a replay challenge just to validate it.
 
-| Question | Evidence to capture |
-| --- | --- |
-| Could the player find an action? | Screenshot and their first attempted input |
-| Did the action feel immediate? | Visible feedback and matching event/state |
-| Was the decision interesting? | Two viable alternatives and their consequences |
-| Was failure understandable? | Cause visible before or at failure; recovery path |
-| Did replay differ? | Second strategy and changed outcome or new insight |
-| Did code authorship matter? | New mechanic's actual rule and exercised behavior |
-
-If independent replay is unavailable, label the review self-play. Do not call a
-successful scripted path independent validation. Do not invent player enjoyment.
-
-End each iteration with a specific judgment such as: “Rotating the mirror gives
-immediate beam feedback, but losing the boat gives no warning; add a danger wake
-before tuning difficulty.” Avoid “Everything is fun and polished.” Fix the most
-important evidenced problem and replay that interaction. Keep deeper architecture
-changes tied to a concrete limitation in what the player or host can do.
+Correlate player input, visible/audible feedback and persisted consequences where
+applicable. Verify the actual requested change and continuity. Separate this
+reliability evidence from enjoyment; a scripted completion or attractive image is
+not an independent player verdict. Label self-play and tool limitations honestly.
+Report concrete friction, fix the most important demonstrated problem, and
+recheck the affected interaction before expanding scope.
 
 ## Returning with a fresh agent
 
 Start with `library list`, then `workspace read` using the intended stable host ID.
 This returns bounded handoff context, source identity and exact save/release freshness;
 read current capabilities and only missing saved fields before attaching. Preserve
-custom character, inventory, skills and progress through the game's own save/command
+the game's arbitrary state and established consequences through its own save/command
 contract. Before leaving, update the workspace brief, decisions, unresolved work and
 artifact references with its observed version. See [library-workspaces.md](library-workspaces.md)
 for the full durable library and cross-session handoff workflow. Compare the brief's
@@ -317,7 +313,7 @@ for the full durable library and cross-session handoff workflow. Compare the bri
 brief as intent/history, not permission to overwrite newer resources or outcomes.
 If the source changed, rediscover capabilities before continuing an old plan.
 
-## Local combat and flexible authored rules
+## Optional example: local combat and timed rules
 
 The director can invent an encounter or timed sequence, but local code executes
 input judgment and consequences. Use the optional [timed-cue helper](live-runtime.md#optional-local-timed-cues)

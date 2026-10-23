@@ -1,21 +1,35 @@
-# Roguelike: commit, adapt, learn, try again
+# Roguelike: variation, commitment and adaptation
 
-## Promise and verbs
+An optional lens for run-based experiences with changing circumstances. Common
+forms involve scarce resources, uncertain opportunities or evolving builds, but
+combat, procedural rooms and permanent upgrades are not mandatory. Combine with
+other lenses when useful; do not impose a run-reset structure on a continuing game.
 
-The player reads uncertain opportunities, commits scarce resources, and adapts a build within a bounded run. Common verbs are scout, route, fight, spend, combine and retreat. Replay should reveal a better plan, not just ask for more grind. Runs can coexist with an RPG's persistent world; choose explicitly what survives.
+## Design questions
 
-## Author the loop
+- If runs and loss exist, what begins, ends or survives a run? Make consequential
+  reset rules understandable before commitment.
+- What variation invites adaptation? Randomness, authored surprises and player
+  choices can each contribute; distinguish meaningful variation from cosmetic change.
+- If rewards or combinations exist, how do they affect decisions? More currencies
+  and upgrades are not inherently more depth.
+- Can a player understand consequential uncertainty well enough to choose a risk?
+  The appropriate detail depends on the rules and intended discovery.
+- If replay is part of the promise, what makes another attempt worth choosing?
+  Avoid treating compulsory grind as evidence of engagement.
 
-- Establish the run goal, risk horizon and reset boundary before serious loss. Distinguish run inventory, permanent unlocks and player knowledge.
-- Give route or reward choices different tactical implications. Randomness should create understandable adaptation, not unknowable punishment; expose consequential odds or uncertainty honestly.
-- Let combinations change play, with viable alternatives rather than one mandatory upgrade chain. Ensure constrained resources create choices before adding more currencies.
-- Telegraph threats and provide room to respond. A failed run should leave the player able to name an avoidable mistake or a risk they knowingly accepted.
-- Keep restart quick and the next attempt meaningfully different. Persistent upgrades are optional, not a substitute for mastery or an excuse for compulsory repetition.
+## Live hosting and continuity
 
-## State, context and live hosting
+Separate run-local and persistent state only where that distinction exists. Preserve
+ongoing progress across ordinary reloads; do not accidentally reroll outcomes or
+change committed odds during publication. Introduce rule changes at a point where
+the player can understand them. Keep context focused on current decisions rather
+than every generated detail.
 
-Track run identity/seed where applicable, stage/route, build, consumables, known threats, rewards and the precise reset policy. Summaries separate this run's state from durable unlocks and remembered discoveries. Preserve the current run across ordinary reloads. Do not reroll a bad outcome by accident during publication, or secretly modify odds after commitment. Introduce authored changes between rooms or runs where their rules can be understood.
+## Observe play
 
-## Play evaluation
-
-Observe a loss or voluntary retreat and an actual restart. Is the loss explainable, and can the next attempt pursue a different strategy? Does a reward alter tactics rather than only throughput? Compare two routes/builds and distinguish meaningful variation from cosmetic randomization. Do not call a continuing campaign a roguelike just because it contains combat or procedural rooms.
+Evaluate the intended uncertainty, adaptation and consequences. Where loss, restart,
+builds or routes exist, inspect those flows and their clarity; do not manufacture
+one merely to pass a checklist. Presentation may be an arena, cards, text, tactical
+board or dense management interface. Show the information needed for meaningful
+commitments without prescribing its visual form.

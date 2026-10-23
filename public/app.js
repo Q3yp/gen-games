@@ -1,3 +1,4 @@
+import { bindPlayerRequests } from './player-requests.js';
 /** Studio bootstrap and accessible human input bindings. */
 import { $, $$, state, savedSession, request, notify, connection, world, hero, scene, game, position, terminal, setText, checkCondition, fillSelect, dispatch } from './shared.js';
 import { render } from './render.js';
@@ -13,6 +14,7 @@ function showNewDialog() { $('#new-form .dialog-error')?.remove(); fillSelect($(
 function bindEvents() {
   $('#new-session').addEventListener('click', showNewDialog);
   bindPlayerShell();
+  bindPlayerRequests();
   $('#help-button').addEventListener('click', () => $('#help-dialog').showModal());
   $$('[data-close-dialog]').forEach(button => button.addEventListener('click', () => button.closest('dialog').close()));
   $$('dialog').forEach(dialog => dialog.addEventListener('click', event => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } }));

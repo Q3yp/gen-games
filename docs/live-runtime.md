@@ -48,6 +48,25 @@ The browser retries stable event IDs; the server durably deduplicates them. Pend
 browser queues are memory-local, not an offline outbox surviving browser crashes.
 Backpressure is reported rather than silently dropping a full queue.
 
+Emission is preflighted before recording an ID or changing the queue. Event types
+are at most 100 characters and cannot use `runtime.*` or `state.changed`; text is
+at most 2000 characters. JSON-encoded data, including the host-added `observation`,
+is at most 12,000 UTF-8 bytes. Existing type/text coercion is preserved. Inspection
+summaries and version maps have the same 12,000-byte limit; version maps contain
+at most 100 string/finite-number tokens. Capabilities must meet the command contract
+and fit within 48,000 bytes. Validation uses the actual JSON wire representation,
+so, for example, a Date-valued token becomes a string. Cycles and BigInt cannot be
+sent. `versions()` is captured once for both the event and its projection.
+
+An invalid emission throws a readable error without enqueueing it. An active game
+pauses; an invalid candidate fails activation, retaining the previous game. Correct
+the source and publish again: already valid queued events keep their IDs and must
+be acknowledged before the corrected release activates, without a browser reload.
+Construction-time events use the validated activation projection. Within a command,
+earlier valid events and the captured save still receive one atomic failed-command
+receipt; invalid optional inspection telemetry is omitted from that receipt. The
+game pauses after that receipt is acknowledged, with normal retries while pending.
+
 `inspect projection` supplies summary, versions, release, runEpoch, observedAt and
 telemetrySeq. This is timestamped browser telemetry, not a promise of current frame
 state. Scope guards are checked on enqueue and again in the playing browser directly

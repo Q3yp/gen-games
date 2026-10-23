@@ -1,30 +1,32 @@
-# Adventure: discover a world through purposeful exploration
+# Adventure: curiosity and discovery
 
-## Promise and verbs
+An optional lens for exploring places, ideas, evidence or relationships. Exploration
+may be spatial, textual, conversational or abstract. Levels, inventory and combat
+are possible tools, not prerequisites.
 
-The player notices, travels, inspects, connects clues, uses objects and changes places. Curiosity and the satisfaction of understanding a location lead. RPG progression can supplement this, but adventure need not include levels, builds or combat.
+## Design questions
 
-## Author the loop
+- What invites the player to investigate, and how can a discovery inform their
+  next idea? Clues, places, objects and characters need only serve the chosen form.
+- If inference matters, can the player distinguish established evidence from an
+  assumption? Respond usefully to reasonable experiments and respect valid deductions.
+- If navigation or object use matters, are possibilities legible enough to avoid
+  accidental hotspot hunting or arbitrary combinations?
+- Does uncertainty serve curiosity, or merely leave the player stuck? Hints,
+  alternate leads or deliberate ambiguity may fit different experiences.
 
-- Give each location a readable identity, exits and an unanswered question. Connect discoveries so a clue changes where the player wants to go or what they can try.
-- Make important interactables recognizable without turning every screen into hotspot hunting. Match object affordances to plausible uses; avoid arbitrary inventory combinations.
-- Track evidence versus assumptions. Offer enough clues to infer a solution, and alternate routes or graduated hints when one missed detail would otherwise halt play.
-- Let discoveries alter the environment, available route or character understanding. Avoid long exposition that has no effect on the next action.
-- Keep backtracking purposeful and navigation legible. Make irreversible choices recognizable; prevent accidental loss of a unique item from silently making progress impossible.
+## Live hosting and continuity
 
-## State, context and live hosting
+Retain discoveries and consequences the game has established. Where there are
+locations, inventory or gates, preserve their relevant state across transitions
+and avoid accidental soft locks. Introduce a promised interaction when its behavior
+is ready; do not invalidate earlier reasoning merely to prolong a mystery.
+Summarize relevant known leads without exposing undiscovered answers.
 
-Persist visited places, discovered connections, inventory, examined clues, solved obstacles and changed location/NPC states. Summarize current question, relevant known clues, accessible leads and unresolved gates; do not reveal unknown answers. New clues should respect established facts and valid deductions, not retroactively invalidate the player's reasoning.
+## Observe play
 
-## Play evaluation
-
-Ask an uncoached player to choose a next lead and explain why. Follow a clue across locations and revisit a changed place. Check that a wrong but reasonable idea receives informative feedback. Distinguish exploration from aimless traversal, and deduction from exhaustively clicking every object.
-
-## Live-world acceptance gates
-
-A newly inviting doorway must actually be traversable when its visual promise appears.
-Stage its destination and save transition before lighting the entrance. Preserve
-carried objects, nearby companions and previously changed places across crossings.
-A rescue should leave someone or something in the world the player can care about,
-not only an achievement flag. Let the player choose a natural stopping point; do
-not immediately replace a satisfying return home with a compulsory new threat.
+Look at how players choose and interpret leads, including unexpected but reasonable
+ideas. Evaluate discoveries in the medium actually used: an illustrated world,
+text passage, evidence board or menu can all support exploration. Check the
+transitions and revisits that exist, rather than requiring a particular route,
+rescue, homecoming or number of locations.

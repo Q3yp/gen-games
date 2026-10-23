@@ -1,24 +1,19 @@
-import { createLifecycle } from './lifecycle.js';
-
-export default function create(host, { save }) {
-  const life = createLifecycle(host);
-  const state = structuredClone(save); // Your JSON object, not an engine world schema.
+// The engine retains this arbitrary world when the renderer/rules are replaced.
+export const stateMode = 'host';
+export default function create(host) {
   const root = document.createElement('div');
   root.style.cssText = 'width:100%;height:100%;min-height:240px;display:grid;place-items:center;background:#10151c;color:#92a3b8';
   root.textContent = '○';
-  root.setAttribute('aria-label', 'Empty game source scaffold. Gameplay has not been authored.');
+  root.setAttribute('aria-label', 'Empty authoring canvas. Gameplay has not been authored.');
   host.root.append(root);
-  life.own(() => root.remove());
-
-  // Replace this placeholder with any DOM, canvas, WebGL, audio, and mechanics.
-  // life.input(root, 'pointerdown', handler) fences player input with host.active.
-  // life.listen(window, 'keyup', handler) can release held inputs even while paused.
-  // After a meaningful change, life.save(); emit semantic outcomes with host.emit().
+  host.lifecycle.own(() => root.remove());
+  // Author any canvas/DOM/WebGL renderer and local mechanics here.
+  // host.world.read() is immutable. transact(draft => ...) changes your JSON.
+  // host.lifecycle.input(...) wires gated input; the engine owns save/cleanup.
+  // The shell's Ask host request channel needs no per-game implementation.
   return {
-    step(dt) { /* Advance your local simulation. The host owns the frame loop. */ },
-    render() { /* Draw your renderer. Candidate render runs before activation. */ },
-    serialize() { return structuredClone(state); },
-    inspect() { return { progress: 'Source scaffold: gameplay not yet authored.' }; },
-    dispose() { life.dispose(); }
+    step(dt) {},
+    render() {},
+    inspect() { return { progress: 'Empty authoring canvas', worldVersion: host.world.version }; }
   };
 }

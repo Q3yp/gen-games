@@ -68,6 +68,7 @@ async function processCommand(current) {
         current.commandStarts.set(command.commandId, performance.now());
       let envelope = current.results.get(command.commandId);
       if (!envelope) {
+        current.commandFault = null;
         let reply;
         let invoked = false;
         try {
@@ -139,17 +140,21 @@ async function processCommand(current) {
           current.commandEvents = [];
           invoked = true;
           const applyStarted = performance.now();
-          const result = current.instance.command(
-            command.name,
-            clone(command.args || {}),
-            Object.freeze({
-              requestId: command.commandId,
-              causeEventId: command.causeEventId,
-              runEpoch: current.epoch,
-              release: current.release.release,
-              expectedVersions: clone(command.expectedVersions || {})
-            })
-          );
+          let result;
+          current.commandExecuting = true;
+          try {
+            result = current.instance.command(
+              command.name,
+              clone(command.args || {}),
+              Object.freeze({
+                requestId: command.commandId,
+                causeEventId: command.causeEventId,
+                runEpoch: current.epoch,
+                release: current.release.release,
+                expectedVersions: clone(command.expectedVersions || {})
+              })
+            );
+          } finally { current.commandExecuting = false; }
           measure('command-apply', command.commandId, applyStarted);
           if (registered && result && typeof result.then === 'function') {
             // A trusted game must not continue mutations from background tasks.
@@ -173,6 +178,24 @@ async function processCommand(current) {
             errorCode: error.code || 'COMMAND_FAILED'
           };
         }
+        let observed;
+        try {
+          observed = projection(current, current.instance);
+        } catch (error) {
+          // Inspection is optional telemetry, not the command save. Do not let
+          // invalid telemetry strand valid events or create an unretryable result.
+          current.commandFault ||= runtimeError(
+            error.code || 'INVALID_PROJECTION',
+            `Game inspection failed: ${error.message}. Fix the game and publish a corrected release.`
+          );
+        }
+        if (current.commandFault)
+          reply = {
+            error:
+              reply.error ||
+              `${current.commandFault.message} The handler may have changed game state; its captured save is retained.`,
+            errorCode: reply.errorCode || current.commandFault.code
+          };
         current.resultEventStarts = new Map(
           (current.commandEvents || []).map((event) => [
             event.id,
@@ -192,7 +215,7 @@ async function processCommand(current) {
           ),
           checkpointSeq: ++current.seq,
           save: clone(current.instance.serialize()),
-          ...projection(current, current.instance),
+          ...observed,
           ...reply
         };
         current.commandEvents = null;
@@ -229,6 +252,11 @@ async function processCommand(current) {
     current.pendingResult = null;
     current.retryAt = 0;
     current.resultError = false;
+    if (current.commandFault) {
+      const error = current.commandFault;
+      current.commandFault = null;
+      fault(current, error);
+    }
     if (current.invalidAsyncCommand)
       fault(
         current,

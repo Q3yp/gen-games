@@ -29,7 +29,7 @@ function bindPlayerShell() {
   $('#menu-toggle').addEventListener('click', () => $('#player-menu').showModal());
   $('#player-menu').addEventListener('close', () => $('#menu-toggle').focus({ preventScroll: true }));
   $('#studio-toggle').addEventListener('click', () => setStudio(!document.body.classList.contains('studio-open')));
-  $('#menu-help').addEventListener('click', () => $('#help-dialog').showModal());
+  $('#menu-help').addEventListener('click', () => { $('#player-menu').close(); $('#help-dialog').showModal(); });
   $('#menu-reload').addEventListener('click', () => { $('#reload-view').click(); $('#player-menu').close(); });
   $('#fullscreen-toggle').addEventListener('click', async () => {
     try {
@@ -45,6 +45,10 @@ function bindPlayerShell() {
     if (event.key !== 'Escape' || $('dialog[open]') || event.defaultPrevented) return;
     if (document.body.classList.contains('studio-open')) setStudio(false);
     else $('#player-menu').showModal();
+  });
+  // Modal input never reaches arbitrary authored document key handlers.
+  document.querySelectorAll('dialog').forEach(dialog => {
+    dialog.addEventListener('keydown', event => event.stopPropagation());
   });
   $('#player-menu').addEventListener('click', event => {
     if (event.target.closest('[data-skill]')) $('#player-menu').close();

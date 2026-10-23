@@ -135,22 +135,24 @@ export async function publishSource(host, args) {
   };
   host.atomic(() => {
     host.engine.store.save(session);
-    host.engine.store.remember(
-      session.id,
-      args.requestId,
-      JSON.stringify(args),
-      result
-    );
-    host.event(
+    const published = host.event(
       session,
       'runtime.release',
       `Release ${release.release} ready; browser activation pending.`,
       {
+        publishId: args.requestId,
         release: release.release,
         entry: release.entry,
         saveVersion: release.saveVersion,
         previousRelease
       }
+    );
+    result.data.publicationCursor = published.seq;
+    host.engine.store.remember(
+      session.id,
+      args.requestId,
+      JSON.stringify(args),
+      result
     );
   });
   Object.assign(host.engine.game(session.gameId), {

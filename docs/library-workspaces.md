@@ -123,20 +123,23 @@ node src/agent/cli.js library --op create --game moon-garden --title 'Moon Garde
 
 `scaffold` allocates `games/moon-garden/` and registers its initial release live.
 It returns the editable path, release and file names, not a new campaign or save.
-The files are a minimal code manifest, an executable `main.js` placeholder, and
-an optional local `lifecycle.js`. The placeholder deliberately is not a game:
-replace its visual mark with your own controls, renderer and executable rules
-before sharing play. Its initial save is `{}`; the engine imposes no scene,
-character, item, action or component catalog. Canvas, WebGL, DOM and any other
-trusted game code remain available.
+The files are a minimal code manifest and an executable `main.js` placeholder.
+The placeholder deliberately is not a game: replace its visual mark with your
+own controls, renderer and executable rules before sharing play. Its initial
+world is `{}`; the engine imposes no scene, character, item, action or component
+catalog. Canvas, WebGL, DOM and other trusted game code remain available.
 
-The optional helper owns cleanup callbacks and listeners, fences `input()` with
-`host.active`, exposes unfenced `listen()` for release/cancel edges, and forwards
-`save()` to the existing runtime. It supplies no simulation or transport. Register
-each owned resource with `own(cleanup)` and dispose it with the game instance.
-Its local copy is included in that game's immutable releases; edit or remove it
-freely. Saves, semantic events, command acknowledgments and director guards still
-use the existing runtime, not a second persistence system.
+New scaffolds opt into `export const stateMode = 'host'`. The engine retains the
+arbitrary JSON world independently of the renderer's serializer. Use immutable
+`host.world.read()` and atomic `host.world.transact(draft => ...)`; rendering can
+be completely replaced while that world survives. `host.lifecycle` owns listeners
+and cleanup without copying plumbing into each game. `input()` is active-gated;
+`listen()` remains available for keyup/blur/cancel edges. Register resources with
+`own(cleanup)`; the engine disposes them on replacement. The shell already owns
+an on-demand Ask host channel. None of these APIs prescribe game mechanics.
+See [engine-owned-world.md](engine-owned-world.md) for the persistence contract.
+Existing legacy code packs keep their own serialize contract until explicitly
+adopted; their private closure state cannot be migrated automatically.
 
 Source IDs for scaffold are 1–80 lowercase letters/numbers separated by single
 hyphens, such as `moon-garden`. An existing registry ID, file, directory or symlink

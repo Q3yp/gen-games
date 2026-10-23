@@ -12,7 +12,9 @@ import {
   measure,
   checkpoint
 } from './code-runtime.js';
-import { scheduleEvents, emitEvent } from './code-events.js';
+import { scheduleEvents } from './code-events.js';
+import { createCodeHost, disposeCodeHost } from './code-host.js';
+import { wrapWorldInstance } from './code-instance.js';
 import {
   queuePending,
   receiveCommandDetail,
@@ -52,6 +54,7 @@ function disposeCodeGame() {
   generation++;
   if (run) {
     run.activationNotice?.();
+    run.faultNotice?.();
     if (run.events.length)
       notify(
         `${run.events.length} game events are still unacknowledged and cannot be carried into another run.`,
@@ -61,6 +64,7 @@ function disposeCodeGame() {
     cancelAnimationFrame(run.frame);
     clearInterval(run.timer);
     clearTimeout(run.eventTimer);
+    try { disposeCodeHost(run.hostResources); } catch (error) { console.warn(error); }
     try {
       run.instance?.dispose?.();
     } catch (error) {
@@ -137,7 +141,7 @@ async function mount(current, session, force = false) {
   )
     return;
   current.loading = true;
-  let candidate, root;
+  let candidate, root, resources;
   try {
     const url = releaseURL(next.entry);
     if (force) url.searchParams.set('reload', Date.now());
@@ -168,42 +172,17 @@ async function mount(current, session, force = false) {
       'position:absolute;inset:0;visibility:hidden;pointer-events:none';
     $('#custom-renderer').append(root);
     const pendingEvents = [];
-    const host = Object.freeze({
-      root,
-      get active() {
-        return (
-          run === current &&
-          current.instance === candidate &&
-          !current.paused &&
-          !current.swapping &&
-          !current.commandBusy &&
-          !current.pendingResult &&
-          !$('dialog[open]')
-        );
-      },
-      asset: (path) => {
-        const target = new URL(path, url);
-        return target.origin === location.origin ? target.href : '';
-      },
-      emit: (type, text, data = {}) =>
-        emitEvent(current, candidate, pendingEvents, type, text, data),
-      notify: (text) => {
-        if (current.instance === candidate) notify(String(text));
-      },
-      requestSave: () => {
-        if (current.instance === candidate) void checkpoint(current);
-      },
-      checkpoint: () => {
-        if (current.instance === candidate) void checkpoint(current);
-      }
-    });
+    resources = createCodeHost({ current, root, url, getCandidate: () => candidate,
+      pendingEvents, stateMode: module.stateMode, save });
+    const host = resources.host;
     candidate = await module.default(host, {
-      save,
+      save: resources.world ? resources.world.api.read() : save,
       release: next,
       previousRelease: current.instance
         ? current.release.release
         : session.runtime.saveRelease
     });
+    if (resources.world) candidate = wrapWorldInstance(candidate, resources.world);
     if (!isDesired()) return;
     if (
       !candidate ||
@@ -216,6 +195,11 @@ async function mount(current, session, force = false) {
     clone(candidate.serialize());
     await new Promise((resolve) => requestAnimationFrame(resolve));
     if (!isDesired()) return;
+    // Construction-time events have no instance to inspect yet. Freeze their
+    // validated activation projection rather than inspecting later during retry.
+    const observed = projection(current, candidate);
+    for (const event of pendingEvents) event.observed ||= observed;
+    resources.world?.seal();
     // Server acknowledgement fences a release before the local swap becomes active.
     await post(current.id, {
       op: 'applied',
@@ -223,14 +207,17 @@ async function mount(current, session, force = false) {
       runEpoch: next.runEpoch,
       release: next.release,
       save: clone(candidate.serialize()),
-      ...projection(current, candidate)
+      ...observed
     });
     await new Promise((resolve) => requestAnimationFrame(resolve));
     // Once acknowledged, honor the activation before mounting any newer target.
     if (run !== current) return;
     const previous = current.instance;
     const previousRoot = current.root;
+    const previousHost = current.hostResources;
     current.instance = candidate;
+    current.hostResources = resources;
+    resources.world?.activate();
     current.root = root;
     current.release = next;
     current.epoch = next.runEpoch;
@@ -276,15 +263,19 @@ async function mount(current, session, force = false) {
     root.classList.remove('code-candidate');
     previousRoot?.remove();
     $('#code-loading')?.remove();
+    try { disposeCodeHost(previousHost); } catch (error) { console.warn(error); }
     try {
       previous?.dispose?.();
     } catch (error) {
       console.warn(error);
     }
+    // Dismiss only notices owned by this run; newer unrelated notices survive.
+    current.faultNotice?.();
+    current.faultNotice = null;
     // Clear both the visual notice and its live-region copy after confirmed activation.
     current.activationNotice?.();
     current.activationNotice = null;
-    $('#announcer').textContent = 'Game is running.';
+    if ($('#notice').hidden) $('#announcer').textContent = 'Game is running.';
     reportUI('ui.recovered', next.entry);
   } catch (error) {
     if (run !== current) return;
@@ -311,6 +302,7 @@ async function mount(current, session, force = false) {
     );
   } finally {
     if (root !== current.root) {
+      try { disposeCodeHost(resources); } catch (error) { console.warn(error); }
       try {
         candidate?.dispose?.();
       } catch {

@@ -1,8 +1,6 @@
 /* The world is the default surface. Studio is an explicit alternate workspace. */
 body:not(.studio-open) { background: #080e12; overflow: hidden; }
 .player-toolbar { position: fixed; z-index: 40; right: max(18px, env(safe-area-inset-right)); top: max(16px, env(safe-area-inset-top)); display: flex; gap: 6px; }
-.player-toolbar .button { min-height: 34px; padding: 7px 12px; font-size: 10px; color: #d8e2df; background: #111a20c9; border: 1px solid #a9bcc32b; backdrop-filter: blur(14px); border-radius: 6px; margin: 0; }
-.player-toolbar .button:hover { background: #2c3b43; }
 .player-hud { position: fixed; top: max(20px, env(safe-area-inset-top)); left: max(24px, env(safe-area-inset-left)); z-index: 10; display: flex; flex-wrap: wrap; gap: 8px 18px; max-width: calc(100vw - 300px); align-items: center; font-size: 11px; color: #b7cac5; pointer-events: none; text-shadow: 0 2px 5px #000; }
 .player-hud strong { color: #eef1e4; }
 .player-hud .hud-health { color: #d4f7a7; }
@@ -56,14 +54,13 @@ body.custom-immersive:not(.studio-open) .scene-stage.immersive .pack-view { disp
 #player-menu .minor-stats { justify-content: flex-start; }
 #player-menu .event-panel { margin-top: 15px; }
 #player-menu .event-list { max-height: 240px; }
-.studio-open .player-hud, .studio-open #menu-toggle { display: none; }
+.studio-open .player-hud { display: none; }
 .studio-open .topbar { padding-right: 230px; }
 .studio-open .scene-stage.immersive { height: 650px; }
 .studio-open .scene-stage.immersive .custom-renderer,
 .studio-open .scene-stage.immersive .pack-view { height: 100%; padding: 0; overflow: auto; }
 @media (max-width: 700px) {
   .player-toolbar { top: max(12px, env(safe-area-inset-top)); right: 12px; gap: 4px; }
-  .player-toolbar .button { padding: 6px 9px; font-size: 9px; }
   .player-hud { left: 14px; top: 17px; max-width: calc(100vw - 220px); font-size: 9px; gap: 3px 8px; }
   .player-hud strong { width: 100%; }
   body:not(.studio-open) .scene-heading { left: 15px; right: 15px; top: 70px; }
@@ -85,7 +82,27 @@ body:not(.studio-open):not(.map-world):not(.custom-owned) .renderer { display: b
 body:not(.studio-open):not(.map-world) .dialogue-scene { margin: auto; }
 .code-game #menu-player, .code-game #menu-focus, .code-game .player-rail,
 .code-game .focus-panel, .code-game .player-hud { display: none; }
-.code-game .menu-columns { grid-template-columns: 1fr; }
+.code-game .menu-columns { display: none; }
 .code-game .custom-renderer { position: relative; }
 .code-game .pack-view { position: relative; }
 #code-loading { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; }
+
+/* Engine chrome is an overlay, never a page header or game design system. */
+.player-toolbar { gap: 8px; }
+.shell-control { position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #ffffff2e; border-radius: 50%; color: #f1f5ed; background: #122027b8; box-shadow: 0 2px 12px #0002; backdrop-filter: blur(12px); font: 21px/1 system-ui; cursor: pointer; }
+.shell-control:hover, .shell-control:focus-visible { background: #263d44; border-color: #d6e8e9; }
+.shell-control:focus-visible { outline: 2px solid #effaff; outline-offset: 3px; }
+.shell-control:disabled { opacity: .45; cursor: wait; }
+.shell-tip { position: absolute; right: 0; top: calc(100% + 9px); width: max-content; padding: 5px 8px; border-radius: 5px; background: #14252bf2; color: #f1f5ed; font: 12px/1.4 system-ui; pointer-events: none; opacity: 0; transition: opacity .15s; }
+.shell-control:hover .shell-tip, .shell-control:focus-visible .shell-tip { opacity: 1; }
+.shell-control[data-request-state="active"]::after, .shell-control[data-request-state="failed"]::after { content: ''; position: absolute; right: 2px; top: 2px; width: 8px; height: 8px; border: 2px solid #182930; border-radius: 50%; background: #c4e9c6; }
+.shell-control[data-request-state="failed"]::after { background: #ffb4a5; }
+#player-menu { width: min(640px, calc(100vw - 32px)); }
+.menu-session-details { margin-top: 22px; }
+.menu-session-details > summary { cursor: pointer; color: #c5d7d4; padding: 8px 0; }
+.menu-session-details[open] > summary { margin-bottom: 14px; }
+.code-game #menu-journal { max-height: 35dvh; overflow: auto; }
+@media (prefers-reduced-motion: reduce) { .shell-tip { transition: none; } }
+
+/* Authored code games supply their own controls; grid help is legacy-only. */
+.code-game #menu-help { display: none; }

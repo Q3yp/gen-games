@@ -1,3 +1,4 @@
+import { isWorldSave } from '../../public/code-world.js';
 import { registerCodeGame } from './registry.js';
 import { scaffoldCodeGame } from './source-workspace.js';
 import { requireValue as check } from './errors.js';
@@ -50,20 +51,22 @@ function freshness(engine, session) {
 export function openWorkspace(engine, args) {
   const session = resolveSession(engine, args), workspace = contextFor(engine, session);
   const scope = args.scope || 'all';
+  const managedWorld = isWorldSave(session.state);
   check(['all', 'metadata', ...sections].includes(scope), 'INVALID_SCOPE', 'Use all, metadata, brief, decisions, unresolved, or references.');
   check(args.afterVersion === undefined || Number.isInteger(args.afterVersion) && args.afterVersion >= 0 && args.afterVersion <= workspace.version,
     'STALE_WORKSPACE_CURSOR', 'afterVersion must be a previously observed workspace version, not a future version.');
   const selected = scope === 'all' ? sections : sections.includes(scope) ? [scope] : [];
   const context = Object.fromEntries(selected.filter(key => args.afterVersion === undefined || (workspace.sectionVersions[key] || 0) > args.afterVersion).map(key => [key, workspace[key]]));
   const data = { ...entry(engine, session), version: workspace.version, updatedAt: workspace.updatedAt,
-    basedOn: workspace.basedOn, stateKeys: Object.keys(session.state), context, freshness: freshness(engine, session),
+    basedOn: workspace.basedOn, stateKeys: Object.keys(managedWorld ? session.state.data : session.state), stateMode: managedWorld ? 'host' : 'legacy', context, freshness: freshness(engine, session),
     source: { gameId: session.gameId, editablePath: `games/${session.gameId}/`,
       sharing: 'All campaigns of this gameId share editable source. Publish targets only the specified session; other sessions retain immutable releases. Editable files may differ from pinned active/save releases. Use a distinct gameId/directory for independent source.',
       activeEntry: session.runtime?.activeEntry ?? null, saveEntry: session.runtime?.saveEntry ?? null },
     director: directorFor(engine).status(session.id),
     api: { contractVersion: 1, discover: { tool: 'discover', args: { sessionId: session.id } },
       capabilities: { tool: 'inspect', args: { sessionId: session.id, scope: 'capabilities' } },
-      save: { tool: 'inspect', args: { sessionId: session.id, scope: 'save' } },
+      save: { tool: 'inspect', args: { sessionId: session.id, scope: managedWorld ? 'world' : 'save' } },
+      ...(session.runtime ? { requests: { tool: 'player_request', args: { sessionId: session.id, op: 'list', status: 'open' } } } : {}),
       delta: { tool: 'observe', args: { sessionId: session.id, after: engine.store.head(session.id) } } }
   };
   return { text: workspaceText(data, args), data };

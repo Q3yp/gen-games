@@ -153,7 +153,8 @@ pending or previously visited garden. It preserves health and existing progress.
 Normal rejoin now works without a simultaneous host command: the independent
 player confirmed the distinct green garden and unchanged 2/5 health at 11:01 UTC.
 The roughly eighteen-minute gap remains a failure even though rejoining is fixed.
-The concluding encounter and actual garden arrival remain under independent play.
+At that checkpoint, the concluding encounter remained under independent play;
+the subsequent ending and qualified verdict are recorded in the next section.
 
 A disposable direct initialization/step check exercised the exact exported balcony
 save, entered the garden while paused, preserved two health, then repeated
@@ -182,5 +183,24 @@ was verified against the exact fresh session URL and 5/5 opening court.
 The earlier nullable command-schema failure also exposed an engine validator gap.
 A shared supported-subset validator now handles nullable type arrays, anyOf and
 nested field/item paths; documentation explicitly does not claim full JSON Schema.
-Direct function checks and pack/syntax validation passed. Like the scaffold and
-compact-text changes, this is not yet loaded into the active player server.
+Direct function checks and pack/syntax validation passed. At this stage these
+changes were held out of the active player server; they were loaded only after the
+clean journey finished, as recorded in the engine readiness audit.
+
+## Unchanged complete journey verdict
+
+The independent player completed the separate Homeward journey at Home, paused
+with 5/5 health. No host command, source change, hint or reset occurred during play.
+Every room transition worked. They deliberately left the first guards alive, used
+the environmental jar against the beetles, combined cover with outbound/return
+hits on the balcony, and reflected the concluding volley. Learned combinations
+made the voluntary replay worthwhile. They would choose new encounters with the
+weapon, but would not repeat this now-mastered route. Their verdict was a
+satisfying small arcade journey, not addiction or deep RPG progression.
+
+The exact source, actual final save and player screenshot are preserved in
+`docs/demo/homeward/`. The ending was restored into a separate new offline data
+directory with identical full state/source and no compatibility override. A new
+unstarted replay was created without changing the completed run. Passive native-
+window capture retained original sampled frames and timestamps; no generated or
+staged developer frames are evidence of this playthrough.
